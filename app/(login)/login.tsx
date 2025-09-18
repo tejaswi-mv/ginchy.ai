@@ -22,12 +22,12 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
   );
 
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
+    <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 via-blue-900 to-black">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <CircleIcon className="h-12 w-12 text-primary" />
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
           {mode === 'signin'
             ? 'Sign in to your account'
             : 'Create your account'}
@@ -42,7 +42,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           <div>
             <Label
               htmlFor="email"
-              className="block text-sm font-medium"
+              className="block text-sm font-medium text-white"
             >
               Email
             </Label>
@@ -64,7 +64,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           <div>
             <Label
               htmlFor="password"
-              className="block text-sm font-medium"
+              className="block text-sm font-medium text-white"
             >
               Password
             </Label>
@@ -116,7 +116,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-background text-muted-foreground">
+              <span className="px-2 bg-gradient-to-r from-slate-900 via-blue-900 to-black text-neutral-300">
                 {mode === 'signin'
                   ? 'New to our platform?'
                   : 'Already have an account?'}

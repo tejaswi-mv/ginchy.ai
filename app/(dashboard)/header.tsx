@@ -61,17 +61,6 @@ function UserMenu({ user }: { user: User }) {
   );
 }
 
-function SignInButton() {
-  return (
-    <Button
-      asChild
-      className="rounded-full bg-[#D7FF00] px-5 py-2 text-sm font-semibold text-black hover:bg-[#D7FF00]/90 transition"
-    >
-      <Link href="/sign-in">Sign in</Link>
-    </Button>
-  );
-}
-
 const tokens = {
   maxW: 'max-w-[1200px]',
   gutter: 'px-4 sm:px-6 lg:px-8',
@@ -80,7 +69,10 @@ const tokens = {
 
 function NavigationLinks() {
   const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard');
+  const isDashboard =
+    pathname?.startsWith('/dashboard') ||
+    pathname?.startsWith('/generate') ||
+    pathname?.startsWith('/pricing');
 
   if (isDashboard) {
     return (
@@ -102,6 +94,12 @@ function NavigationLinks() {
           className="text-neutral-300 hover:text-white transition"
         >
           Dashboard
+        </Link>
+        <Link
+          href="/generate"
+          className="text-neutral-300 hover:text-white transition"
+        >
+          Generate
         </Link>
       </nav>
     );
@@ -130,6 +128,18 @@ function NavigationLinks() {
       >
         Pricing
       </Link>
+      <a
+        href="#faq"
+        className="text-neutral-300 hover:text-white transition"
+      >
+        FAQ
+      </a>
+      <Link
+        href="/generate"
+        className="rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-600 transition"
+        >
+        Generate
+        </Link>
     </nav>
   );
 }
@@ -138,7 +148,7 @@ export default function DashboardHeader() {
   const { data: user, isLoading } = useSWR<User>('/api/user', fetcher);
   return (
     <header
-      className={`sticky top-0 z-50 bg-black text-white ${tokens.gutter}`}
+      className={`sticky top-0 z-50 bg-gradient-to-r from-slate-900/95 via-blue-900/95 to-black/95 backdrop-blur-md text-white ${tokens.gutter}`}
     >
       <div className={`mx-auto ${tokens.maxW} h-16 flex items-center`}>
         <div className="flex items-center gap-8">
@@ -153,7 +163,12 @@ export default function DashboardHeader() {
           ) : user ? (
             <UserMenu user={user} />
           ) : (
-            <SignInButton />
+            <Button
+              asChild
+              className="rounded-full bg-[#009AFF] px-5 py-2 text-sm font-semibold text-white hover:bg-[#009AFF]/90 transition"
+            >
+              <Link href="/sign-in">Sign in</Link>
+            </Button>
           )}
         </div>
       </div>

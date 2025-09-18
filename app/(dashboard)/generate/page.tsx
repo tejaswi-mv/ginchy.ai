@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,12 +16,162 @@ import {
   Video,
   X
 } from 'lucide-react';
+import { getPublicImages, getUserAssets, uploadAsset } from '@/app/(login)/actions';
+import { useActionState } from 'react';
+import useSWR from 'swr';
+import { User } from '@/lib/db/schema';
+import { useRouter } from 'next/navigation';
+
 
 type EnvironmentPreset = {
   id: string;
   name: string;
   thumbnail: string;
 };
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+// This component now handles both public and private assets
+function AssetLibrary({ type, title }: { type: 'characters' | 'poses' | 'environment' | 'garments' | 'accessory', title: string }) {
+  const { data: user } = useSWR<User>('/api/user', fetcher);
+  const router = useRouter();
+
+  const [assets, setAssets] = useState<{ name: string; url: string; }[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [uploadState, uploadAction] = useActionState<any, FormData>(uploadAsset, null);
+
+  useEffect(() => {
+    async function fetchAllAssets() {
+      const publicResult = await getPublicImages(type);
+      const publicData = publicResult.data || [];
+
+      if (user) {
+        const formData = new FormData();
+        formData.append('type', type);
+        // Using startTransition for the async action call
+        startTransition(async () => {
+            const userAssetsResult = await getUserAssets(null, formData);
+            const userData = (userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
+            setAssets([...publicData, ...userData]);
+        });
+      } else {
+        setAssets(publicData);
+      }
+    }
+    fetchAllAssets();
+  }, [type, user, uploadState]); // Re-fetch when user changes or after an upload
+
+  const handleUploadClick = () => {
+    if (!user) {
+      router.push('/sign-up');
+    } else {
+      document.getElementById(`file-upload-${type}`)?.click();
+    }
+  };
+  
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && user) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+      // Using startTransition to wrap the action
+      startTransition(() => {
+        uploadAction(formData);
+      });
+    }
+  };
+
+  const previewAssets = assets.slice(0, 5);
+
+  return (
+    <div>
+      <div className="grid grid-cols-5 gap-2">
+        {previewAssets.map((asset) => (
+          <img
+            key={asset.name}
+            src={asset.url}
+            className="aspect-square w-full rounded-md object-cover"
+            alt={asset.name}
+          />
+        ))}
+      </div>
+      <div className="mt-3 flex items-center gap-2">
+        <Button onClick={handleUploadClick} variant="outline" className="h-8 border-[#009AFF]/30 text-neutral-200 hover:border-[#009AFF]/50" disabled={isPending}>
+          <Upload className="mr-2 h-4 w-4" /> {isPending ? 'Uploading...' : 'Upload'}
+          <input
+            type="file"
+            id={`file-upload-${type}`}
+            className="sr-only"
+            onChange={handleFileUpload}
+            disabled={isPending}
+          />
+        </Button>
+        <Button
+          variant="ghost"
+          className="h-8 text-neutral-300 hover:text-[#009AFF]"
+          onClick={() => setIsModalOpen(true)}
+        >
+          View Library
+        </Button>
+      </div>
+      {uploadState?.error && <p className="text-red-500 text-xs mt-2">{uploadState.error}</p>}
+      {uploadState?.success && <p className="text-green-500 text-xs mt-2">{uploadState.success}</p>}
+      <AssetLibraryModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        assets={assets}
+        title={title}
+      />
+    </div>
+  );
+}
+
+function AssetLibraryModal({
+  open,
+  onClose,
+  assets,
+  title
+}: {
+  open: boolean;
+  onClose: () => void;
+  assets: { name: string; url: string; }[];
+  title: string;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
+      <div className="absolute left-1/2 top-1/2 w-[min(920px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[#009AFF]/20 bg-neutral-950 p-4 shadow-2xl">
+        <div className="flex items-center justify-between px-1 py-2">
+          <div className="text-sm font-medium text-neutral-200">{title}</div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-md hover:bg-[#009AFF]/10"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="mt-4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[70vh] overflow-y-auto">
+          {assets.map((asset) => (
+            <button
+              key={asset.name}
+              type="button"
+              onClick={() => { onClose(); }}
+              className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-[#009AFF]/50"
+            >
+              <img src={asset.url} alt={asset.name} className="h-full w-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function CollapsibleSection({
   title,
@@ -34,11 +184,11 @@ function CollapsibleSection({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-white/10 rounded-xl overflow-hidden bg-neutral-900/40">
+    <div className="border border-[#009AFF]/20 rounded-xl overflow-hidden bg-neutral-900/40">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm text-neutral-200 hover:bg-neutral-800/60"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm text-neutral-200 hover:bg-[#009AFF]/10"
       >
         <span className="font-medium">{title}</span>
         {open ? (
@@ -67,8 +217,8 @@ function Chip({
       onClick={onClick}
       className={`h-8 px-3 rounded-md text-sm border transition ${
         active
-          ? 'bg-[#B7FF2C] text-black border-[#B7FF2C]'
-          : 'bg-neutral-900/40 text-neutral-300 border-white/10 hover:bg-neutral-800'
+          ? 'bg-[#009AFF] text-white border-[#009AFF]'
+          : 'bg-neutral-900/40 text-neutral-300 border-white/10 hover:bg-[#009AFF]/10 hover:border-[#009AFF]/30'
       }`}
     >
       {label}
@@ -98,13 +248,13 @@ function EnvironmentModal({
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="absolute left-1/2 top-1/2 w-[min(920px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/15 bg-neutral-950 p-4 shadow-2xl">
+      <div className="absolute left-1/2 top-1/2 w-[min(920px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[#009AFF]/20 bg-neutral-950 p-4 shadow-2xl">
         <div className="flex items-center justify-between px-1 py-2">
           <div className="text-sm font-medium text-neutral-200">Environment</div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-white/10"
+            className="p-1.5 rounded-md hover:bg-[#009AFF]/10"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -116,7 +266,7 @@ function EnvironmentModal({
               placeholder="Search environment"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pl-9 bg-neutral-900 border-white/10 text-neutral-200 placeholder:text-neutral-500"
+              className="pl-9 bg-neutral-900 border-white/10 text-neutral-200 placeholder:text-neutral-500 focus:border-[#009AFF]/50 focus:ring-[#009AFF]/20"
             />
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
           </div>
@@ -125,7 +275,7 @@ function EnvironmentModal({
           <button
             type="button"
             onClick={() => undefined}
-            className="aspect-[4/3] rounded-xl border border-dashed border-white/15 grid place-items-center text-neutral-400 hover:bg-white/5"
+            className="aspect-[4/3] rounded-xl border border-dashed border-[#009AFF]/30 grid place-items-center text-neutral-400 hover:bg-[#009AFF]/5"
           >
             <div className="flex flex-col items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -137,7 +287,7 @@ function EnvironmentModal({
               key={p.id}
               type="button"
               onClick={() => onSelect(p)}
-              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 hover:border-white/30"
+              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 hover:border-[#009AFF]/50"
             >
               <img src={p.thumbnail} alt={p.name} className="h-full w-full object-cover" />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-left">
@@ -153,7 +303,7 @@ function EnvironmentModal({
 
 function GalleryCard({ src }: { src: string }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-neutral-900">
+    <div className="relative overflow-hidden rounded-2xl border border-[#009AFF]/20 bg-neutral-900">
       <img src={src} alt="Generated" className="h-full w-full object-cover" />
       <div className="absolute inset-x-0 top-0 flex items-center gap-2 p-2">
         <span className="rounded-md bg-black/70 px-2 py-1 text-[11px] text-neutral-200">S</span>
@@ -161,11 +311,11 @@ function GalleryCard({ src }: { src: string }) {
         <span className="rounded-md bg-black/70 px-2 py-1 text-[11px] text-neutral-200">4:5</span>
       </div>
       <div className="absolute right-2 top-2 flex gap-2">
-        <Button size="sm" variant="secondary" className="h-7 px-2 bg-black/70 text-white hover:bg-black/60">
+        <Button size="sm" variant="secondary" className="h-7 px-2 bg-black/70 text-white hover:bg-[#009AFF]/20">
           <Video className="h-3.5 w-3.5" />
           <span className="ml-1 text-xs">Video</span>
         </Button>
-        <Button size="sm" variant="secondary" className="h-7 px-2 bg-black/70 text-white hover:bg-black/60">
+        <Button size="sm" variant="secondary" className="h-7 px-2 bg-black/70 text-white hover:bg-[#009AFF]/20">
           <Edit3 className="h-3.5 w-3.5" />
           <span className="ml-1 text-xs">Edit</span>
         </Button>
@@ -199,14 +349,14 @@ export default function GeneratePage() {
   ];
 
   return (
-    <main className="bg-neutral-950 text-neutral-100">
+    <main className="bg-gradient-to-br from-slate-900 via-blue-900 to-black text-neutral-100 min-h-screen">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-12 gap-4">
           {/* Sidebar (left menu + controls) */}
           <aside className="col-span-12 lg:col-span-4 xl:col-span-3 space-y-4">
             {/* App left menu */}
-            <div className="rounded-2xl border border-white/10 bg-neutral-900/60">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+            <div className="rounded-2xl border border-[#009AFF]/20 bg-neutral-900/60">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#009AFF]/20">
                 <div className="flex items-center gap-2">
                   <Menu className="h-4 w-4 text-neutral-400" />
                   
@@ -221,7 +371,7 @@ export default function GeneratePage() {
                   <a
                     key={item.label}
                     href={item.href}
-                    className="block rounded-lg px-3 py-2 text-sm text-neutral-200 hover:bg-white/10"
+                    className="block rounded-lg px-3 py-2 text-sm text-neutral-200 hover:bg-[#009AFF]/10"
                   >
                     {item.label}
                   </a>
@@ -230,95 +380,36 @@ export default function GeneratePage() {
             </div>
 
             {/* Generate panel */}
-            <div className="rounded-2xl border border-white/10 bg-neutral-900/60 p-4 space-y-4">
+            <div className="rounded-2xl border border-[#009AFF]/20 bg-neutral-900/60 p-4 space-y-4">
               <div>
                 <div className="text-sm font-semibold">Generate Images</div>
                 <p className="mt-2 text-xs text-neutral-400">
-                  Describe your image style (e.g., “red hoodie on tall male model”)…
+                  Describe your image style (e.g., "red hoodie on tall male model")…
                 </p>
                 <textarea
                   rows={3}
                   placeholder="Describe your image style..."
-                  className="mt-2 w-full rounded-lg border border-white/10 bg-neutral-950/60 p-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#B7FF2C]"
+                  className="mt-2 w-full rounded-lg border border-white/10 bg-neutral-950/60 p-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#009AFF]"
                 />
-                <Button variant="outline" className="mt-2 h-8 gap-2 border-white/15 text-neutral-200">
+                <Button variant="outline" className="mt-2 h-8 gap-2 border-[#009AFF]/30 text-neutral-200 hover:border-[#009AFF]/50">
                   <Upload className="h-4 w-4" /> Upload images
                 </Button>
               </div>
 
               <CollapsibleSection title="Model" defaultOpen>
-                <div className="flex items-center gap-2 overflow-x-auto">
-                  {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <img
-                      key={i}
-                      src={`https://i.pravatar.cc/80?img=${i}`}
-                      className="h-10 w-10 rounded-md object-cover"
-                      alt="model"
-                    />
-                  ))}
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <Button variant="outline" className="h-8 border-white/15 text-neutral-200">
-                    <Upload className="mr-2 h-4 w-4" /> Upload
-                  </Button>
-                  <Button variant="ghost" className="h-8 text-neutral-300">
-                    View Library
-                  </Button>
-                </div>
+                <AssetLibrary type="characters" title="Model Library" />
               </CollapsibleSection>
 
               <CollapsibleSection title="Model Poses" defaultOpen>
-                <div className="grid grid-cols-6 gap-2">
-                  {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <img
-                      key={i}
-                      src={`https://picsum.photos/seed/pose${i}/80/80`}
-                      className="aspect-square w-full rounded-md object-cover"
-                      alt="pose"
-                    />
-                  ))}
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <Button variant="outline" className="h-8 border-white/15 text-neutral-200">
-                    <Upload className="mr-2 h-4 w-4" /> Upload
-                  </Button>
-                  <Button variant="ghost" className="h-8 text-neutral-300">
-                    View Library
-                  </Button>
-                </div>
+                <AssetLibrary type="poses" title="Pose Library" />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Garment">
-                <div className="grid grid-cols-5 gap-2">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <img
-                      key={i}
-                      src={`https://picsum.photos/seed/gar${i}/120/120`}
-                      className="aspect-square w-full rounded-md object-cover"
-                      alt="garment"
-                    />
-                  ))}
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <Button variant="outline" className="h-8 border-white/15 text-neutral-200">
-                    <Upload className="mr-2 h-4 w-4" /> Upload
-                  </Button>
-                  <Button variant="ghost" className="h-8 text-neutral-300">
-                    View Library
-                  </Button>
-                </div>
+              <CollapsibleSection title="Garment" defaultOpen>
+                <AssetLibrary type="garments" title="Garment Library" />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Environment">
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    onClick={() => setEnvironmentOpen(true)}
-                    className="h-8 bg-white/10 text-white hover:bg-white/20"
-                  >
-                    Browse presets
-                  </Button>
-                </div>
+              <CollapsibleSection title="Environment" defaultOpen>
+                <AssetLibrary type="environment" title="Environment Library" />
               </CollapsibleSection>
 
               <CollapsibleSection title="Camera Settings">
@@ -362,7 +453,7 @@ export default function GeneratePage() {
               </CollapsibleSection>
 
               <div className="pt-1">
-                <Button className="w-full bg-[#B7FF2C] text-black hover:brightness-95">Generate Image</Button>
+                <Button className="w-full bg-[#009AFF] text-white hover:brightness-95">Generate Image</Button>
                 <div className="mt-1 text-right text-[11px] text-neutral-400">1 credit</div>
               </div>
             </div>
@@ -370,7 +461,7 @@ export default function GeneratePage() {
 
           {/* Main gallery */}
           <section className="col-span-12 lg:col-span-8 xl:col-span-9 space-y-4">
-            <div className="rounded-2xl border border-white/10 bg-neutral-900/60 p-4">
+            <div className="rounded-2xl border border-[#009AFF]/20 bg-neutral-900/60 p-4">
               <div className="text-sm font-medium text-neutral-300">Generated Images</div>
               <p className="mt-1 text-xs text-neutral-500">
                 These are just examples. Describe a garment or style to try it yourself!
@@ -395,5 +486,3 @@ export default function GeneratePage() {
     </main>
   );
 }
-
-

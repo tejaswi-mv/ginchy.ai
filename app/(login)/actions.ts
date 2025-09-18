@@ -26,6 +26,7 @@ import {
   validatedAction,
   validatedActionWithUser
 } from '@/lib/auth/middleware';
+import { supabase } from '@/lib/supabase/client';
 
 async function logActivity(
   teamId: number | null | undefined,
@@ -360,7 +361,7 @@ export const updateAccount = validatedActionWithUser(
 );
 
 const removeTeamMemberSchema = z.object({
-  memberId: z.number()
+  memberId: z.string().transform(Number)
 });
 
 export const removeTeamMember = validatedActionWithUser(
@@ -456,5 +457,92 @@ export const inviteTeamMember = validatedActionWithUser(
     // await sendInvitationEmail(email, userWithTeam.team.name, role)
 
     return { success: 'Invitation sent successfully' };
+  }
+);
+
+export async function getPublicImages(folderPath: string) {
+  try {
+    const { data: fileList, error } = await supabase.storage
+      .from('public-assets') // Your PUBLIC bucket name
+      .list(folderPath, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+      });
+
+    if (error) {
+      throw error;
+    }
+    
+    if (!fileList) {
+        return { data: [] };
+    }
+
+    const images = fileList.map(file => {
+      const { data: { publicUrl } } = supabase.storage
+        .from('public-assets') // Your PUBLIC bucket name
+        .getPublicUrl(`${folderPath}/${file.name}`);
+      return { name: file.name, url: publicUrl };
+    });
+
+    return { data: images };
+
+  } catch (error) {
+    console.error('Error fetching public images:', error);
+    return { error: 'Failed to fetch public images.' };
+  }
+}
+
+export const getUserAssets = validatedActionWithUser(
+  z.object({
+    type: z.enum(['characters', 'poses', 'environment', 'garments', 'accessory']),
+  }),
+  async ({ type }, _, user) => {
+
+    const { data: fileList, error } = await supabase.storage
+      .from(type) // Private bucket
+      .list(`${user.id}`); 
+
+    if (error) {
+      console.error('Error fetching user assets:', error);
+      return { error: 'Failed to fetch your assets.' };
+    }
+
+    if (!fileList) {
+        return { data: [] };
+    }
+
+    const images = fileList.map(file => {
+      const { data: { publicUrl } } = supabase.storage
+        .from(type)
+        .getPublicUrl(`${user.id}/${file.name}`);
+      return { name: file.name, url: publicUrl, isOwner: true };
+    });
+
+    return { data: images };
+  }
+);
+
+export const uploadAsset = validatedActionWithUser(
+  z.object({
+    file: z.instanceof(File),
+    type: z.string(),
+  }),
+  async (data, _, user) => {
+    const { file, type } = data;
+    const filePath = `${user.id}/${file.name}`;
+
+    const { error } = await supabase.storage
+      .from(type) // private bucket
+      .upload(filePath, file, {
+          upsert: true // Overwrite file if it exists
+      });
+
+    if (error) {
+      console.error('Error uploading asset:', error);
+      return { error: 'Failed to upload asset.' };
+    }
+
+    return { success: 'Asset uploaded successfully!' };
   }
 );

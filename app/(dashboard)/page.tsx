@@ -1,8 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Cog, ArrowRight, X, ChevronLeft, ChevronRight } from "lucide-react"; // icons
+import { Cog, ArrowRight, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
+import { askQuestion, getPublicCharacters } from './actions';
+import useSWR from 'swr';
+import { User } from '@/lib/db/schema';
+import { useRouter } from "next/navigation";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const tokens = {
   maxW: "max-w-[1200px]",
@@ -10,71 +18,47 @@ const tokens = {
   grid: "grid grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-8",
 };
 
-// Image gallery data - mapping each image to related images
-const imageGallery = {
-  "/images/Woman.png": [
-    "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
-    "/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png",
-    "/images/woman v2.png"
-  ],
-  "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg": [
-    "/images/Woman.png",
-    "/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png",
-    "/images/woman v2.png"
-  ],
-  "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg": [
-    "/images/romain.gn_A_hand_holding_a_phone_--ar_5877_--raw_--profile_h5_5161a1f7-02d7-43a3-afd2-b77925b50fab_0.png",
-    "/images/Woman.png"
-  ],
-  "/images/romain.gn_A_hand_holding_a_phone_--ar_5877_--raw_--profile_h5_5161a1f7-02d7-43a3-afd2-b77925b50fab_0.png": [
-    "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg",
-    "/images/Woman.png"
-  ],
-  "/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png": [
-    "/images/Woman.png",
-    "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
-    "/images/woman v2.png"
-  ],
-  "/images/woman v2.png": [
-    "/images/Woman.png",
-    "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
-    "/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png"
-  ],
-  "/images/website.png": [
-    "/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png",
-    "/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53455 (1).png"
-  ],
-  "/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png": [
-    "/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png",
-    "/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png",
-    "/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png"
-  ],
-  "/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png": [
-    "/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png",
-    "/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png",
-    "/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png"
-  ],
-  "/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png": [
-    "/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png",
-    "/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png",
-    "/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png"
-  ],
-  "/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png": [
-    "/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png",
-    "/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png",
-    "/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png"
-  ],
-  "/images/image (1).png": [
-    "/images/freepik__make-text-and-style-and-buttons-into-more-this-vib__85504 (1).png",
-    "/images/Woman.png"
-  ],
-  "/images/freepik__make-text-and-style-and-buttons-into-more-this-vib__85504 (1).png": [
-    "/images/image (1).png",
-    "/images/Woman.png"
-  ]
+type Character = {
+  name: string;
+  url: string;
 };
 
-// Modal component for image gallery
+// ================== MODAL COMPONENTS ==================
+
+function ModelLibraryModal({ isOpen, onClose, characters, onSelect }: {
+    isOpen: boolean;
+    onClose: () => void;
+    characters: Character[];
+    onSelect: (character: Character) => void;
+}) {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div className="relative bg-white rounded-2xl p-6 max-w-4xl w-full text-black">
+                <h3 className="text-xl font-bold">Model Library</h3>
+                <p className="text-neutral-600 text-sm mt-1">Select a model to preview.</p>
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 mt-6 max-h-[70vh] overflow-y-auto">
+                    {characters.map((char) => (
+                        <div key={char.name} className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group" onClick={() => onSelect(char)}>
+                            <Image src={char.url} alt={char.name} fill className="object-cover transition-transform duration-200 group-hover:scale-105"/>
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                        </div>
+                    ))}
+                </div>
+                <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition">
+                    <X className="w-5 h-5 text-black"/>
+                </button>
+            </div>
+        </div>
+    );
+}
+
+const imageGallery: Record<string, string[]> = {
+  "/images/Woman.png": ["/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg", "/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png", "/images/woman v2.png"],
+  "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg": ["/images/romain.gn_A_hand_holding_a_phone_--ar_5877_--raw_--profile_h5_5161a1f7-02d7-43a3-afd2-b77925b50fab_0.png"],
+};
+
 const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
   isOpen: boolean;
   onClose: () => void;
@@ -138,7 +122,7 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
               key={image}
               onClick={() => setCurrentIndex(index)}
               className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition ${
-                index === currentIndex ? 'border-[#B7FF2C]' : 'border-transparent'
+                index === currentIndex ? 'border-[#009AFF]' : 'border-transparent'
               }`}
             >
               <Image
@@ -160,6 +144,96 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
     </div>
   );
 };
+
+// ================== PAGE SECTIONS ==================
+
+function ChooseModelSection() {
+    const { data: user } = useSWR<User>('/api/user', fetcher);
+    const router = useRouter();
+    const [characters, setCharacters] = useState<Character[]>([]);
+    const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        async function fetchCharacters() {
+            const result = await getPublicCharacters();
+            if (result.data) {
+                setCharacters(result.data);
+                if (result.data.length > 0) {
+                    setSelectedCharacter(result.data[0]);
+                }
+            }
+        }
+        fetchCharacters();
+    }, []);
+
+    const handleBrowseLibrary = () => {
+        if (!user) {
+            router.push('/sign-in?redirect=/');
+        } else {
+            setIsModalOpen(true);
+        }
+    };
+    
+    const handleSelectCharacter = (character: Character) => {
+        setSelectedCharacter(character);
+        setIsModalOpen(false);
+    };
+
+    const previewCharacters = characters.slice(0, 18);
+
+    return (
+        <section className={`${tokens.gutter} py-20 bg-white`}>
+            <div className={`mx-auto ${tokens.maxW}`}>
+                <div className="relative rounded-[24px] bg-white border-[8px] border-black p-6 sm:p-8 lg:p-10">
+                    <div>
+                        <h2 className="text-center text-[32px] font-bold text-black mb-2">
+                            CHOOSE YOUR MODEL
+                        </h2>
+                        <p className="text-center text-[14px] text-neutral-600 mb-8">
+                            Browse our diverse library or generate a custom one.
+                        </p>
+                        <div className="grid grid-cols-12 gap-6 items-center">
+                            <div className="col-span-12 lg:col-span-7">
+                                <div className="relative rounded-lg overflow-hidden mb-6 p-4 border border-neutral-200">
+                                    <div className="grid grid-cols-6 gap-2">
+                                        {previewCharacters.map((char) => (
+                                            <div key={char.name} className="relative aspect-square rounded-md overflow-hidden cursor-pointer group" onClick={() => handleSelectCharacter(char)}>
+                                                <Image src={char.url} alt={char.name} fill className="object-cover transition-transform duration-200 group-hover:scale-105"/>
+                                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-full px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
+                                        BROWSE LIBRARY
+                                    </button>
+                                    <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-full px-6 py-3 font-semibold hover:bg-neutral-700 transition">
+                                        GENERATE CUSTOM MODEL
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="col-span-12 lg:col-span-5">
+                                <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200">
+                                    {selectedCharacter ? <Image src={selectedCharacter.url} alt={selectedCharacter.name} unoptimized fill className="object-contain" /> : <div className="w-full h-full flex items-center justify-center text-neutral-400">Select a model</div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ModelLibraryModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                characters={characters}
+                onSelect={handleSelectCharacter}
+            />
+        </section>
+    );
+}
+
+// ================== MAIN PAGE COMPONENT ==================
 
 export default function LandingPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -203,13 +277,15 @@ export default function LandingPage() {
     }
   };
 
+  const [state, formAction] = useActionState(askQuestion, { message: '' });
+
   return (
-    <main className="relative min-h-screen bg-black text-white antialiased">
+    <main className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-black text-white antialiased overflow-hidden">
       {/* neon background accents */}
       <div className="pointer-events-none absolute -z-10 inset-0">
-        <div className="absolute left-[-120px] top-24 h-[260px] w-[260px] rounded-full bg-[#B7FF2C] blur-[120px] opacity-25"></div>
-        <div className="absolute right-[-100px] top-[520px] h-[300px] w-[300px] rounded-full bg-[#B7FF2C] blur-[140px] opacity-20"></div>
-        <div className="absolute left-1/3 bottom-[-120px] h-[280px] w-[280px] rounded-full bg-[#B7FF2C] blur-[140px] opacity-15"></div>
+        <div className="absolute left-[-120px] top-24 h-[260px] w-[260px] rounded-full bg-[#009AFF] blur-[120px] opacity-25"></div>
+        <div className="absolute right-[-100px] top-[520px] h-[300px] w-[300px] rounded-full bg-[#009AFF] blur-[140px] opacity-20"></div>
+        <div className="absolute left-1/3 bottom-[-120px] h-[280px] w-[280px] rounded-full bg-[#009AFF] blur-[140px] opacity-15"></div>
       </div>
    
 
@@ -219,18 +295,18 @@ export default function LandingPage() {
           <div className={tokens.grid}>
             {/* Left: copy */}
             <div className="col-span-12 lg:col-span-6 flex flex-col justify-center">
-              <h1 className="font-[var(--font-display)] text-[64px] sm:text-[72px] lg:text-[88px] font-extrabold leading-[0.95] tracking-tight">
-                <span className="text-[#D7FF00] drop-shadow-[0_0_22px_rgba(215,255,0,0.25)]">UNLOCK</span>
+              <h1 className="font-[var(--font-display)] text-[48px] sm:text-[64px] lg:text-[88px] font-extrabold leading-[0.95] tracking-tight">
+                <span className="text-[#009AFF] drop-shadow-[0_0_22px_rgba(0,154,255,0.25)]">UNLOCK</span>
                 <br />
                 <span className="italic">GROWTH</span>
               </h1>
-              <p className="mt-6 text-[18px] sm:text-[20px] text-neutral-200 max-w-xl leading-relaxed">
+              <p className="mt-6 text-[16px] sm:text-[18px] lg:text-[20px] text-neutral-200 max-w-xl leading-relaxed">
                 Adopt the industry’s leading AI platform for in-house creation of PDP, Lookbook, and Campaign visuals.
               </p>
-              <p className="mt-3 text-[#D7FF00] drop-shadow-[0_0_16px_rgba(215,255,0,0.35)] font-semibold tracking-wider text-[20px]">[ with Ginchy ]</p>
+              <p className="mt-3 text-[#009AFF] drop-shadow-[0_0_16px_rgba(0,154,255,0.35)] font-semibold tracking-wider text-[18px] sm:text-[20px]">[ with Ginchy ]</p>
               <div className="mt-6">
                 {/* CTA duplicated below hero media per screenshot; keep here for mobile */}
-                <a href="#try" className="inline-flex lg:hidden items-center justify-center gap-2 rounded-full bg-[#D7FF00] px-8 py-3.5 text-black text-lg font-semibold hover:brightness-95 transition shadow-[0_0_0_8px_rgba(183,255,44,0.12)]">Try it now <ArrowRight className="w-5 h-5" /></a>
+                <a href="#try" className="inline-flex lg:hidden items-center justify-center gap-2 rounded-full bg-[#009AFF] px-8 py-3.5 text-white text-lg font-semibold hover:brightness-95 transition shadow-[0_0_0_8px_rgba(0,154,255,0.12)]">Try it now <ArrowRight className="w-5 h-5" /></a>
               </div>
             </div>
 
@@ -241,7 +317,7 @@ export default function LandingPage() {
               </div>
               {/* CTA under hero showcase on desktop */}
               <div className="hidden lg:block mt-6">
-                <a href="#try" className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#D7FF00] px-10 py-4 text-black text-xl font-semibold hover:brightness-95 transition shadow-[0_0_0_10px_rgba(183,255,44,0.12)]">Try it now <ArrowRight className="w-6 h-6" /></a>
+                <a href="#try" className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#009AFF] px-10 py-4 text-white text-xl font-semibold hover:brightness-95 transition shadow-[0_0_0_10px_rgba(0,154,255,0.12)]">Try it now <ArrowRight className="w-6 h-6" /></a>
               </div>
             </div>
           </div>
@@ -251,10 +327,10 @@ export default function LandingPage() {
       {/* ================== SECTION 2 — Create/All types ================== */}
       <section className={`${tokens.gutter} py-20 bg-black text-white`} id="about">
         <div className={`mx-auto ${tokens.maxW}`}>
-          <div className={tokens.grid}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left column: title + media with benefits on the right */}
-            <div className="col-span-12 lg:col-span-7">
-              <h2 className="font-[var(--font-display)] text-[30px] sm:text-[36px] font-extrabold tracking-tight mb-6 max-w-2xl">
+            <div className="col-span-1 lg:col-span-7">
+              <h2 className="font-[var(--font-display)] text-[28px] sm:text-[36px] font-extrabold tracking-tight mb-6 max-w-2xl">
                 Create, amplify and scale professional product content.
               </h2>
               <div className="grid grid-cols-12 gap-6 items-start">
@@ -290,10 +366,10 @@ export default function LandingPage() {
 
             {/* Right column: heading + three cards layout */}
             <div className="col-span-12 lg:col-span-5">
-              <h2 className="font-[var(--font-display)] text-[34px] sm:text-[40px] font-extrabold tracking-tight mb-6 uppercase">
+              <h2 className="font-[var(--font-display)] text-[30px] sm:text-[40px] font-extrabold tracking-tight mb-6 uppercase">
                 ALL TYPES OF
                 <br />
-                <span className="italic text-[#D7FF00]">[ fashion items ]</span>
+                <span className="italic text-[#009AFF]">[ fashion items ]</span>
               </h2>
               <div className="grid grid-cols-1 gap-4">
                 {/* Top row: shoes with small label on the right */}
@@ -326,123 +402,19 @@ export default function LandingPage() {
       </section>
 
       {/* ================== SECTION 3 — AI outfit / Choose your model ================== */}
-      <section className={`${tokens.gutter} py-20 bg-white`}>
-        <div className={`mx-auto ${tokens.maxW}`}>
-          <div className="relative rounded-[24px] bg-white border-[8px] border-black p-6 sm:p-8 lg:p-10">
-
-            {/* AI outfit generated section */}
-            <div className="mb-16">
-              <h2 className="text-center text-[20px] font-semibold text-neutral-900 mb-6">
-                AI outfit generated with Genchy AI technology
-              </h2>
-              
-              {/* Outfit grid - matching screenshot layout exactly with proper sizing */}
-              <div className="flex items-center justify-center gap-6">
-                {/* Woman in car - far left */}
-                <div className="relative w-48 h-60 rounded-lg overflow-hidden bg-neutral-200">
-                  <Image src="/images/Woman.png" alt="Woman in car" unoptimized fill className="object-cover" />
-                </div>
-                
-                {/* Athletic outfit - middle left */}
-                <div className="relative w-48 h-60 rounded-lg overflow-hidden bg-neutral-200">
-                  <Image src="/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg" alt="Athletic outfit" unoptimized fill className="object-cover" />
-                </div>
-                
-                {/* Center - 3x2 clothing grid - larger size */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-neutral-200">
-                    <Image src="https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Black tee" unoptimized fill className="object-cover" />
-                  </div>
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-neutral-200">
-                    <Image src="https://images.pexels.com/photos/1964970/pexels-photo-1964970.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Cargo vest" unoptimized fill className="object-cover" />
-                  </div>
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-neutral-200 border-2 border-yellow-400">
-                    <Image src="https://images.pexels.com/photos/1055691/pexels-photo-1055691.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Black dress" unoptimized fill className="object-cover" />
-                  </div>
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-neutral-200">
-                    <Image src="https://images.pexels.com/photos/2026960/pexels-photo-2026960.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Black dress 2" unoptimized fill className="object-cover" />
-                  </div>
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-neutral-200">
-                    <Image src="https://images.pexels.com/photos/1597554/pexels-photo-1597554.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Flared pant" unoptimized fill className="object-cover" />
-                  </div>
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-neutral-200">
-                    <Image src="https://images.pexels.com/photos/1485637/pexels-photo-1485637.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Asymmetrical top" unoptimized fill className="object-cover" />
-                  </div>
-                </div>
-                
-                {/* Man in grey shirt - middle right */}
-                <div className="relative w-48 h-60 rounded-lg overflow-hidden bg-neutral-200">
-                  <Image src="/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg" alt="Man in grey shirt" unoptimized fill className="object-cover" />
-                </div>
-                
-                {/* Man in cream outfit - far right */}
-                <div className="relative w-48 h-60 rounded-lg overflow-hidden bg-neutral-200">
-                  <Image src="/images/romain.gn_A_hand_holding_a_phone_--ar_5877_--raw_--profile_h5_5161a1f7-02d7-43a3-afd2-b77925b50fab_0.png" alt="Man in cream outfit" unoptimized fill className="object-cover" />
-                </div>
-              </div>
-            </div>
-
-            {/* Choose your model section */}
-            <div>
-              <h2 className="text-center text-[32px] font-bold text-black mb-2">
-                CHOOSE YOUR MODEL
-              </h2>
-              <p className="text-center text-[14px] text-neutral-600 mb-8">
-                Browse our diverse library or generate a custom one.
-              </p>
-              
-              {/* Model grid and buttons */}
-              <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-12 lg:col-span-8">
-                  {/* Model headshots grid - using the original image with click functionality */}
-                  <div 
-                    className="relative rounded-lg overflow-hidden mb-6 cursor-pointer hover:scale-105 transition-transform duration-200"
-                    onClick={() => openModal("/images/freepik__make-text-and-style-and-buttons-into-more-this-vib__85504 (1).png")}
-                  >
-                    <Image 
-                      src="/images/freepik__make-text-and-style-and-buttons-into-more-this-vib__85504 (1).png" 
-                      alt="Model headshots grid" 
-                      unoptimized 
-                      width={800} 
-                      height={400} 
-                      className="w-full h-auto" 
-                    />
-                  </div>
-                  
-                  {/* Buttons */}
-                  <div className="flex gap-4">
-                    <button className="flex-1 border border-black rounded-lg px-6 py-3 text-black font-semibold hover:bg-neutral-50 transition">
-                      BROWSE LIBRARY
-                    </button>
-                    <button className="flex-1 bg-neutral-800 text-white rounded-lg px-6 py-3 font-semibold hover:bg-neutral-700 transition">
-                      GENERATE CUSTOM MODEL
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Right side - full body model */}
-                <div className="col-span-12 lg:col-span-4">
-                  <div className="relative w-full h-[500px] rounded-lg overflow-hidden bg-neutral-200">
-                    <Image src="/images/image (1).png" alt="Full body model" unoptimized fill className="object-contain" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ChooseModelSection />
 
       {/* ================== SECTION 4 — Customize your pictures ================== */}
       <section className={`${tokens.gutter} py-24 bg-black text-white`} id="examples">
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Title with exact font and color from screenshot */}
-          <h2 className="text-center font-bold text-[#B7FF2C] text-[32px] leading-tight mb-10">
+          <h2 className="text-center font-bold text-[#009AFF] text-[28px] sm:text-[32px] leading-tight mb-10">
             Customize your pictures the way you want
-            <span className="text-[#B7FF2C] ml-1">✱</span>
+            <span className="text-[#009AFF] ml-1">✱</span>
           </h2>
 
           {/* container with left padding so the vertical pill is always visible */}
-          <div className="relative pl-20 overflow-visible">
+          <div className="relative pl-16 sm:pl-20 overflow-visible">
             {/* vertical lime pill - exact styling from screenshot */}
             <div className="absolute left-0 top-0 h-full z-10">
               <div 
@@ -450,49 +422,49 @@ export default function LandingPage() {
                 onClick={handleGetAccess}
               >
                 {/* lime gradient fill */}
-                <div className="absolute inset-0 bg-[#B7FF2C]" />
+                <div className="absolute inset-0 bg-[#009AFF]" />
                 {/* vertical label - text from bottom to top */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="rotate-[-90deg] font-black text-black text-sm tracking-wider whitespace-nowrap">
-                    Get Access Now →
+                    GET ACCESS
                   </span>
                 </div>
               </div>
             </div>
 
             {/* four tall images row - professional images as specified */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
               {/* Sample placeholder - Desert scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#B7FF2C] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png" alt="Sample placeholder" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_12px_rgba(183,255,44,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_14px_rgba(183,255,44,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 2 - New York scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#B7FF2C] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png" alt="Customized 2" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_12px_rgba(183,255,44,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_14px_rgba(183,255,44,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 3 - White studio scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#B7FF2C] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_12px_rgba(183,255,44,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_14px_rgba(183,255,44,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 4 - Snow environment scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#B7FF2C] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png" alt="Customized 4" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_12px_rgba(183,255,44,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#B7FF2C] rounded-sm shadow-[0_0_14px_rgba(183,255,44,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
             </div>
 
             {/* Bottom text - exact styling from screenshot */}
-            <p className="mt-8 text-center font-bold text-[#B7FF2C] text-[32px] tracking-wide">
+            <p className="mt-8 text-center font-bold text-[#009AFF] text-[24px] sm:text-[32px] tracking-wide">
               Consistency Models + Unlimited Environments + Much more
             </p>
           </div>
@@ -503,7 +475,7 @@ export default function LandingPage() {
       <section className={`${tokens.gutter} py-24 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Main interactive display area - just placeholder for the entire image */}
-          <div className="relative aspect-[16/9] rounded-3xl overflow-hidden border-2 border-[#B7FF2C] bg-neutral-900 shadow-[0_0_40px_rgba(183,255,44,0.40)]">
+          <div className="relative aspect-[16/9] rounded-3xl overflow-hidden border-2 border-[#009AFF] bg-neutral-900 shadow-[0_0_40px_rgba(0,154,255,0.40)]">
             <div className="grid grid-cols-3 grid-rows-2 w-full h-full gap-2 p-2">
               <div className="relative col-span-1 row-span-1 rounded-2xl overflow-hidden"><Image src="https://images.pexels.com/photos/3772510/pexels-photo-3772510.jpeg?auto=compress&cs=tinysrgb&w=800" alt="GenAI Model 1" fill className="object-cover" unoptimized /></div>
               <div className="relative col-span-1 row-span-1 rounded-2xl overflow-hidden"><Image src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=800" alt="GenAI Model 2" fill className="object-cover" unoptimized /></div>
@@ -518,8 +490,8 @@ export default function LandingPage() {
       {/* ================== SECTION 5 — Personalize your outfit ================== */}
       <section className={`${tokens.gutter} py-24 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
-          <h2 className="text-center text-4xl font-extrabold tracking-tight text-[#B7FF2C] mb-16 drop-shadow-[0_0_14px_rgba(183,255,44,0.45)]">
-            Personalize your outfit<span className="ml-2 text-[#B7FF2C]">✱</span>
+          <h2 className="text-center text-3xl sm:text-4xl font-extrabold tracking-tight text-[#009AFF] mb-16 drop-shadow-[0_0_14px_rgba(0,154,255,0.45)]">
+            Personalize your outfit<span className="ml-2 text-[#009AFF]">✱</span>
           </h2>
 
           {/* two main sections - SOCIAL MEDIA and PRODUCT PAGES */}
@@ -547,7 +519,7 @@ export default function LandingPage() {
               </div>
 
               {/* Section label */}
-              <p className="text-center text-[#B7FF2C] font-bold text-sm tracking-wider">
+              <p className="text-center text-[#009AFF] font-bold text-sm tracking-wider">
                 [SOCIAL MEDIA]
               </p>
 
@@ -561,12 +533,12 @@ export default function LandingPage() {
             {/* RIGHT SECTION - PRODUCT PAGES */}
             <div className="space-y-6">
               {/* Product page image */}
-              <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-800 border-2 border-[#B7FF2C]">
+              <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-800 border-2 border-[#009AFF]">
                 <Image src="/images/website.png" alt="Product page" unoptimized fill className="object-cover" />
               </div>
 
               {/* Section label */}
-              <p className="text-center text-[#B7FF2C] font-bold text-sm tracking-wider">
+              <p className="text-center text-[#009AFF] font-bold text-sm tracking-wider">
                 [PRODUCT PAGES]
               </p>
 
@@ -590,7 +562,7 @@ export default function LandingPage() {
           {/* divider with glow */}
           <div className="relative mt-16">
             <div className="h-px bg-white/30 mx-auto max-w-2xl"></div>
-            <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-56 w-56 rounded-full bg-[#B7FF2C] blur-3xl opacity-20"></div>
+            <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-56 w-56 rounded-full bg-[#009AFF] blur-3xl opacity-20"></div>
           </div>
         </div>
       </section>
@@ -599,18 +571,18 @@ export default function LandingPage() {
       <section className={`${tokens.gutter} py-24 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Section Title */}
-          <h2 className="text-center text-2xl font-bold text-white mb-4 uppercase tracking-wide whitespace-nowrap">
+          <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-4 uppercase tracking-wide">
             WHAT OUR USERS THINK ABOUT GENCHY AI
           </h2>
           
           {/* Subtitle */}
-          <p className="text-center text-white/80 text-lg mb-16">
-            Real feedback from real people<br />I&apos;ve had the pleasure to work with.
+          <p className="text-center text-white/80 text-base sm:text-lg mb-16">
+            Real feedback from real people<br />I've had the pleasure to work with.
           </p>
 
           {/* Testimonial Cards */}
           <div className="flex justify-center">
-            <div className="relative w-[400px] max-w-full rounded-2xl bg-white text-black p-6 shadow-[0_0_40px_rgba(183,255,44,0.60)] border border-[#B7FF2C]">
+            <div className="relative w-[400px] max-w-full rounded-2xl bg-white text-black p-6 shadow-[0_0_40px_rgba(0,154,255,0.60)] border border-[#009AFF]">
               {/* Profile Picture */}
               <div className="flex items-start space-x-4 mb-4">
                 <div className="relative">
@@ -643,7 +615,7 @@ export default function LandingPage() {
         <div className={`mx-auto ${tokens.maxW}`}>
           <h2 className="text-center text-3xl sm:text-4xl font-extrabold tracking-tight mb-10">Select Package</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
             {/* Starter */}
             <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
               <p className="text-sm text-neutral-400">STARTER</p>
@@ -662,7 +634,7 @@ export default function LandingPage() {
             </div>
 
             {/* Pro (highlighted) */}
-            <div className="rounded-2xl bg-neutral-900 border-2 border-[#B7FF2C] p-6 shadow-[0_0_0_4px_rgba(183,255,44,0.15)]">
+            <div className="rounded-2xl bg-neutral-900 border-2 border-[#009AFF] p-6 shadow-[0_0_0_4px_rgba(0,154,255,0.15)]">
               <p className="text-sm text-neutral-400">PRO</p>
               <div className="mt-2 text-3xl font-extrabold tracking-tight">$19<span className="text-base font-medium">/month</span></div>
               <p className="text-xs text-neutral-400">50 credits / month</p>
@@ -703,12 +675,12 @@ export default function LandingPage() {
 
       {/* ================== SECTION 8 — Final CTA (blue “Perfect”) ================== */}
       <section className={`${tokens.gutter} py-16 bg-white relative`}>
-        <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-60 w-60 rounded-full bg-[#B7FF2C] blur-3xl opacity-25"></div>
+        <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-60 w-60 rounded-full bg-[#009AFF] blur-3xl opacity-25"></div>
         <div className={`relative mx-auto ${tokens.maxW} text-center`}>
-          <h3 className="text-[28px] sm:text-[32px] font-semibold text-neutral-800 tracking-tight">
+          <h3 className="text-[24px] sm:text-[32px] font-semibold text-neutral-800 tracking-tight">
             Ready to <span className="font-extrabold text-[#1DA1FF]">Perfect</span> Your AI Art?
           </h3>
-          <p className="mt-2 text-[12px] sm:text-[13px] text-neutral-500">
+          <p className="mt-2 text-[12px] sm:text-[13px] text-neutral-500 max-w-md mx-auto">
             Join thousands of creators making their AI-generated images look naturally stunning.
           </p>
           <div className="mt-5 flex items-center justify-center gap-3">
@@ -724,6 +696,61 @@ export default function LandingPage() {
             >
               View Pricing
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ================== FAQ Section ================== */}
+      <section className={`${tokens.gutter} py-24 bg-black text-white`} id="faq">
+        <div className={`mx-auto ${tokens.maxW}`}>
+          <h2 className="text-center text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
+            Ask us a question
+          </h2>
+          <p className="text-center text-neutral-400 mb-10">
+            Have something else you want to ask? Reach out to us.
+          </p>
+          <div className="max-w-2xl mx-auto">
+            <form action={formAction} className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-neutral-300">
+                  Email
+                </label>
+                <div className="mt-1">
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    className="block w-full rounded-md border-neutral-700 bg-neutral-900 text-white shadow-sm focus:border-lime-500 focus:ring-lime-500 sm:text-sm h-10 px-3"
+                    placeholder="you@example.com"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="question" className="block text-sm font-medium text-neutral-300">
+                  Question
+                </label>
+                <div className="mt-1">
+                  <textarea
+                    id="question"
+                    name="question"
+                    rows={4}
+                    className="block w-full rounded-md border-neutral-700 bg-neutral-900 text-white shadow-sm focus:border-lime-500 focus:ring-lime-500 sm:text-sm p-3"
+                    placeholder="Your question..."
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <SubmitButton />
+              </div>
+              {state?.success && (
+                <p className="text-sm text-lime-500">{state.success}</p>
+              )}
+              {state?.error && (
+                <p className="text-sm text-red-500">{state.error}</p>
+              )}
+            </form>
           </div>
         </div>
       </section>
@@ -773,5 +800,19 @@ export default function LandingPage() {
         relatedImages={relatedImages}
       />
     </main>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      aria-disabled={pending}
+      className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#009AFF] px-8 py-3.5 text-white text-lg font-semibold hover:brightness-95 transition disabled:opacity-50"
+    >
+      {pending ? 'Submitting...' : 'Submit'}
+    </button>
   );
 }
