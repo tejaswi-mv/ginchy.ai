@@ -277,7 +277,7 @@ export default function LandingPage() {
     }
   };
 
-  const [state, formAction] = useActionState(askQuestion, { message: '' });
+  const [state, formAction] = useActionState(askQuestion, { success: '', error: '' });
 
   return (
     <main className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-black text-white antialiased overflow-hidden">
@@ -744,10 +744,10 @@ export default function LandingPage() {
               <div>
                 <SubmitButton />
               </div>
-              {state?.success && (
+              {'success' in state && state.success && (
                 <p className="text-sm text-lime-500">{state.success}</p>
               )}
-              {state?.error && (
+              {'error' in state && state.error && (
                 <p className="text-sm text-red-500">{state.error}</p>
               )}
             </form>

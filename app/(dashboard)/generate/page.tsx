@@ -51,8 +51,8 @@ function AssetLibrary({ type, title }: { type: 'characters' | 'poses' | 'environ
         formData.append('type', type);
         // Using startTransition for the async action call
         startTransition(async () => {
-            const userAssetsResult = await getUserAssets(null, formData);
-            const userData = (userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
+            const userAssetsResult = await getUserAssets({}, formData);
+            const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
             setAssets([...publicData, ...userData]);
         });
       } else {
