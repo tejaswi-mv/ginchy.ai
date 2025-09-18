@@ -20,7 +20,7 @@ export default async function PricingPage() {
   const plusPrice = prices.find((price) => price.productId === plusPlan?.id);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-br from-slate-900 via-blue-900 to-black min-h-screen">
       <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
         <PricingCard
           name={basePlan?.name || 'Base'}
@@ -68,21 +68,21 @@ function PricingCard({
 }) {
   return (
     <div className="pt-6">
-      <h2 className="text-2xl font-medium mb-2">{name}</h2>
-      <p className="text-sm text-muted-foreground mb-4">
+      <h2 className="text-2xl font-medium mb-2 text-white">{name}</h2>
+      <p className="text-sm text-neutral-300 mb-4">
         with {trialDays} day free trial
       </p>
-      <p className="text-4xl font-medium mb-6">
+      <p className="text-4xl font-medium mb-6 text-white">
         ${price / 100}{' '}
-        <span className="text-xl font-normal text-muted-foreground">
+        <span className="text-xl font-normal text-neutral-300">
           per user / {interval}
         </span>
       </p>
       <ul className="space-y-4 mb-8">
         {features.map((feature, index) => (
           <li key={index} className="flex items-start">
-            <Check className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
-            <span className="text-foreground">{feature}</span>
+            <Check className="h-5 w-5 text-[#009AFF] mr-2 mt-0.5 flex-shrink-0" />
+            <span className="text-white">{feature}</span>
           </li>
         ))}
       </ul>

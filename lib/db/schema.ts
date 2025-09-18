@@ -68,6 +68,24 @@ export const invitations = pgTable('invitations', {
   status: varchar('status', { length: 20 }).notNull().default('pending'),
 });
 
+export const assets = pgTable('assets', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  teamId: integer('team_id').references(() => teams.id),
+  type: varchar('type', { length: 50 }).notNull(), // 'character', 'pose', 'environment', 'garment', 'accessory'
+  url: text('url').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const generatedImages = pgTable('generated_images', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  teamId: integer('team_id').references(() => teams.id),
+  prompt: text('prompt'),
+  imageUrl: text('image_url').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),

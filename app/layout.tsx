@@ -6,8 +6,8 @@ import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
 
 export const metadata: Metadata = {
-  title: 'Ginchy.ai',
-  description: 'Get started quickly with virtual photoshoot'
+  title: 'Next.js SaaS Starter',
+  description: 'Get started quickly with Next.js, Postgres, and Stripe.'
 };
 
 export const viewport: Viewport = {
@@ -32,7 +32,7 @@ export default function RootLayout({
       className={`${jakarta.variable} ${serif.variable} dark`}
       suppressHydrationWarning={true}
     >
-      <body className="min-h-[100dvh]">
+      <body className="min-h-[100dvh] bg-gradient-to-br from-slate-900 via-blue-900 to-black">
         <SWRConfig
           value={{
             fallback: {

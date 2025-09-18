@@ -62,7 +62,7 @@ function ManageSubscription() {
               </p>
             </div>
             <form action={customerPortalAction}>
-              <Button type="submit" variant="outline">
+              <Button type="submit" variant="outline" className="border-[#009AFF]/30 text-[#009AFF] hover:bg-[#009AFF]/10">
                 Manage Subscription
               </Button>
             </form>
@@ -160,6 +160,7 @@ function TeamMembers() {
                     type="submit"
                     variant="outline"
                     size="sm"
+                    className="border-red-500/30 text-red-500 hover:bg-red-500/10"
                     disabled={isRemovePending}
                   >
                     {isRemovePending ? 'Removing...' : 'Remove'}
@@ -241,7 +242,7 @@ function InviteTeamMember() {
           )}
           <Button
             type="submit"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="bg-[#009AFF] hover:bg-[#009AFF]/90 text-white"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -271,7 +272,7 @@ function InviteTeamMember() {
 
 export default function SettingsPage() {
   return (
-    <section className="flex-1 p-4 lg:p-8">
+    <section className="flex-1 p-4 lg:p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-black min-h-screen">
       <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
       <Suspense fallback={<SubscriptionSkeleton />}>
         <ManageSubscription />
