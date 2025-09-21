@@ -22,12 +22,14 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
   );
 
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 via-blue-900 to-black">
+    <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-black">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <CircleIcon className="h-12 w-12 text-primary" />
+          <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#009AFF] to-[#00D4FF] flex items-center justify-center">
+            <span className="text-white font-bold text-xl">G</span>
+          </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-white font-[var(--font-display)]">
           {mode === 'signin'
             ? 'Sign in to your account'
             : 'Create your account'}
@@ -55,7 +57,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 defaultValue={state.email}
                 required
                 maxLength={50}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-border placeholder-muted-foreground focus:outline-none focus:ring-ring focus:border-ring focus:z-10 sm:text-sm"
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#009AFF] focus:border-[#009AFF] focus:z-10 sm:text-sm"
                 placeholder="Enter your email"
               />
             </div>
@@ -80,7 +82,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 required
                 minLength={8}
                 maxLength={100}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-border placeholder-muted-foreground focus:outline-none focus:ring-ring focus:border-ring focus:z-10 sm:text-sm"
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#009AFF] focus:border-[#009AFF] focus:z-10 sm:text-sm"
                 placeholder="Enter your password"
               />
             </div>
@@ -93,7 +95,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           <div>
             <Button
               type="submit"
-              className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+              className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-[#009AFF] hover:bg-[#009AFF]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009AFF] transition-all duration-200"
               disabled={pending}
             >
               {pending ? (
@@ -113,10 +115,10 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
+              <div className="w-full border-t border-neutral-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gradient-to-r from-slate-900 via-blue-900 to-black text-neutral-300">
+              <span className="px-2 bg-black text-neutral-300">
                 {mode === 'signin'
                   ? 'New to our platform?'
                   : 'Already have an account?'}
@@ -129,7 +131,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${
                 redirect ? `?redirect=${redirect}` : ''
               }${priceId ? `&priceId=${priceId}` : ''}`}
-              className="w-full flex justify-center py-2 px-4 border rounded-full shadow-sm text-sm font-medium bg-card hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+              className="w-full flex justify-center py-3 px-6 border border-neutral-700 rounded-lg shadow-sm text-sm font-medium bg-neutral-900 text-white hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009AFF] transition-all duration-200"
             >
               {mode === 'signin'
                 ? 'Create an account'

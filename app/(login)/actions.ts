@@ -9,10 +9,14 @@ import {
   teams,
   teamMembers,
   activityLogs,
+  generatedImages,
+  assets,
   type NewUser,
   type NewTeam,
   type NewTeamMember,
   type NewActivityLog,
+  type NewGeneratedImage,
+  type NewAsset,
   ActivityType,
   invitations
 } from '@/lib/db/schema';
@@ -27,6 +31,9 @@ import {
   validatedActionWithUser
 } from '@/lib/auth/middleware';
 import { supabase } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase/server'; // Temporarily commented out due to missing module
+import sharp from 'sharp';
+import { withTimeout, TimeoutError } from '@/lib/utils/timeout';
 
 async function logActivity(
   teamId: number | null | undefined,
@@ -460,13 +467,13 @@ export const inviteTeamMember = validatedActionWithUser(
   }
 );
 
-export async function getPublicImages(folderPath: string) {
+export async function getPublicImages(folderPath: string, limit: number = 100, offset: number = 0) {
   try {
     const { data: fileList, error } = await supabase.storage
       .from('public-assets') // Your PUBLIC bucket name
       .list(folderPath, {
-        limit: 100,
-        offset: 0,
+        limit,
+        offset,
         sortBy: { column: 'name', order: 'asc' },
       });
 
@@ -496,53 +503,399 @@ export async function getPublicImages(folderPath: string) {
 export const getUserAssets = validatedActionWithUser(
   z.object({
     type: z.enum(['characters', 'poses', 'environment', 'garments', 'accessory']),
+    limit: z.number().optional(),
+    offset: z.number().optional(),
   }),
-  async ({ type }, _, user) => {
+  async ({ type, limit = 100, offset = 0 }, _, user) => {
 
     const { data: fileList, error } = await supabase.storage
-      .from(type) // Private bucket
-      .list(`${user.id}`); 
+      .from(type)
+      .list(`${user.id}`, { limit, offset });
 
     if (error) {
       console.error('Error fetching user assets:', error);
       return { error: 'Failed to fetch your assets.' };
     }
 
-    if (!fileList) {
+    if (!fileList || fileList.length === 0) {
         return { data: [] };
     }
 
-    const images = fileList.map(file => {
-      const { data: { publicUrl } } = supabase.storage
+    // Generate signed URLs for each file using admin client
+    const signedUrlPromises = fileList.map(async (file) => {
+      const { data, error } = await supabaseAdmin.storage
         .from(type)
-        .getPublicUrl(`${user.id}/${file.name}`);
-      return { name: file.name, url: publicUrl, isOwner: true };
-    });
+        .createSignedUrl(`${user.id}/${file.name}`, 60 * 15); // URL expires in 15 minutes
 
-    return { data: images };
+      if (error) {
+        console.error('Error creating signed URL:', error);
+        return null;
+      }
+      
+      return { name: file.name, url: data.signedUrl, isOwner: true };
+    });
+    
+    const images = (await Promise.all(signedUrlPromises)).filter(Boolean);
+
+    return { data: images as { name: string; url: string; isOwner: boolean }[] };
   }
 );
 
 export const uploadAsset = validatedActionWithUser(
   z.object({
-    file: z.instanceof(File),
     type: z.string(),
   }),
-  async (data, _, user) => {
-    const { file, type } = data;
-    const filePath = `${user.id}/${file.name}`;
+  async (data, formData, user) => { // Use the raw formData
+    const file = formData.get('file') as File;
+    const type = formData.get('type') as string;
 
-    const { error } = await supabase.storage
-      .from(type) // private bucket
-      .upload(filePath, file, {
-          upsert: true // Overwrite file if it exists
-      });
-
-    if (error) {
-      console.error('Error uploading asset:', error);
-      return { error: 'Failed to upload asset.' };
+    if (!file || !type || file.size === 0) {
+      return { error: 'A valid file and type are required.' };
     }
 
-    return { success: 'Asset uploaded successfully!' };
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      return { error: 'File size must be less than 10MB.' };
+    }
+
+    try {
+      // Wrap the entire upload process with timeout
+      const result = await withTimeout(
+        (async () => {
+          // Image optimization
+          const buffer = await file.arrayBuffer();
+          const optimizedBuffer = await sharp(Buffer.from(buffer))
+            .resize(1024, 1024, { fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 80 })
+            .toBuffer();
+
+          const filePath = `${user.id}/${file.name.split('.')[0]}.webp`;
+
+          // Use the supabaseAdmin client here
+          const { error } = await supabaseAdmin.storage
+            .from(type)
+            .upload(filePath, optimizedBuffer, {
+              upsert: true,
+              contentType: 'image/webp',
+            });
+
+          if (error) {
+            throw error;
+          }
+
+          return { success: 'Asset uploaded successfully!' };
+        })(),
+        30000, // 30 seconds timeout
+        'Upload timed out'
+      );
+
+      return result;
+
+    } catch (error) {
+      console.error('Error uploading asset:', error);
+      
+      if (error instanceof TimeoutError) {
+        return { error: 'Upload timed out. Please try again with a smaller file.' };
+      }
+      
+      return { error: 'Failed to upload asset.' };
+    }
+  }
+);
+
+export const deleteAsset = validatedActionWithUser(
+  z.object({
+      type: z.string(),
+      fileName: z.string(),
+  }),
+  async ({ type, fileName }, _, user) => {
+      const filePath = `${user.id}/${fileName}`;
+      const { error } = await supabaseAdmin.storage
+          .from(type)
+          .remove([filePath]);
+
+      if (error) {
+          console.error('Error deleting asset:', error);
+          return { error: 'Failed to delete asset.' };
+      }
+
+      return { success: 'Asset deleted successfully.' };
+  }
+);
+
+// Add New Character Workflow
+export const createCharacter = validatedActionWithUser(
+  z.object({
+    name: z.string().min(1, 'Character name is required'),
+    gender: z.string().min(1, 'Gender is required'),
+    availableModels: z.string().optional(),
+  }),
+  async (data, formData, user) => {
+    try {
+      const userWithTeam = await getUserWithTeam(user.id);
+      
+      // Get uploaded files
+      const files = formData.getAll('files') as File[];
+      
+      if (files.length < 5) {
+        return { error: 'Please upload at least 5 images for best results.' };
+      }
+
+      // Validate file types and sizes
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) {
+          return { error: 'All files must be images.' };
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          return { error: 'File size must be less than 10MB.' };
+        }
+      }
+
+      // Upload files to Supabase storage
+      const uploadedUrls: string[] = [];
+      
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('characters')
+          .upload(fileName, file);
+        
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          return { error: 'Failed to upload images. Please try again.' };
+        }
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('characters')
+          .getPublicUrl(fileName);
+        
+        uploadedUrls.push(publicUrl);
+      }
+
+      // Create character asset in database
+      const characterAsset: NewAsset = {
+        userId: user.id,
+        teamId: userWithTeam?.teamId,
+        type: 'characters',
+        name: data.name,
+        url: uploadedUrls[0], // Use first image as main character image
+        metadata: JSON.stringify({
+          gender: data.gender,
+          availableModels: data.availableModels,
+          trainingImages: uploadedUrls,
+          status: 'training', // Simulate training status
+        }),
+      };
+
+      const [insertedAsset] = await db.insert(assets).values(characterAsset).returning();
+
+      // Simulate model training process
+      // In production, this would trigger actual AI model training
+      setTimeout(async () => {
+        // Update status to trained
+        if (insertedAsset?.id) {
+          await db
+            .update(assets)
+            .set({
+              metadata: JSON.stringify({
+                ...JSON.parse(characterAsset.metadata || '{}'),
+                status: 'trained',
+              }),
+            })
+            .where(eq(assets.id, insertedAsset.id));
+        }
+      }, 10000); // 10 seconds simulation
+
+      return { 
+        success: `Character "${data.name}" created successfully! Training will complete in a few minutes.`,
+        characterId: insertedAsset?.id 
+      };
+    } catch (error) {
+      console.error('Error creating character:', error);
+      return { error: 'Failed to create character. Please try again.' };
+    }
+  }
+);
+
+// AI Image Generation Service
+async function generateWithAI(params: {
+  prompt: string;
+  modelUrl?: string;
+  poseUrl?: string;
+  garmentUrl?: string;
+  environmentUrl?: string;
+  aspectRatio?: string;
+  processor: string;
+}): Promise<string> {
+  try {
+    // For now, return a placeholder image
+    // In production, integrate with Replicate, Stability AI, or another service
+    
+    // Example Replicate integration (uncomment and configure):
+    /*
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
+    });
+    
+    const output = await replicate.run(
+      "stability-ai/stable-diffusion:27b93a2413e7f36cd83da926f3656280b2931564ff050bf9575f1fdf9bcd747e",
+      {
+        input: {
+          prompt: params.prompt,
+          width: getWidthFromAspectRatio(params.aspectRatio),
+          height: getHeightFromAspectRatio(params.aspectRatio),
+          num_inference_steps: 20,
+          guidance_scale: 7.5,
+        }
+      }
+    );
+    
+    return output[0] as string;
+    */
+    
+    // Placeholder implementation
+    const aspectRatioMap: Record<string, string> = {
+      '1:1': '800x800',
+      '9:16': '720x1280',
+      '16:9': '1280x720',
+      '3:2': '1200x800',
+      '2:3': '800x1200'
+    };
+    
+    const dimensions = aspectRatioMap[params.aspectRatio || '1:1'] || '800x800';
+    const [width, height] = dimensions.split('x').map(Number);
+    
+    // Generate a placeholder image URL with the correct dimensions
+    const placeholderUrl = `https://picsum.photos/${width}/${height}?random=${Date.now()}`;
+    
+    // Simulate processing time
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    return placeholderUrl;
+  } catch (error) {
+    console.error('AI generation error:', error);
+    throw new Error('Failed to generate image. Please try again.');
+  }
+}
+
+function getWidthFromAspectRatio(aspectRatio?: string): number {
+  const ratioMap: Record<string, number> = {
+    '1:1': 512,
+    '9:16': 576,
+    '16:9': 1024,
+    '3:2': 768,
+    '2:3': 512
+  };
+  return ratioMap[aspectRatio || '1:1'] || 512;
+}
+
+function getHeightFromAspectRatio(aspectRatio?: string): number {
+  const ratioMap: Record<string, number> = {
+    '1:1': 512,
+    '9:16': 1024,
+    '16:9': 576,
+    '3:2': 512,
+    '2:3': 768
+  };
+  return ratioMap[aspectRatio || '1:1'] || 512;
+}
+
+export const generateImage = validatedActionWithUser(
+  z.object({
+    prompt: z.string().min(1, 'Prompt is required.'),
+    modelUrl: z.string().url().optional(),
+    poseUrl: z.string().url().optional(),
+    garmentUrl: z.string().url().optional(),
+    environmentUrl: z.string().url().optional(),
+    cameraView: z.string().optional(),
+    lensAngle: z.string().optional(),
+    aspectRatio: z.string().optional(),
+    processor: z.string().optional(),
+  }),
+  async (data, _, user) => {
+    try {
+      const userWithTeam = await getUserWithTeam(user.id);
+
+      if ((user.credits || 0) <= 0) {
+          return { error: 'You have no credits remaining.' };
+      }
+
+      console.log('Generating image with:', data);
+      
+      // Wrap the entire generation process with timeout
+      const result = await withTimeout(
+        (async () => {
+          // Build enhanced prompt with all parameters
+          let enhancedPrompt = data.prompt;
+          
+          // Add camera settings to prompt
+          if (data.cameraView) {
+            enhancedPrompt += `, ${data.cameraView.toLowerCase()}`;
+          }
+          
+          // Add aspect ratio context
+          if (data.aspectRatio) {
+            const ratioMap: Record<string, string> = {
+              '1:1': 'square format',
+              '9:16': 'portrait format',
+              '16:9': 'landscape format',
+              '3:2': 'classic photography format',
+              '2:3': 'vertical format'
+            };
+            enhancedPrompt += `, ${ratioMap[data.aspectRatio] || data.aspectRatio}`;
+          }
+          
+          // Add lens angle context
+          if (data.lensAngle) {
+            enhancedPrompt += `, ${data.lensAngle.toLowerCase()}`;
+          }
+          
+          // Add professional photography terms
+          enhancedPrompt += ', professional photography, high quality, detailed, fashion photography';
+          
+          // For now, use a placeholder service - replace with actual AI service
+          // This could be Replicate, Stability AI, or any other service
+          const generatedImageUrl = await generateWithAI({
+            prompt: enhancedPrompt,
+            modelUrl: data.modelUrl,
+            poseUrl: data.poseUrl,
+            garmentUrl: data.garmentUrl,
+            environmentUrl: data.environmentUrl,
+            aspectRatio: data.aspectRatio,
+            processor: data.processor || 'Nano Banana'
+          });
+          
+          const newImage: NewGeneratedImage = {
+            userId: user.id,
+            teamId: userWithTeam?.teamId,
+            prompt: data.prompt,
+            imageUrl: generatedImageUrl,
+          };
+          
+          // Use Promise.all for concurrent database operations
+          await Promise.all([
+            db.insert(generatedImages).values(newImage),
+            db.update(users).set({ credits: (user.credits || 0) - 1 }).where(eq(users.id, user.id))
+          ]);
+          
+          return { success: 'Image generated!', imageUrl: generatedImageUrl };
+        })(),
+        30000, // 30 seconds timeout
+        'Image generation timed out'
+      );
+
+      return result;
+
+    } catch (error) {
+        console.error("Image generation failed", error);
+        
+        if (error instanceof TimeoutError) {
+          return { error: "Image generation timed out. Please try again with a simpler prompt." };
+        }
+        
+        return { error: "Image generation failed. Please try again." };
+    }
   }
 );

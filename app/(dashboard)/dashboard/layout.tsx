@@ -22,14 +22,14 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full bg-background">
+    <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full bg-black">
       {/* Mobile header */}
-      <div className="lg:hidden flex items-center justify-between bg-card border-b border-border p-4">
+      <div className="lg:hidden flex items-center justify-between bg-neutral-900 border-b border-neutral-700 p-4">
         <div className="flex items-center">
-          <span className="font-medium">Settings</span>
+          <span className="font-medium text-white">Settings</span>
         </div>
         <Button
-          className="-mr-3"
+          className="-mr-3 text-white hover:bg-neutral-800"
           variant="ghost"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
@@ -41,7 +41,7 @@ export default function DashboardLayout({
       <div className="flex flex-1 overflow-hidden h-full">
         {/* Sidebar */}
         <aside
-          className={`w-64 bg-card lg:bg-card border-r border-border lg:block ${
+          className={`w-64 bg-neutral-900 lg:bg-neutral-900 border-r border-neutral-700 lg:block ${
             isSidebarOpen ? 'block' : 'hidden'
           } lg:relative absolute inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -52,10 +52,10 @@ export default function DashboardLayout({
               <Link key={item.href} href={item.href} passHref>
                 <Button
                   variant={pathname === item.href ? 'secondary' : 'ghost'}
-                  className={`shadow-none my-1 w-full justify-start ${
+                  className={`shadow-none my-1 w-full justify-start text-white hover:bg-neutral-800 ${
                     pathname === item.href
-                      ? 'bg-accent text-accent-foreground'
-                      : ''
+                      ? 'bg-[#009AFF] text-white hover:bg-[#009AFF]/90'
+                      : 'text-neutral-300'
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
                 >

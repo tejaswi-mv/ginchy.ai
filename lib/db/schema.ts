@@ -14,6 +14,7 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   role: varchar('role', { length: 20 }).notNull().default('member'),
+  credits: integer('credits').notNull().default(10),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
@@ -74,6 +75,8 @@ export const assets = pgTable('assets', {
   teamId: integer('team_id').references(() => teams.id),
   type: varchar('type', { length: 50 }).notNull(), // 'character', 'pose', 'environment', 'garment', 'accessory'
   url: text('url').notNull(),
+  name: varchar('name', { length: 255 }),
+  metadata: text('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -140,6 +143,10 @@ export type ActivityLog = typeof activityLogs.$inferSelect;
 export type NewActivityLog = typeof activityLogs.$inferInsert;
 export type Invitation = typeof invitations.$inferSelect;
 export type NewInvitation = typeof invitations.$inferInsert;
+export type Asset = typeof assets.$inferSelect;
+export type NewAsset = typeof assets.$inferInsert;
+export type GeneratedImage = typeof generatedImages.$inferSelect;
+export type NewGeneratedImage = typeof generatedImages.$inferInsert;
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
     user: Pick<User, 'id' | 'name' | 'email'>;

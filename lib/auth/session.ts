@@ -1,7 +1,7 @@
 import { compare, hash } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 
-const key = new TextEncoder().encode(process.env.AUTH_SECRET);
+const key = new TextEncoder().encode(process.env.AUTH_SECRET || process.env.JWT_SECRET || 'fallback-secret-key-for-development');
 const SALT_ROUNDS = 10;
 
 export async function hashPassword(password: string) {

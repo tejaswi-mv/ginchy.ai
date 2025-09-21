@@ -153,15 +153,24 @@ function ChooseModelSection() {
     const [characters, setCharacters] = useState<Character[]>([]);
     const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function fetchCharacters() {
-            const result = await getPublicCharacters();
-            if (result.data) {
-                setCharacters(result.data);
-                if (result.data.length > 0) {
-                    setSelectedCharacter(result.data[0]);
+            try {
+                setIsLoading(true);
+                const result = await getPublicCharacters();
+                console.log('Fetched characters:', result);
+                if (result.data) {
+                    setCharacters(result.data);
+                    if (result.data.length > 0) {
+                        setSelectedCharacter(result.data[0]);
+                    }
                 }
+            } catch (error) {
+                console.error('Error fetching characters:', error);
+            } finally {
+                setIsLoading(false);
             }
         }
         fetchCharacters();
@@ -176,6 +185,7 @@ function ChooseModelSection() {
     };
     
     const handleSelectCharacter = (character: Character) => {
+        console.log('Selecting character:', character);
         setSelectedCharacter(character);
         setIsModalOpen(false);
     };
@@ -196,14 +206,32 @@ function ChooseModelSection() {
                         <div className="grid grid-cols-12 gap-6 items-center">
                             <div className="col-span-12 lg:col-span-7">
                                 <div className="relative rounded-lg overflow-hidden mb-6 p-4 border border-neutral-200">
-                                    <div className="grid grid-cols-6 gap-2">
-                                        {previewCharacters.map((char) => (
+                                    {isLoading ? (
+                                        <div className="grid grid-cols-6 gap-2">
+                                            {Array.from({ length: 18 }).map((_, i) => (
+                                                <div key={i} className="aspect-square rounded-md bg-neutral-200 animate-pulse"></div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-6 gap-2">
+                                            {previewCharacters.map((char) => (
                                             <div key={char.name} className="relative aspect-square rounded-md overflow-hidden cursor-pointer group" onClick={() => handleSelectCharacter(char)}>
-                                                <Image src={char.url} alt={char.name} fill className="object-cover transition-transform duration-200 group-hover:scale-105"/>
+                                                <Image 
+                                                    src={char.url} 
+                                                    alt={char.name} 
+                                                    fill 
+                                                    className="object-cover transition-transform duration-200 group-hover:scale-105"
+                                                    onError={(e) => {
+                                                        console.error('Image failed to load:', char.url);
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                    onLoad={() => console.log('Image loaded successfully:', char.url)}
+                                                />
                                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                                             </div>
                                         ))}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-full px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
@@ -216,7 +244,22 @@ function ChooseModelSection() {
                             </div>
                             <div className="col-span-12 lg:col-span-5">
                                 <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200">
-                                    {selectedCharacter ? <Image src={selectedCharacter.url} alt={selectedCharacter.name} unoptimized fill className="object-contain" /> : <div className="w-full h-full flex items-center justify-center text-neutral-400">Select a model</div>}
+                                    {selectedCharacter ? (
+                                        <Image 
+                                            src={selectedCharacter.url} 
+                                            alt={selectedCharacter.name} 
+                                            unoptimized 
+                                            fill 
+                                            className="object-contain"
+                                            onError={(e) => {
+                                                console.error('Preview image failed to load:', selectedCharacter.url);
+                                                e.currentTarget.style.display = 'none';
+                                            }}
+                                            onLoad={() => console.log('Preview image loaded successfully:', selectedCharacter.url)}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-neutral-400">Select a model</div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -253,10 +296,8 @@ export default function LandingPage() {
   };
 
   const handleGetAccess = () => {
-    // You can customize this functionality - for now it will show an alert
-    alert("Get Access Now clicked! This could redirect to signup, pricing, or contact form.");
-    // Example: window.location.href = "/signup";
-    // Example: window.open("https://your-signup-page.com", "_blank");
+    // Redirect to pricing page
+    window.location.href = "/pricing";
   };
 
   const handleEnhanceNow = () => {
@@ -267,14 +308,8 @@ export default function LandingPage() {
   };
 
   const handleViewPricing = () => {
-    // Scroll to the pricing section
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      alert("View Pricing clicked! This could redirect to pricing page.");
-      // Example: window.location.href = "/pricing";
-    }
+    // Redirect to pricing page
+    window.location.href = "/pricing";
   };
 
   const [state, formAction] = useActionState(askQuestion, { success: '', error: '' });
@@ -323,6 +358,18 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
+      <section className="w-full bg-black pt-2 pb-4">
+        <div className="relative w-full h-20">
+          <img 
+            src="/images/logos.png" 
+            alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </section>
+
 
       {/* ================== SECTION 2 — Create/All types ================== */}
       <section className={`${tokens.gutter} py-20 bg-black text-white`} id="about">
@@ -388,11 +435,11 @@ export default function LandingPage() {
                     <div className="absolute -bottom-7 left-[90px] -translate-x-1/2 w-[110px] text-center rounded-md border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
                   </div>
                   {/* sunglasses big square with label on right */}
-                  <div className="relative flex justify-start">
+                  <div className="flex items-center gap-2">
                     <div className="relative w-[260px] max-w-full rounded-2xl overflow-hidden border border-neutral-700 bg-neutral-100 aspect-square">
                       <Image src="/images/glasses.png" alt="Sunglasses" fill className="object-cover" unoptimized />
                     </div>
-                    <div className="absolute top-1/2 -translate-y-1/2 -right-1 rounded-md border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
+                    <div className="rounded-md border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
                   </div>
                 </div>
               </div>
@@ -407,10 +454,10 @@ export default function LandingPage() {
       {/* ================== SECTION 4 — Customize your pictures ================== */}
       <section className={`${tokens.gutter} py-24 bg-black text-white`} id="examples">
         <div className={`mx-auto ${tokens.maxW}`}>
-          {/* Title with exact font and color from screenshot */}
-          <h2 className="text-center font-bold text-[#009AFF] text-[28px] sm:text-[32px] leading-tight mb-10">
+          {/* Professional title styling */}
+          <h2 className="text-center font-[var(--font-display)] text-white text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-10">
             Customize your pictures the way you want
-            <span className="text-[#009AFF] ml-1">✱</span>
+            <span className="text-white ml-2">✦</span>
           </h2>
 
           {/* container with left padding so the vertical pill is always visible */}
@@ -463,26 +510,68 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Bottom text - exact styling from screenshot */}
-            <p className="mt-8 text-center font-bold text-[#009AFF] text-[24px] sm:text-[32px] tracking-wide">
+            {/* Bottom text - professional styling */}
+            <p className="mt-8 text-center font-[var(--font-display)] text-white text-[24px] sm:text-[32px] lg:text-[36px] font-extrabold tracking-tight leading-[1.1]">
               Consistency Models + Unlimited Environments + Much more
             </p>
           </div>
         </div>
       </section>
 
-      {/* ================== GENAI MODELS SECTION ================== */}
-      <section className={`${tokens.gutter} py-24 bg-black text-white`}>
+      {/* ================== GENAI PLATFORM SECTION ================== */}
+      <section className={`${tokens.gutter} pt-4 pb-20 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
-          {/* Main interactive display area - just placeholder for the entire image */}
-          <div className="relative aspect-[16/9] rounded-3xl overflow-hidden border-2 border-[#009AFF] bg-neutral-900 shadow-[0_0_40px_rgba(0,154,255,0.40)]">
-            <div className="grid grid-cols-3 grid-rows-2 w-full h-full gap-2 p-2">
-              <div className="relative col-span-1 row-span-1 rounded-2xl overflow-hidden"><Image src="https://images.pexels.com/photos/3772510/pexels-photo-3772510.jpeg?auto=compress&cs=tinysrgb&w=800" alt="GenAI Model 1" fill className="object-cover" unoptimized /></div>
-              <div className="relative col-span-1 row-span-1 rounded-2xl overflow-hidden"><Image src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=800" alt="GenAI Model 2" fill className="object-cover" unoptimized /></div>
-              <div className="relative col-span-1 row-span-2 rounded-2xl overflow-hidden"><Image src="https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=800" alt="GenAI Model 3" fill className="object-cover" unoptimized /></div>
-              <div className="relative col-span-1 row-span-1 rounded-2xl overflow-hidden"><Image src="https://images.pexels.com/photos/2100063/pexels-photo-2100063.jpeg?auto=compress&cs=tinysrgb&w=800" alt="GenAI Model 4" fill className="object-cover" unoptimized /></div>
-              <div className="relative col-span-1 row-span-1 rounded-2xl overflow-hidden"><Image src="https://images.pexels.com/photos/2773977/pexels-photo-2773977.jpeg?auto=compress&cs=tinysrgb&w=800" alt="GenAI Model 5" fill className="object-cover" unoptimized /></div>
+          {/* Company Logos Banner */}
+          <div className="text-center mb-12">
+            <p className="text-white text-xl mb-6">
+              All the top GenAI models—plus Magnific, recently acquired
+              <br />
+              by Freepik
+            </p>
+          </div>
+        </div>
+        
+        {/* Full Width Company Logos Banner */}
+        <div className="w-full bg-black py-8">
+          <div className="relative w-full h-24 px-4">
+            <img 
+              src="/images/logos.png" 
+              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+        
+        <div className={`mx-auto ${tokens.maxW}`}>
+
+          {/* Main Application Interface */}
+          <div className="relative w-full max-w-5xl mx-auto mb-12">
+            <div className="relative w-full h-[400px] rounded-2xl overflow-hidden bg-neutral-900 border-2 border-neutral-700 shadow-2xl">
+              <img 
+                src="/images/app-interface.png" 
+                alt="Main application interface with AI editing tools" 
+                className="w-full h-full object-cover"
+              />
             </div>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-center gap-4">
+            <button className="px-6 py-3 rounded-xl bg-neutral-700 text-white text-sm font-medium hover:bg-neutral-600 transition">
+              Image editing
+            </button>
+            <button className="px-6 py-3 rounded-xl border border-neutral-600 text-white text-sm font-medium hover:bg-neutral-800 transition">
+              Image generation
+            </button>
+            <button className="px-6 py-3 rounded-xl border border-neutral-600 text-white text-sm font-medium hover:bg-neutral-800 transition">
+              Video generation
+            </button>
+            <button className="px-6 py-3 rounded-xl border border-neutral-600 text-white text-sm font-medium hover:bg-neutral-800 transition">
+              Video editing
+            </button>
+            <button className="px-6 py-3 rounded-xl border border-neutral-600 text-white text-sm font-medium hover:bg-neutral-800 transition">
+              Audio generation
+            </button>
           </div>
         </div>
       </section>
@@ -490,8 +579,8 @@ export default function LandingPage() {
       {/* ================== SECTION 5 — Personalize your outfit ================== */}
       <section className={`${tokens.gutter} py-24 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
-          <h2 className="text-center text-3xl sm:text-4xl font-extrabold tracking-tight text-[#009AFF] mb-16 drop-shadow-[0_0_14px_rgba(0,154,255,0.45)]">
-            Personalize your outfit<span className="ml-2 text-[#009AFF]">✱</span>
+          <h2 className="text-center font-[var(--font-display)] text-white text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-16">
+            Personalize your outfit<span className="ml-2 text-white">✦</span>
           </h2>
 
           {/* two main sections - SOCIAL MEDIA and PRODUCT PAGES */}
@@ -621,7 +710,7 @@ export default function LandingPage() {
               <p className="text-sm text-neutral-400">STARTER</p>
               <div className="mt-2 text-3xl font-extrabold tracking-tight">$0<span className="text-base font-medium">/month</span></div>
               <p className="text-xs text-neutral-400">5 credits / month</p>
-              <a className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-neutral-600 px-4 py-2 text-sm">
+              <a href="/pricing" className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-neutral-600 px-4 py-2 text-sm hover:bg-neutral-800 transition">
                 Sign up Free <Cog className="w-4 h-4" />
               </a>
               <ul className="mt-6 space-y-2 text-sm text-neutral-300">
@@ -639,7 +728,7 @@ export default function LandingPage() {
               <div className="mt-2 text-3xl font-extrabold tracking-tight">$19<span className="text-base font-medium">/month</span></div>
               <p className="text-xs text-neutral-400">50 credits / month</p>
               <div className="mt-4 inline-flex rounded-full bg-white p-1 text-sm text-black">
-                <button className="px-5 py-2 rounded-full font-semibold">Go Pro</button>
+                <a href="/pricing" className="px-5 py-2 rounded-full font-semibold hover:bg-neutral-100 transition">Go Pro</a>
                 <button className="px-5 py-2 rounded-full text-neutral-600">•</button>
               </div>
               <ul className="mt-6 space-y-2 text-sm text-neutral-300">
@@ -656,7 +745,7 @@ export default function LandingPage() {
               <p className="text-sm text-neutral-400">ENTERPRISE</p>
               <div className="mt-2 text-3xl font-extrabold tracking-tight">Custom pricing</div>
               <p className="text-xs text-neutral-400">Unlimited credits</p>
-              <a className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-neutral-600 px-4 py-2 text-sm">
+              <a href="/pricing" className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-neutral-600 px-4 py-2 text-sm hover:bg-neutral-800 transition">
                 Contact Sales <Cog className="w-4 h-4" />
               </a>
               <ul className="mt-6 space-y-2 text-sm text-neutral-300">
