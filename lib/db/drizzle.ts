@@ -17,7 +17,7 @@ if (!databaseUrl) {
 const finalDatabaseUrl = databaseUrl || 'postgresql://postgres:password@localhost:5432/ginchy_ai_dev';
 
 let client: postgres.Sql;
-let db: ReturnType<typeof drizzle>;
+let db: ReturnType<typeof drizzle<typeof schema>>;
 
 try {
   client = postgres(finalDatabaseUrl, {
