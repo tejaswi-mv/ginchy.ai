@@ -41,8 +41,8 @@ function UserMenu({ user }: { user: User }) {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="flex flex-col gap-1">
-        <DropdownMenuItem className="cursor-pointer">
+      <DropdownMenuContent align="end" className="flex flex-col gap-1 bg-neutral-900 border-neutral-700 text-white">
+        <DropdownMenuItem className="cursor-pointer text-white hover:bg-neutral-800 focus:bg-neutral-800">
           <Link href="/dashboard" className="flex w-full items-center">
             <Home className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
@@ -50,7 +50,7 @@ function UserMenu({ user }: { user: User }) {
         </DropdownMenuItem>
         <form action={handleSignOut} className="w-full">
           <button type="submit" className="flex w-full">
-            <DropdownMenuItem className="w-full flex-1 cursor-pointer">
+            <DropdownMenuItem className="w-full flex-1 cursor-pointer text-white hover:bg-neutral-800 focus:bg-neutral-800">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sign out</span>
             </DropdownMenuItem>

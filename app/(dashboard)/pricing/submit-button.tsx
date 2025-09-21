@@ -8,23 +8,22 @@ export function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button
+    <button
       type="submit"
       disabled={pending}
-      variant="outline"
-      className="w-full rounded-full"
+      className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#009AFF] px-6 py-3 text-white text-sm font-semibold hover:bg-[#009AFF]/90 transition-all duration-200 shadow-[0_0_0_6px_rgba(0,154,255,0.12)] hover:shadow-[0_0_0_8px_rgba(0,154,255,0.18)] disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {pending ? (
         <>
-          <Loader2 className="animate-spin mr-2 h-4 w-4" />
-          Loading...
+          <Loader2 className="animate-spin h-4 w-4" />
+          Processing...
         </>
       ) : (
         <>
           Get Started
-          <ArrowRight className="ml-2 h-4 w-4" />
+          <ArrowRight className="h-4 w-4" />
         </>
       )}
-    </Button>
+    </button>
   );
 }

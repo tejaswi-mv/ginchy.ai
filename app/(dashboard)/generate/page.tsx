@@ -1,71 +1,99 @@
 'use client';
 
-import React, { useMemo, useState, useEffect, useTransition } from 'react';
+import React, { useState, useEffect, useTransition, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
-  Camera,
   ChevronDown,
   ChevronRight,
-  Edit3,
-  Image as ImageIcon,
-  Menu,
+  Upload,
+  X,
+  Sparkles,
+  Loader2,
+  Settings,
+  Camera,
   Plus,
   Search,
-  Upload,
-  Video,
-  X
+  ArrowLeft,
+  User as UserIcon,
+  Accessibility,
+  Shirt,
+  Globe,
+  Ratio,
+  Trash2,
+  Play,
+  Square,
 } from 'lucide-react';
-import { getPublicImages, getUserAssets, uploadAsset } from '@/app/(login)/actions';
+import { getPublicImages, getUserAssets, uploadAsset, generateImage, deleteAsset, createCharacter } from '@/app/(login)/actions';
 import { useActionState } from 'react';
 import useSWR from 'swr';
 import { User } from '@/lib/db/schema';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Input } from '@/components/ui/input';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-
-type EnvironmentPreset = {
-  id: string;
+type Asset = {
   name: string;
-  thumbnail: string;
+  url: string;
+  isOwner?: boolean;
+  metadata?: string;
 };
+
+type AssetType = 'characters' | 'poses' | 'environment' | 'garments' | 'accessory';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-// This component now handles both public and private assets
-function AssetLibrary({ type, title }: { type: 'characters' | 'poses' | 'environment' | 'garments' | 'accessory', title: string }) {
+// ================== SIDEBAR COMPONENTS ==================
+
+function AssetPreview({
+  type,
+  onSelect,
+  onOpenLibrary,
+  selectedAsset,
+  onOpenCreateCharacter,
+}: {
+  type: AssetType;
+  onSelect: (asset: Asset) => void;
+  onOpenLibrary: () => void;
+  selectedAsset: Asset | null;
+  onOpenCreateCharacter?: () => void;
+}) {
   const { data: user } = useSWR<User>('/api/user', fetcher);
   const router = useRouter();
-
-  const [assets, setAssets] = useState<{ name: string; url: string; }[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewAssets, setPreviewAssets] = useState<Asset[]>([]);
+  const [uploadState, uploadAction, isUploading] = useActionState<any, FormData>(uploadAsset, null);
   const [isPending, startTransition] = useTransition();
-  const [uploadState, uploadAction] = useActionState<any, FormData>(uploadAsset, null);
+
+  const fetchPreviewAssets = async () => {
+    const publicResult = await getPublicImages(type, 5);
+    const publicData = publicResult.data || [];
+
+    if (user) {
+      const formData = new FormData();
+      formData.append('type', type);
+      formData.append('limit', '5');
+      const userAssetsResult = await getUserAssets({}, formData);
+      const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
+      const combined = [...userData, ...publicData];
+      setPreviewAssets(combined.slice(0, 5));
+    } else {
+      setPreviewAssets(publicData.slice(0, 5));
+    }
+  };
 
   useEffect(() => {
-    async function fetchAllAssets() {
-      const publicResult = await getPublicImages(type);
-      const publicData = publicResult.data || [];
-
-      if (user) {
-        const formData = new FormData();
-        formData.append('type', type);
-        // Using startTransition for the async action call
-        startTransition(async () => {
-            const userAssetsResult = await getUserAssets({}, formData);
-            const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
-            setAssets([...publicData, ...userData]);
-        });
-      } else {
-        setAssets(publicData);
-      }
-    }
-    fetchAllAssets();
-  }, [type, user, uploadState]); // Re-fetch when user changes or after an upload
+    fetchPreviewAssets();
+  }, [type, user, uploadState]);
 
   const handleUploadClick = () => {
     if (!user) {
       router.push('/sign-up');
+    } else if (type === 'characters' && onOpenCreateCharacter) {
+      // For characters, open the create character modal
+      onOpenCreateCharacter();
     } else {
+      // For other types, use direct file upload
       document.getElementById(`file-upload-${type}`)?.click();
     }
   };
@@ -73,416 +101,487 @@ function AssetLibrary({ type, title }: { type: 'characters' | 'poses' | 'environ
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && user) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size exceeds 10MB limit.');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file.');
+        return;
+      }
+      
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', type);
-      // Using startTransition to wrap the action
-      startTransition(() => {
-        uploadAction(formData);
-      });
+      startTransition(() => uploadAction(formData));
     }
   };
 
-  const previewAssets = assets.slice(0, 5);
-
   return (
-    <div>
-      <div className="grid grid-cols-5 gap-2">
+    <div className="space-y-3">
+      <div className="grid grid-cols-3 gap-2">
         {previewAssets.map((asset) => (
-          <img
-            key={asset.name}
-            src={asset.url}
-            className="aspect-square w-full rounded-md object-cover"
-            alt={asset.name}
-          />
+          <button key={asset.name} type="button" onClick={() => onSelect(asset)}
+            className={`relative aspect-square w-full rounded-md object-cover border-2 transition-all ${selectedAsset?.url === asset.url ? 'border-primary' : 'border-transparent'} hover:border-primary/50`}>
+            <Image src={asset.url} alt={asset.name} fill className="rounded-md object-cover" />
+          </button>
         ))}
       </div>
-      <div className="mt-3 flex items-center gap-2">
-        <Button onClick={handleUploadClick} variant="outline" className="h-8 border-[#009AFF]/30 text-neutral-200 hover:border-[#009AFF]/50" disabled={isPending}>
-          <Upload className="mr-2 h-4 w-4" /> {isPending ? 'Uploading...' : 'Upload'}
-          <input
-            type="file"
-            id={`file-upload-${type}`}
-            className="sr-only"
-            onChange={handleFileUpload}
-            disabled={isPending}
-          />
+       <div className="flex items-center gap-2">
+        <Button onClick={handleUploadClick} variant="outline" size="sm" className="flex-1" disabled={isUploading || isPending}>
+          <Upload className="mr-2 h-4 w-4" /> {isUploading || isPending ? 'Uploading...' : 'Upload'}
         </Button>
-        <Button
-          variant="ghost"
-          className="h-8 text-neutral-300 hover:text-[#009AFF]"
-          onClick={() => setIsModalOpen(true)}
-        >
-          View Library
-        </Button>
+         <Button onClick={onOpenLibrary} variant="ghost" size="sm" className="flex-1">View Library</Button>
       </div>
-      {uploadState?.error && <p className="text-red-500 text-xs mt-2">{uploadState.error}</p>}
-      {uploadState?.success && <p className="text-green-500 text-xs mt-2">{uploadState.success}</p>}
-      <AssetLibraryModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        assets={assets}
-        title={title}
-      />
+      <input type="file" id={`file-upload-${type}`} className="hidden" onChange={handleFileUpload} accept="image/*" />
+      {uploadState?.error && <p className="text-red-500 text-xs mt-1">{uploadState.error}</p>}
+      {uploadState?.success && <p className="text-green-500 text-xs mt-1">{uploadState.success}</p>}
     </div>
   );
 }
 
-function AssetLibraryModal({
-  open,
-  onClose,
-  assets,
-  title
-}: {
-  open: boolean;
-  onClose: () => void;
-  assets: { name: string; url: string; }[];
-  title: string;
-}) {
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="absolute left-1/2 top-1/2 w-[min(920px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[#009AFF]/20 bg-neutral-950 p-4 shadow-2xl">
-        <div className="flex items-center justify-between px-1 py-2">
-          <div className="text-sm font-medium text-neutral-200">{title}</div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-[#009AFF]/10"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="mt-4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[70vh] overflow-y-auto">
-          {assets.map((asset) => (
-            <button
-              key={asset.name}
-              type="button"
-              onClick={() => { onClose(); }}
-              className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-[#009AFF]/50"
-            >
-              <img src={asset.url} alt={asset.name} className="h-full w-full object-cover" />
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CollapsibleSection({
-  title,
-  children,
-  defaultOpen = false
-}: {
-  title: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}) {
+function CollapsibleSection({ title, children, defaultOpen = false, icon: Icon }: { title: string; children: React.ReactNode; defaultOpen?: boolean; icon: React.ElementType }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-[#009AFF]/20 rounded-xl overflow-hidden bg-neutral-900/40">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm text-neutral-200 hover:bg-[#009AFF]/10"
-      >
-        <span className="font-medium">{title}</span>
-        {open ? (
-          <ChevronDown className="h-4 w-4" />
-        ) : (
-          <ChevronRight className="h-4 w-4" />
-        )}
+    <div className="border-b border-neutral-800">
+      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-3 text-sm text-neutral-200 hover:bg-neutral-800/50">
+        <span className="font-medium flex items-center gap-3">
+          <Icon className="h-5 w-5 text-neutral-400" />
+          {title}
+        </span>
+        {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
       </button>
-      {open && <div className="px-4 pb-4 pt-2">{children}</div>}
+      {open && <div className="p-3 pt-0">{children}</div>}
     </div>
   );
 }
 
-function Chip({
-  label,
-  active,
-  onClick
-}: {
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
-}) {
+function Chip({ label, active, onClick }: { label: string; active?: boolean; onClick?: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`h-8 px-3 rounded-md text-sm border transition ${
-        active
-          ? 'bg-[#009AFF] text-white border-[#009AFF]'
-          : 'bg-neutral-900/40 text-neutral-300 border-white/10 hover:bg-[#009AFF]/10 hover:border-[#009AFF]/30'
-      }`}
-    >
+    <button type="button" onClick={onClick} className={`h-8 px-3 rounded-md text-sm border transition ${active ? 'bg-primary text-white border-primary' : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'}`}>
       {label}
     </button>
   );
 }
 
-function EnvironmentModal({
-  open,
-  onClose,
-  onSelect,
-  presets
-}: {
-  open: boolean;
-  onClose: () => void;
-  onSelect: (preset: EnvironmentPreset) => void;
-  presets: EnvironmentPreset[];
-}) {
-  const [query, setQuery] = useState('');
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return presets;
-    return presets.filter((p) => p.name.toLowerCase().includes(q));
-  }, [query, presets]);
+// ================== MODAL COMPONENTS ==================
 
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="absolute left-1/2 top-1/2 w-[min(920px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[#009AFF]/20 bg-neutral-950 p-4 shadow-2xl">
-        <div className="flex items-center justify-between px-1 py-2">
-          <div className="text-sm font-medium text-neutral-200">Environment</div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-[#009AFF]/10"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          <div className="relative w-full">
-            <Input
-              placeholder="Search environment"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="pl-9 bg-neutral-900 border-white/10 text-neutral-200 placeholder:text-neutral-500 focus:border-[#009AFF]/50 focus:ring-[#009AFF]/20"
-            />
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          <button
-            type="button"
-            onClick={() => undefined}
-            className="aspect-[4/3] rounded-xl border border-dashed border-[#009AFF]/30 grid place-items-center text-neutral-400 hover:bg-[#009AFF]/5"
-          >
-            <div className="flex flex-col items-center gap-2">
-              <Plus className="h-5 w-5" />
-              <span className="text-xs">Upload</span>
+function AddNewCharacterView({ onBack }: { onBack: () => void }) {
+    const goodExamples = ["/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg", "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg", "/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png", "/images/woman v2.png", "/images/romain.gn_A_hand_holding_a_phone_--ar_5877_--raw_--profile_h5_5161a1f7-02d7-43a3-afd2-b77925b50fab_0.png"];
+    const badExamples = ["/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53455 (1).png", "/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png", "/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png", "/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png", "/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png"];
+    
+    const [createState, createAction, isCreating] = useActionState<any, FormData>(createCharacter, null);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(event.target.files || []);
+        setSelectedFiles(files);
+    };
+
+    const handleSubmit = (formData: FormData) => {
+        // Add selected files to form data
+        selectedFiles.forEach(file => {
+            formData.append('files', file);
+        });
+        createAction(formData);
+    };
+
+    return (
+        <div>
+            <Button variant="ghost" onClick={onBack} className="absolute top-4 left-4"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+                <div className="space-y-6">
+                    <div>
+                        <h4 className="font-semibold text-neutral-200">✅ Upload 5+ photos for best results</h4>
+                        <p className="text-sm text-neutral-400 mt-1">Upload high-quality images of one person. The more images you provide, the better the result - show different angles, clear facial expressions, and consistent identity.</p>
+                        <div className="grid grid-cols-5 gap-2 mt-3">
+                            {goodExamples.map(src => <Image key={src} src={src} alt="Good example" width={100} height={100} className="rounded-md object-cover aspect-square" />)}
+                        </div>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold text-neutral-200">❌ Avoid these types of photos</h4>
+                        <p className="text-sm text-neutral-400 mt-1">No duplicates, group shots, pets, nudes, filters, face-covering accessories, or masks.</p>
+                         <div className="grid grid-cols-5 gap-2 mt-3">
+                            {badExamples.map(src => <Image key={src} src={src} alt="Bad example" width={100} height={100} className="rounded-md object-cover aspect-square" />)}
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-neutral-900 p-6 rounded-lg">
+                    <h4 className="font-bold text-lg text-neutral-100">Create your character</h4>
+                    <form action={handleSubmit} className="space-y-4 mt-4">
+                        <Input name="name" placeholder="Name" className="bg-neutral-800 border-neutral-700" required/>
+                        <select name="gender" className="w-full rounded-lg border border-neutral-700 bg-neutral-800 p-3 text-sm text-neutral-200" required>
+                            <option value="">Select the gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                        </select>
+                        <Input name="available_models" placeholder="Available models" className="bg-neutral-800 border-neutral-700"/>
+                        <div className="border-2 border-dashed border-neutral-700 rounded-lg p-6 text-center">
+                            <p className="text-neutral-300">Drag and drop images or <Button variant="link" asChild><label htmlFor="file-upload-modal" className="cursor-pointer">browse</label></Button></p>
+                            <p className="text-xs text-neutral-500 mt-1">(5 images minimum)</p>
+                            <input 
+                                id="file-upload-modal" 
+                                type="file" 
+                                multiple 
+                                className="sr-only" 
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                required
+                            />
+                            {selectedFiles.length > 0 && (
+                                <p className="text-sm text-primary mt-2">{selectedFiles.length} files selected</p>
+                            )}
+                        </div>
+                        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isCreating}>
+                            {isCreating ? 'Creating character...' : 'Create your character'}
+                        </Button>
+                        {createState?.error && <p className="text-red-500 text-xs">{createState.error}</p>}
+                        {createState?.success && <p className="text-green-500 text-xs">{createState.success}</p>}
+                        <p className="text-xs text-neutral-500 text-center">Your custom character and all your generations are private and will not be used to train any datasets. By submitting, you agree to our <a href="#" className="underline">Terms of Service</a>.</p>
+                    </form>
+                </div>
             </div>
-          </button>
-          {filtered.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => onSelect(p)}
-              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 hover:border-[#009AFF]/50"
-            >
-              <img src={p.thumbnail} alt={p.name} className="h-full w-full object-cover" />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-left">
-                <div className="text-[11px] font-medium text-neutral-200">{p.name}</div>
-              </div>
-            </button>
-          ))}
         </div>
+    );
+}
+
+function AssetLibraryModal({ open, onClose, type, onSelect, onDelete }: { open: boolean; onClose: () => void; type: AssetType | null; onSelect: (asset: Asset) => void; onDelete: (asset: Asset) => void; }) {
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [view, setView] = useState<'library' | 'create'>('library');
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const { data: user } = useSWR<User>('/api/user', fetcher);
+
+  // Define filter tabs based on asset type
+  const getFilterTabs = (assetType: AssetType) => {
+    switch (assetType) {
+      case 'characters':
+        return ['All', 'My Characters', 'Female', 'Male'];
+      case 'poses':
+        return ['All', 'My Poses', 'Single', 'Static', 'Sitting', 'Expressive', 'Standing', 'Action', 'Close-up'];
+      case 'garments':
+        return ['All', 'My Garments', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Accessories'];
+      case 'environment':
+        return ['All', 'My Environments', 'Studio', 'Outdoor', 'Indoor', 'Urban', 'Natural'];
+      default:
+        return ['All', 'My Assets'];
+    }
+  };
+
+  useEffect(() => {
+    async function fetchAssets() {
+      if (!type) return;
+      const publicResult = await getPublicImages(type, 100);
+      const publicData = publicResult.data || [];
+      if (user) {
+        const formData = new FormData();
+        formData.append('type', type);
+        formData.append('limit', '100');
+        const userAssetsResult = await getUserAssets({}, formData);
+        const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
+        setAssets([...userData, ...publicData]);
+      } else {
+        setAssets(publicData);
+      }
+    }
+    if (open) {
+      setActiveTab('all');
+      fetchAssets();
+    }
+  }, [open, type, user]);
+
+  const filteredAssets = useMemo(() => {
+    let filtered = assets.filter(asset => asset.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    // Apply category filters
+    if (activeTab === 'My Characters' || activeTab === 'My Poses' || activeTab === 'My Garments' || activeTab === 'My Environments') {
+      filtered = filtered.filter(asset => asset.isOwner);
+    } else if (activeTab !== 'All') {
+      // Filter by metadata or other criteria
+      filtered = filtered.filter(asset => {
+        const metadata = asset.metadata ? JSON.parse(asset.metadata) : {};
+        return metadata.gender === activeTab.toLowerCase() || 
+               metadata.category === activeTab.toLowerCase() ||
+               asset.name.toLowerCase().includes(activeTab.toLowerCase());
+      });
+    }
+    
+    return filtered;
+  }, [assets, activeTab, searchQuery]);
+  
+  if (!open || !type) return null;
+
+  const filterTabs = getFilterTabs(type);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="relative w-[min(1024px,92vw)] rounded-2xl border border-primary/20 bg-neutral-900 p-6 shadow-2xl">
+        <button type="button" onClick={() => { setView('library'); onClose(); }} className="absolute top-4 right-4 p-1.5 rounded-md hover:bg-primary/10" aria-label="Close"><X className="h-5 w-5" /></button>
+        {view === 'library' ? (
+          <>
+            <h3 className="text-xl font-bold text-neutral-100 capitalize">{type}</h3>
+            <div className="flex items-center gap-4 border-b border-neutral-800 mt-4 overflow-x-auto">
+              {filterTabs.map(tab => (
+                 <button 
+                   key={tab} 
+                   className={`py-2 text-sm whitespace-nowrap ${activeTab === tab ? 'text-white border-b-2 border-white' : 'text-neutral-400 hover:text-white'}`}
+                   onClick={() => setActiveTab(tab)}
+                 >
+                   {tab}
+                 </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                <Input placeholder={`Search ${type}`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="bg-neutral-800 border-neutral-700 pl-9"/>
+              </div>
+              {type === 'characters' && (
+                <Button onClick={() => setView('create')} className="bg-primary hover:bg-primary/90">
+                  <Plus className="mr-2 h-4 w-4" /> New Character
+                </Button>
+              )}
+            </div>
+            <div className="mt-4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[60vh] overflow-y-auto p-1">
+              {filteredAssets.map(asset => (
+                <div key={asset.url} className="relative group text-center">
+                  <button type="button" onClick={() => onSelect(asset)} className="group relative w-full aspect-square overflow-hidden rounded-xl border border-neutral-700 hover:border-primary transition">
+                    <Image src={asset.url} alt={asset.name} fill className="object-cover transition-transform group-hover:scale-105" />
+                    {asset.isOwner && <button onClick={(e) => { e.stopPropagation(); onDelete(asset); }} className="absolute top-1.5 right-1.5 p-1 bg-black/50 rounded-full hover:bg-red-500 transition-colors"><Trash2 className="h-3 w-3 text-white" /></button>}
+                  </button>
+                  <p className="text-xs text-neutral-400 mt-1 truncate">{asset.name.split('.')[0]}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : <AddNewCharacterView onBack={() => setView('library')} />}
       </div>
     </div>
   );
 }
 
-function GalleryCard({ src }: { src: string }) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#009AFF]/20 bg-neutral-900">
-      <img src={src} alt="Generated" className="h-full w-full object-cover" />
-      <div className="absolute inset-x-0 top-0 flex items-center gap-2 p-2">
-        <span className="rounded-md bg-black/70 px-2 py-1 text-[11px] text-neutral-200">S</span>
-        <span className="rounded-md bg-black/70 px-2 py-1 text-[11px] text-neutral-200">HD</span>
-        <span className="rounded-md bg-black/70 px-2 py-1 text-[11px] text-neutral-200">4:5</span>
-      </div>
-      <div className="absolute right-2 top-2 flex gap-2">
-        <Button size="sm" variant="secondary" className="h-7 px-2 bg-black/70 text-white hover:bg-[#009AFF]/20">
-          <Video className="h-3.5 w-3.5" />
-          <span className="ml-1 text-xs">Video</span>
-        </Button>
-        <Button size="sm" variant="secondary" className="h-7 px-2 bg-black/70 text-white hover:bg-[#009AFF]/20">
-          <Edit3 className="h-3.5 w-3.5" />
-          <span className="ml-1 text-xs">Edit</span>
-        </Button>
-      </div>
-    </div>
-  );
-}
+
+// ================== MAIN PAGE COMPONENT ==================
 
 export default function GeneratePage() {
-  const [environmentOpen, setEnvironmentOpen] = useState(false);
-  const [activeAR, setActiveAR] = useState('1:1');
-  const [activeView, setActiveView] = useState<'front' | 'side' | 'bottom' | 'low' | 'close' | 'full'>('front');
-  const [processor, setProcessor] = useState<'nano' | 'kling'>('nano');
-  const envPresets: EnvironmentPreset[] = [
-    { id: '3d', name: '3D', thumbnail: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop' },
-    { id: 'horror', name: 'Horror', thumbnail: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=800&auto=format&fit=crop' },
-    { id: 'scifi', name: 'Sci-fi', thumbnail: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800&auto=format&fit=crop' },
-    { id: 'fantasy', name: 'Fantasy', thumbnail: 'https://images.unsplash.com/photo-1493799812874-113b93c2bdba?q=80&w=800&auto=format&fit=crop' },
-    { id: 'vintage', name: 'Vintage', thumbnail: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop' },
-    { id: 'classic', name: 'Classic', thumbnail: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=800&auto=format&fit=crop' },
-    { id: 'watercolor', name: 'Water color', thumbnail: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=800&auto=format&fit=crop' },
-    { id: 'abstract', name: 'Abstract', thumbnail: 'https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=800&auto=format&fit=crop' },
-    { id: 'cinematic', name: 'Cinematic', thumbnail: 'https://images.unsplash.com/photo-1495562569060-2eec283d3391?q=80&w=800&auto=format&fit=crop' }
+  const [selectedModel, setSelectedModel] = useState<Asset | null>(null);
+  const [selectedPose, setSelectedPose] = useState<Asset | null>(null);
+  const [selectedGarment, setSelectedGarment] = useState<Asset | null>(null);
+  const [selectedEnvironment, setSelectedEnvironment] = useState<Asset | null>(null);
+  
+  const [activeLibrary, setActiveLibrary] = useState<AssetType | null>(null);
+  const [showCreateCharacter, setShowCreateCharacter] = useState(false);
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [generateState, generateAction, isGenerating] = useActionState<any, FormData>(generateImage, null);
+  
+  const { data: user, mutate: mutateUser } = useSWR<User>('/api/user', fetcher);
+
+  const [cameraView, setCameraView] = useState<string | null>(null);
+  const [lensAngle, setLensAngle] = useState<string | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<string>('1:1');
+  const [processor, setProcessor] = useState<'Nano Banana' | 'Kling'>('Nano Banana');
+
+  const handleGenerate = (formData: FormData) => {
+    formData.append('modelUrl', selectedModel?.url || '');
+    formData.append('poseUrl', selectedPose?.url || '');
+    formData.append('garmentUrl', selectedGarment?.url || '');
+    formData.append('environmentUrl', selectedEnvironment?.url || '');
+    formData.append('cameraView', cameraView || '');
+    formData.append('lensAngle', lensAngle || '');
+    formData.append('aspectRatio', aspectRatio);
+    formData.append('processor', processor);
+    generateAction(formData);
+  };
+  
+  useEffect(() => {
+    if (generateState?.success && generateState.imageUrl) {
+      setGallery(prev => [generateState.imageUrl, ...prev]);
+      if(user) mutateUser({ ...user, credits: (user.credits || 0) - 1 }, false);
+    }
+    if (generateState?.error) alert(`Generation failed: ${generateState.error}`);
+  }, [generateState, user, mutateUser]);
+
+  const assetCategories = [
+    { type: 'characters' as AssetType, title: 'Model', selected: selectedModel, setter: setSelectedModel, icon: UserIcon },
+    { type: 'poses' as AssetType, title: 'Model Poses', selected: selectedPose, setter: setSelectedPose, icon: Accessibility },
+    { type: 'garments' as AssetType, title: 'Garment', selected: selectedGarment, setter: setSelectedGarment, icon: Shirt },
+    { type: 'environment' as AssetType, title: 'Environment', selected: selectedEnvironment, setter: setSelectedEnvironment, icon: Globe },
   ];
 
-  const gallery = [
-    'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?q=80&w=1200&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1200&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1520975922203-b044420e0b9a?q=80&w=1200&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1516726817505-f5ed825624d8?q=80&w=1200&auto=format&fit=crop'
-  ];
+  const handleSelectAsset = (asset: Asset) => {
+    switch(activeLibrary) {
+      case 'characters': setSelectedModel(asset); break;
+      case 'poses': setSelectedPose(asset); break;
+      case 'garments': setSelectedGarment(asset); break;
+      case 'environment': setSelectedEnvironment(asset); break;
+    }
+    setActiveLibrary(null);
+  };
+
+  const handleDeleteAsset = async (asset: Asset) => {
+      if (!activeLibrary) return;
+      if (window.confirm(`Delete ${asset.name}? This cannot be undone.`)) {
+          const formData = new FormData();
+          formData.append('type', activeLibrary);
+          formData.append('fileName', asset.name);
+          await deleteAsset({}, formData);
+          // Force a re-fetch in the modal
+          setActiveLibrary(null); 
+          setTimeout(() => setActiveLibrary(assetCategories.find(c => c.type === activeLibrary)?.type!), 50);
+      }
+  }
 
   return (
-    <main className="bg-gradient-to-br from-slate-900 via-blue-900 to-black text-neutral-100 min-h-screen">
-      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-12 gap-4">
-          {/* Sidebar (left menu + controls) */}
-          <aside className="col-span-12 lg:col-span-4 xl:col-span-3 space-y-4">
-            {/* App left menu */}
-            <div className="rounded-2xl border border-[#009AFF]/20 bg-neutral-900/60">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#009AFF]/20">
-                <div className="flex items-center gap-2">
-                  <Menu className="h-4 w-4 text-neutral-400" />
-                  
-                </div>
-              </div>
-              <nav className="p-2">
-                {[
-                  { label: 'My creations', href: '#' },
-                  { label: 'Profile', href: '#' },
-                  { label: 'Settings', href: '#' }
-                ].map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="block rounded-lg px-3 py-2 text-sm text-neutral-200 hover:bg-[#009AFF]/10"
-                  >
-                    {item.label}
-                  </a>
-                ))}
-              </nav>
+    <ErrorBoundary>
+      <main className="bg-black text-neutral-100 min-h-[calc(100vh-64px)]">
+        {/* Navigation Menu */}
+        <div className="border-b border-neutral-800 bg-neutral-900/50">
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="flex items-center justify-center gap-4">
+              <span className="text-sm text-neutral-400">My Creations / Generate Images</span>
             </div>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <Button 
+                variant="ghost" 
+                className="bg-neutral-800 text-white hover:bg-neutral-700 px-6 py-3 h-auto"
+              >
+                <Settings className="mr-2 h-5 w-5" />
+                Create an image
+              </Button>
+              <Button 
+                variant="ghost" 
+                asChild
+                className="bg-neutral-800 text-neutral-300 hover:bg-neutral-700 px-6 py-3 h-auto"
+              >
+                <Link href="/my-creations">
+                  <UserIcon className="mr-2 h-5 w-5" />
+                  My Creations
+                </Link>
+              </Button>
+              <Button 
+                variant="ghost" 
+                asChild
+                className="bg-neutral-800 text-neutral-300 hover:bg-neutral-700 px-6 py-3 h-auto"
+              >
+                <Link href="/create-video">
+                  <Play className="mr-2 h-5 w-5" />
+                  Create a video
+                </Link>
+              </Button>
+              <Button 
+                variant="ghost" 
+                asChild
+                className="bg-neutral-800 text-neutral-300 hover:bg-neutral-700 px-6 py-3 h-auto"
+              >
+                <Link href="/create-packshot">
+                  <Square className="mr-2 h-5 w-5" />
+                  Create packshot
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
 
-            {/* Generate panel */}
-            <div className="rounded-2xl border border-[#009AFF]/20 bg-neutral-900/60 p-4 space-y-4">
-              <div>
-                <div className="text-sm font-semibold">Generate Images</div>
-                <p className="mt-2 text-xs text-neutral-400">
-                  Describe your image style (e.g., "red hoodie on tall male model")…
-                </p>
-                <textarea
-                  rows={3}
-                  placeholder="Describe your image style..."
-                  className="mt-2 w-full rounded-lg border border-white/10 bg-neutral-950/60 p-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#009AFF]"
-                />
-                <Button variant="outline" className="mt-2 h-8 gap-2 border-[#009AFF]/30 text-neutral-200 hover:border-[#009AFF]/50">
-                  <Upload className="h-4 w-4" /> Upload images
-                </Button>
+        <div className="grid grid-cols-12 h-full">
+          <aside className="col-span-12 lg:col-span-3 border-r border-neutral-800 bg-neutral-900/50 p-4">
+            <div className="flex flex-col h-full">
+              <div className="flex-1 space-y-2 overflow-y-auto">
+                <h2 className="text-lg font-semibold text-neutral-100 mb-2 px-3">Generate Images</h2>
+                <form id="generate-form" action={handleGenerate} className="space-y-4 px-3">
+                  <textarea name="prompt" rows={3} placeholder="Describe your image style (e.g., 'red hoodie on tall male model')..."
+                    className="w-full rounded-lg border border-neutral-700 bg-neutral-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary" required />
+                  <Button type="button" variant="outline" className="w-full justify-start text-neutral-300 border-neutral-700 hover:bg-neutral-800">
+                    <Upload className="mr-2 h-4 w-4" /> Upload Images
+                  </Button>
+                </form>
+                <div className="border border-neutral-800 rounded-lg">
+                  {assetCategories.map((category, index) => (
+                    <CollapsibleSection key={category.type} title={category.title} defaultOpen={index < 2} icon={category.icon}>
+                      <AssetPreview 
+                        type={category.type} 
+                        onSelect={(asset) => category.setter(asset)} 
+                        onOpenLibrary={() => setActiveLibrary(category.type)} 
+                        selectedAsset={category.selected}
+                        onOpenCreateCharacter={category.type === 'characters' ? () => setShowCreateCharacter(true) : undefined}
+                      />
+                    </CollapsibleSection>
+                  ))}
+                   <CollapsibleSection title="Camera Settings" icon={Camera}>
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-xs font-medium text-neutral-400 mb-2">Camera</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {['Front view', 'Side view', 'Back view', 'Close up', 'Full body'].map(view => (<Chip key={view} label={view} active={cameraView === view} onClick={() => setCameraView(view)} />))}
+                          </div>
+                        </div>
+                      </div>
+                  </CollapsibleSection>
+                  <CollapsibleSection title="Aspect Ratio" icon={Ratio}>
+                     <div className="flex flex-wrap gap-2">
+                        {['1:1', '9:16', '16:9', '3:2', '2:3'].map(ratio => (<Chip key={ratio} label={ratio} active={aspectRatio === ratio} onClick={() => setAspectRatio(ratio)} />))}
+                      </div>
+                  </CollapsibleSection>
+                </div>
               </div>
 
-              <CollapsibleSection title="Model" defaultOpen>
-                <AssetLibrary type="characters" title="Model Library" />
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Model Poses" defaultOpen>
-                <AssetLibrary type="poses" title="Pose Library" />
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Garment" defaultOpen>
-                <AssetLibrary type="garments" title="Garment Library" />
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Environment" defaultOpen>
-                <AssetLibrary type="environment" title="Environment Library" />
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Camera Settings">
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'front', label: 'Front view' },
-                    { id: 'side', label: 'Side view' },
-                    { id: 'bottom', label: 'Bottom view' },
-                    { id: 'low', label: 'Low angle' },
-                    { id: 'close', label: 'Close up' },
-                    { id: 'full', label: 'Full body' }
-                  ].map((v) => (
-                    <Chip
-                      key={v.id}
-                      label={v.label}
-                      active={activeView === (v.id as any)}
-                      onClick={() => setActiveView(v.id as any)}
-                    />
-                  ))}
-                </div>
-                <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-neutral-400">
-                  <div className="flex items-center gap-2"><Camera className="h-3.5 w-3.5" /> Wide angle — 10/24mm</div>
-                  <div className="flex items-center gap-2"><Camera className="h-3.5 w-3.5" /> Standard — 50/90mm</div>
-                  <div className="flex items-center gap-2"><Camera className="h-3.5 w-3.5" /> Long lens — 110/150mm</div>
-                </div>
-              </CollapsibleSection>
-
-              <CollapsibleSection title="AI Processor">
-                <div className="flex items-center gap-2">
-                  <Chip label="Nano Banana" active={processor === 'nano'} onClick={() => setProcessor('nano')} />
-                  <Chip label="Kling" active={processor === 'kling'} onClick={() => setProcessor('kling')} />
-                </div>
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Aspect Ratio">
-                <div className="flex flex-wrap gap-2">
-                  {['1:1', '9:16', '16:9', '3:2', '2:3'].map((r) => (
-                    <Chip key={r} label={r} active={activeAR === r} onClick={() => setActiveAR(r)} />
-                  ))}
-                </div>
-              </CollapsibleSection>
-
-              <div className="pt-1">
-                <Button className="w-full bg-[#009AFF] text-white hover:brightness-95">Generate Image</Button>
-                <div className="mt-1 text-right text-[11px] text-neutral-400">1 credit</div>
+              <div className="mt-4 pt-4 border-t border-neutral-800">
+                <Button type="submit" form="generate-form" className="w-full bg-primary text-white hover:bg-primary/90" disabled={isGenerating}>
+                  {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                  Generate Image
+                </Button>
+                 <div className="mt-2 flex justify-between items-center text-xs text-neutral-400 px-1">
+                    <p>1 credit</p>
+                    <p>{user?.credits ?? 0} credits remaining</p>
+                 </div>
               </div>
             </div>
           </aside>
 
-          {/* Main gallery */}
-          <section className="col-span-12 lg:col-span-8 xl:col-span-9 space-y-4">
-            <div className="rounded-2xl border border-[#009AFF]/20 bg-neutral-900/60 p-4">
-              <div className="text-sm font-medium text-neutral-300">Generated Images</div>
-              <p className="mt-1 text-xs text-neutral-500">
-                These are just examples. Describe a garment or style to try it yourself!
-              </p>
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <GalleryCard src={gallery[0]} />
-                <GalleryCard src={gallery[1]} />
-                <GalleryCard src={gallery[2]} />
-                <GalleryCard src={gallery[3]} />
-              </div>
+          <section className="col-span-12 lg:col-span-9 p-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="font-semibold text-neutral-200">Generated Images</h3>
+                    <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
+                </div>
+                {/* Add Tabs here if needed */}
+            </div>
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+              {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
+              {gallery.map((src, index) => (
+                <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
+              ))}
+              {gallery.length === 0 && !isGenerating && [
+                  "/images/image (1).png", 
+                  "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
+                  "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
+                  "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
+              ].map(src => (
+                 <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
+              ))}
             </div>
           </section>
         </div>
-      </div>
+      </main>
 
-      <EnvironmentModal
-        open={environmentOpen}
-        onClose={() => setEnvironmentOpen(false)}
-        onSelect={() => setEnvironmentOpen(false)}
-        presets={envPresets}
-      />
-    </main>
+      <AssetLibraryModal open={!!activeLibrary} onClose={() => setActiveLibrary(null)} type={activeLibrary} onSelect={handleSelectAsset} onDelete={handleDeleteAsset} />
+      
+      {/* Create Character Modal */}
+      {showCreateCharacter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="relative w-[min(1200px,95vw)] rounded-2xl border border-primary/20 bg-neutral-900 p-6 shadow-2xl">
+            <button 
+              type="button" 
+              onClick={() => setShowCreateCharacter(false)} 
+              className="absolute top-4 right-4 p-1.5 rounded-md hover:bg-primary/10" 
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <AddNewCharacterView onBack={() => setShowCreateCharacter(false)} />
+          </div>
+        </div>
+      )}
+    </ErrorBoundary>
   );
 }
