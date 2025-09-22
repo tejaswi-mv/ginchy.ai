@@ -8,9 +8,9 @@ import Image from 'next/image';
 
 type GeneratedImage = {
   id: number;
-  prompt: string;
+  prompt: string | null;
   imageUrl: string;
-  createdAt: string;
+  createdAt: Date;
 };
 
 interface MyCreationsClientProps {
@@ -20,14 +20,15 @@ interface MyCreationsClientProps {
 export function MyCreationsClient({ images }: MyCreationsClientProps) {
   const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
 
-  const handleDownload = async (imageUrl: string, prompt: string) => {
+  const handleDownload = async (imageUrl: string, prompt: string | null) => {
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ginchy-${prompt.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}.jpg`;
+      const promptText = prompt || 'generated-image';
+      a.download = `ginchy-${promptText.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}.jpg`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -145,9 +146,9 @@ export function MyCreationsClient({ images }: MyCreationsClientProps) {
                   </Button>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-sm text-white truncate">{image.prompt}</p>
+                  <p className="text-sm text-white truncate">{image.prompt || 'No prompt'}</p>
                   <p className="text-xs text-neutral-400">
-                    {new Date(image.createdAt).toLocaleDateString()}
+                    {image.createdAt.toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -169,14 +170,14 @@ export function MyCreationsClient({ images }: MyCreationsClientProps) {
             <div className="relative aspect-[3/4] max-h-[80vh]">
               <Image
                 src={selectedImage.imageUrl}
-                alt={selectedImage.prompt}
+                alt={selectedImage.prompt || 'Generated image'}
                 fill
                 className="object-contain"
               />
             </div>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-2">Prompt</h3>
-              <p className="text-neutral-300 mb-4">{selectedImage.prompt}</p>
+              <p className="text-neutral-300 mb-4">{selectedImage.prompt || 'No prompt available'}</p>
               <div className="flex gap-2">
                 <Button
                   onClick={() => handleDownload(selectedImage.imageUrl, selectedImage.prompt)}

@@ -9,9 +9,9 @@ import { MyCreationsClient } from './MyCreationsClient';
 
 type GeneratedImage = {
   id: number;
-  prompt: string;
+  prompt: string | null;
   imageUrl: string;
-  createdAt: string;
+  createdAt: Date;
 };
 
 async function MyCreationsContent() {
@@ -24,7 +24,7 @@ async function MyCreationsContent() {
           <h1 className="text-2xl font-bold mb-4">Please sign in to view your creations</h1>
           <Button asChild className="bg-primary hover:bg-primary/90">
             <Link href="/sign-in">Sign In</Link>
-          </Button>
+            </Button>
         </div>
       </div>
     );
