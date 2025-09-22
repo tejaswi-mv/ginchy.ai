@@ -118,7 +118,7 @@ export function MyCreationsClient({ images }: MyCreationsClientProps) {
               <div key={image.id} className="group relative aspect-[3/4] rounded-lg overflow-hidden bg-neutral-900">
                 <Image
                   src={image.imageUrl}
-                  alt={image.prompt}
+                  alt={image.prompt || 'Generated image'}
                   fill
                   className="object-cover transition-transform group-hover:scale-105"
                 />

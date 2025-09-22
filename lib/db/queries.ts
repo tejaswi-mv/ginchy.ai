@@ -197,3 +197,39 @@ export async function getTeamForUser() {
     return null;
   }
 }
+
+// Function for when we need the full team data with members (for middleware)
+export async function getTeamForUserWithMembers() {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return null;
+    }
+
+    const result = await db.query.teamMembers.findFirst({
+      where: eq(teamMembers.userId, user.id),
+      with: {
+        team: {
+          with: {
+            teamMembers: {
+              with: {
+                user: {
+                  columns: {
+                    id: true,
+                    name: true,
+                    email: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return result?.team || null;
+  } catch (error) {
+    console.error('Database error in getTeamForUserWithMembers:', error);
+    return null;
+  }
+}
