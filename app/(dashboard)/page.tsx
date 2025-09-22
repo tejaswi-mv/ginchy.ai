@@ -362,10 +362,12 @@ export default function LandingPage() {
       {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
       <section className="w-full bg-black pt-2 pb-4">
         <div className="relative w-full h-20">
-          <img 
+          <Image 
             src="/images/logos.png" 
             alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-            className="w-full h-full object-contain"
+            fill
+            className="object-contain"
+            unoptimized
           />
         </div>
       </section>
@@ -534,10 +536,12 @@ export default function LandingPage() {
         {/* Full Width Company Logos Banner */}
         <div className="w-full bg-black py-8">
           <div className="relative w-full h-24 px-4">
-            <img 
+            <Image 
               src="/images/logos.png" 
               alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-              className="w-full h-full object-contain"
+              fill
+              className="object-contain"
+              unoptimized
             />
           </div>
         </div>
@@ -547,10 +551,12 @@ export default function LandingPage() {
           {/* Main Application Interface */}
           <div className="relative w-full max-w-5xl mx-auto mb-12">
             <div className="relative w-full h-[400px] rounded-2xl overflow-hidden bg-neutral-900 border-2 border-neutral-700 shadow-2xl">
-              <img 
+              <Image 
                 src="/images/app-interface.png" 
                 alt="Main application interface with AI editing tools" 
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                unoptimized
               />
             </div>
           </div>
