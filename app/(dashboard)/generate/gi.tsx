@@ -61,48 +61,30 @@ function AssetPreview({
 }) {
   const { data: user } = useSWR<User>('/api/user', fetcher);
   const router = useRouter();
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [isAssetsLoading, setIsAssetsLoading] = useState(true);
+  const [previewAssets, setPreviewAssets] = useState<Asset[]>([]);
   const [uploadState, uploadAction, isUploading] = useActionState<any, FormData>(uploadAsset, null);
   const [isPending, startTransition] = useTransition();
 
-  const fetchPublicAssets = async () => {
-    // FAST path: Load public assets immediately
+  const fetchPreviewAssets = async () => {
     const publicResult = await getPublicImages(type, 5);
-    setAssets(publicResult.data || []);
-    setIsAssetsLoading(false); 
-  };
+    const publicData = publicResult.data || [];
 
-  const fetchUserAssetsOnly = async () => {
-    if (!user) return; // Only run if user is logged in
-    setIsAssetsLoading(true);
-
-    // SLOW path: Fetch user assets
-    const formData = new FormData();
-    formData.append('type', type);
-    formData.append('limit', '5');
-    const userAssetsResult = await getUserAssets({}, formData);
-    const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
-
-    // Merge user assets with public, prioritize user assets
-    setAssets(prevPublic => [...userData, ...prevPublic.filter(a => !userData.find(u => u.url === a.url))].slice(0, 5));
-    setIsAssetsLoading(false);
-  };
-
-  // Effect 1: Loads fast public assets on mount/type change
-  useEffect(() => {
-    fetchPublicAssets();
-  }, [type]);
-
-  // Effect 2: Triggers the slow user fetch only when the SWR hook resolves
-  useEffect(() => {
     if (user) {
-      fetchUserAssetsOnly();
-    } else if (user === null) {
-      // If user is definitively null (logged out), stop loading
-      setIsAssetsLoading(false); 
+      const formData = new FormData();
+      formData.append('type', type);
+      formData.append('limit', '5');
+      const userAssetsResult = await getUserAssets({}, formData);
+      const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
+      const combined = [...userData, ...publicData];
+      setPreviewAssets(combined.slice(0, 5));
+    } else {
+      setPreviewAssets(publicData.slice(0, 5));
     }
-  }, [user, type, uploadState]);
+  };
+
+  useEffect(() => {
+    fetchPreviewAssets();
+  }, [type, user, uploadState]);
 
   const handleUploadClick = () => {
     if (!user) {
@@ -138,20 +120,12 @@ function AssetPreview({
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
-        {isAssetsLoading ? (
-          // Show skeleton placeholder when loading
-          Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="aspect-square w-full rounded-md bg-neutral-800 animate-pulse" />
-          ))
-        ) : (
-          // Show real assets when loaded
-          assets.map((asset) => (
-            <button key={asset.name} type="button" onClick={() => onSelect(asset)}
-              className={`relative aspect-square w-full rounded-md object-cover border-2 transition-all ${selectedAsset?.url === asset.url ? 'border-primary' : 'border-transparent'} hover:border-primary/50`}>
-              <Image src={asset.url} alt={asset.name} fill className="rounded-md object-cover" />
-            </button>
-          ))
-        )}
+        {previewAssets.map((asset) => (
+          <button key={asset.name} type="button" onClick={() => onSelect(asset)}
+            className={`relative aspect-square w-full rounded-md object-cover border-2 transition-all ${selectedAsset?.url === asset.url ? 'border-primary' : 'border-transparent'} hover:border-primary/50`}>
+            <Image src={asset.url} alt={asset.name} fill className="rounded-md object-cover" />
+          </button>
+        ))}
       </div>
        <div className="flex items-center gap-2">
         <Button onClick={handleUploadClick} variant="outline" size="sm" className="flex-1" disabled={isUploading || isPending}>

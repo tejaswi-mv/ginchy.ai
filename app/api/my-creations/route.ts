@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/drizzle';
 import { generatedImages } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
-import { getUser } from '@/lib/db/queries';
+import { getUser, getCreationsForUser } from '@/lib/db/queries';
 
 export async function GET() {
   try {
@@ -12,11 +12,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const images = await db
-      .select()
-      .from(generatedImages)
-      .where(eq(generatedImages.userId, user.id))
-      .orderBy(generatedImages.createdAt);
+    // Use optimized query with proper indexing
+    const images = await getCreationsForUser(user.id, 100);
 
     return NextResponse.json({ images });
   } catch (error) {

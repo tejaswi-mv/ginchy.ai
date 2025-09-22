@@ -1,0 +1,1 @@
+CREATE INDEX "user_time_idx" ON "activity_logs" USING btree ("user_id","timestamp");
