@@ -144,7 +144,7 @@ function NavigationLinks() {
   );
 }
 
-export default function DashboardHeader() {
+export default function DashboardHeader({ largeOnHome = false }: { largeOnHome?: boolean }) {
   const { data: user, isLoading } = useSWR<User>('/api/user', fetcher);
   return (
     <header
@@ -152,7 +152,7 @@ export default function DashboardHeader() {
     >
       <div className={`mx-auto ${tokens.maxW} h-16 flex items-center`}>
         <div className="flex items-center gap-8">
-          <span className="text-white font-extrabold tracking-wide">
+          <span className={`text-white font-extrabold tracking-wide ${largeOnHome ? 'text-2xl' : ''}`}>
             GINCHY
           </span>
           <NavigationLinks />
@@ -165,7 +165,7 @@ export default function DashboardHeader() {
           ) : (
             <Button
               asChild
-              className="rounded-full bg-[#009AFF] px-5 py-2 text-sm font-semibold text-white hover:bg-[#009AFF]/90 transition"
+              className="rounded-full bg-[#1E90FF] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1E90FF]/90 transition"
             >
               <Link href="/sign-in">Sign in</Link>
             </Button>
