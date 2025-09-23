@@ -1,43 +1,32 @@
 import { desc, and, eq, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
 import { activityLogs, teamMembers, teams, users, generatedImages } from './schema';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/auth/session';
+import { createClient } from '@/lib/supabase/server';
 import { cache } from 'react';
 
 // 1. Rename original function logic to an internal implementation
 const getUserImpl = async () => {
   try {
-    const sessionCookie = (await cookies()).get('session');
-    if (!sessionCookie || !sessionCookie.value) {
+    const supabase = await createClient();
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+
+    if (!supabaseUser || !supabaseUser.email) {
       return null;
     }
 
-    const sessionData = await verifyToken(sessionCookie.value);
-    if (
-      !sessionData ||
-      !sessionData.user ||
-      typeof sessionData.user.id !== 'number'
-    ) {
-      return null;
-    }
-
-    if (new Date(sessionData.expires) < new Date()) {
-      return null;
-    }
-
-    // The database query remains here
-    const user = await db
+    // Now that we have the authenticated user from Supabase,
+    // find the corresponding user in our own Drizzle database.
+    const userResult = await db
       .select()
       .from(users)
-      .where(and(eq(users.id, sessionData.user.id), isNull(users.deletedAt)))
+      .where(and(eq(users.email, supabaseUser.email), isNull(users.deletedAt)))
       .limit(1);
 
-    if (user.length === 0) {
+    if (userResult.length === 0) {
       return null;
     }
 
-    return user[0];
+    return userResult[0];
   } catch (error) {
     console.error('Database error in getUser:', error);
     return null;

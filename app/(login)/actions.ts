@@ -20,18 +20,15 @@ import {
   ActivityType,
   invitations
 } from '@/lib/db/schema';
-import { comparePasswords, hashPassword } from '@/lib/auth/session';
-import { setSession } from '@/lib/auth/session.server';
+import { comparePasswords, hashPassword } from '@/lib/auth/password';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import { createCheckoutSession } from '@/lib/payments/stripe';
 import { getUser, getUserWithTeam } from '@/lib/db/queries';
 import {
   validatedAction,
   validatedActionWithUser
 } from '@/lib/auth/middleware';
-import { supabase } from '@/lib/supabase/client';
-import { supabaseAdmin } from '@/lib/supabase/server'; // Temporarily commented out due to missing module
+import { createClient, supabaseAdmin } from '@/lib/supabase/server';
 import sharp from 'sharp';
 import { withTimeout, TimeoutError } from '@/lib/utils/timeout';
 
@@ -95,10 +92,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
     };
   }
 
-  await Promise.all([
-    setSession(foundUser),
-    logActivity(foundTeam?.id, foundUser.id, ActivityType.SIGN_IN)
-  ]);
+  await logActivity(foundTeam?.id, foundUser.id, ActivityType.SIGN_IN);
 
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
@@ -106,7 +100,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
     return createCheckoutSession({ team: foundTeam, priceId });
   }
 
-  redirect('/dashboard');
+  redirect('/');
 });
 
 const signUpSchema = z.object({
@@ -217,8 +211,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
   await Promise.all([
     db.insert(teamMembers).values(newTeamMember),
-    logActivity(teamId, createdUser.id, ActivityType.SIGN_UP),
-    setSession(createdUser)
+    logActivity(teamId, createdUser.id, ActivityType.SIGN_UP)
   ]);
 
   const redirectTo = formData.get('redirect') as string | null;
@@ -227,14 +220,26 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     return createCheckoutSession({ team: createdTeam, priceId });
   }
 
-  redirect('/dashboard');
+  redirect('/');
 });
 
 export async function signOut() {
-  const user = (await getUser()) as User;
-  const userWithTeam = await getUserWithTeam(user.id);
-  await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
-  (await cookies()).delete('session');
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    // Convert Supabase user ID (string) to number for our database
+    const userId = parseInt(user.id, 10);
+    if (!isNaN(userId)) {
+      const userWithTeam = await getUserWithTeam(userId);
+      if (userWithTeam?.teamId) {
+         await logActivity(userWithTeam.teamId, userId, ActivityType.SIGN_OUT);
+      }
+    }
+  }
+  
+  await supabase.auth.signOut();
+  redirect('/');
 }
 
 const updatePasswordSchema = z.object({
@@ -342,7 +347,6 @@ export const deleteAccount = validatedActionWithUser(
         );
     }
 
-    (await cookies()).delete('session');
     redirect('/sign-in');
   }
 );
@@ -469,6 +473,7 @@ export const inviteTeamMember = validatedActionWithUser(
 
 export async function getPublicImages(folderPath: string, limit: number = 100, offset: number = 0) {
   try {
+    const supabase = await createClient();
     const { data: fileList, error } = await supabase.storage
       .from('public-assets') // Your PUBLIC bucket name
       .list(folderPath, {
@@ -507,7 +512,7 @@ export const getUserAssets = validatedActionWithUser(
     offset: z.number().optional(),
   }),
   async ({ type, limit = 100, offset = 0 }, _, user) => {
-
+    const supabase = await createClient();
     const { data: fileList, error } = await supabase.storage
       .from(type)
       .list(`${user.id}`, { limit, offset });
@@ -658,6 +663,7 @@ export const createCharacter = validatedActionWithUser(
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
         
+        const supabase = await createClient();
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('characters')
           .upload(fileName, file);
@@ -899,3 +905,116 @@ export const generateImage = validatedActionWithUser(
     }
   }
 );
+
+/**
+ * Server Action to initiate the Supabase Google OAuth flow.
+ * Redirects the user to the Google login page.
+ */
+/**
+ * Creates the application session after a successful Google One Tap sign-in.
+ */
+export async function handleIdTokenLogin() {
+  'use server';
+
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session || !session.user || !session.user.email) {
+    return redirect('/sign-in?error=auth_failed');
+  }
+
+  const supabaseUser = session.user;
+  const userEmail = supabaseUser.email!; // We already checked this is not null above
+
+  // Find or create the user in the local database
+  let dbUser = await db.query.users.findFirst({
+    where: eq(users.email, userEmail),
+  });
+
+  if (!dbUser) {
+    dbUser = await db.transaction(async (tx) => {
+      const newTeam: NewTeam = {
+        name: `${supabaseUser.user_metadata.full_name || userEmail}'s Team`,
+      };
+      const [createdTeam] = await tx.insert(teams).values(newTeam).returning();
+
+      const newUser: NewUser = {
+        email: userEmail,
+        passwordHash: 'oauth_user_no_password',
+        name: supabaseUser.user_metadata.full_name || null,
+        role: 'owner',
+      };
+      const [createdUser] = await tx.insert(users).values(newUser).returning();
+
+      const newTeamMember: NewTeamMember = {
+        userId: createdUser.id,
+        teamId: createdTeam.id,
+        role: 'owner',
+      };
+      await tx.insert(teamMembers).values(newTeamMember);
+
+      await logActivity(createdTeam.id, createdUser.id, ActivityType.SIGN_UP);
+      
+      return createdUser;
+    });
+  }
+
+  if (dbUser) {
+    redirect('/dashboard');
+  } else {
+    redirect('/sign-in?error=user_creation_failed');
+  }
+}
+
+export async function handleOAuthCallback() {
+  'use server';
+
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session || !session.user || !session.user.email) {
+    return redirect('/sign-in?error=oauth_failed');
+  }
+
+  const supabaseUser = session.user;
+  const userEmail = supabaseUser.email!; // We already checked this is not null above
+
+  // Find or create the user in the local database
+  let dbUser = await db.query.users.findFirst({
+    where: eq(users.email, userEmail),
+  });
+
+  if (!dbUser) {
+    dbUser = await db.transaction(async (tx) => {
+      const newTeam: NewTeam = {
+        name: `${supabaseUser.user_metadata.full_name || userEmail}'s Team`,
+      };
+      const [createdTeam] = await tx.insert(teams).values(newTeam).returning();
+
+      const newUser: NewUser = {
+        email: userEmail,
+        passwordHash: 'oauth_user_no_password',
+        name: supabaseUser.user_metadata.full_name || null,
+        role: 'owner',
+      };
+      const [createdUser] = await tx.insert(users).values(newUser).returning();
+
+      const newTeamMember: NewTeamMember = {
+        userId: createdUser.id,
+        teamId: createdTeam.id,
+        role: 'owner',
+      };
+      await tx.insert(teamMembers).values(newTeamMember);
+
+      await logActivity(createdTeam.id, createdUser.id, ActivityType.SIGN_UP);
+      
+      return createdUser;
+    });
+  }
+
+  if (dbUser) {
+    redirect('/dashboard');
+  } else {
+    redirect('/sign-in?error=user_creation_failed');
+  }
+}
