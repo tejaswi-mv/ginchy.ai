@@ -101,6 +101,12 @@ function NavigationLinks() {
         >
           Generate
         </Link>
+        <Link
+          href="/my-creations"
+          className="text-neutral-300 hover:text-white transition"
+        >
+          My Creations
+        </Link>
       </nav>
     );
   }
