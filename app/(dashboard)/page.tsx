@@ -9,6 +9,7 @@ import { askQuestion, getPublicCharacters } from './actions';
 import useSWR from 'swr';
 import { User } from '@/lib/db/schema';
 import { useRouter } from "next/navigation";
+import Hero from '@/components/Hero';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -122,7 +123,7 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
               key={image}
               onClick={() => setCurrentIndex(index)}
               className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition ${
-                index === currentIndex ? 'border-[#009AFF]' : 'border-transparent'
+                index === currentIndex ? 'border-[#1E90FF]' : 'border-transparent'
               }`}
             >
               <Image
@@ -318,54 +319,22 @@ export default function LandingPage() {
     <main className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-black text-white antialiased overflow-hidden">
       {/* neon background accents */}
       <div className="pointer-events-none absolute -z-10 inset-0">
-        <div className="absolute left-[-120px] top-24 h-[260px] w-[260px] rounded-full bg-[#009AFF] blur-[120px] opacity-25"></div>
-        <div className="absolute right-[-100px] top-[520px] h-[300px] w-[300px] rounded-full bg-[#009AFF] blur-[140px] opacity-20"></div>
-        <div className="absolute left-1/3 bottom-[-120px] h-[280px] w-[280px] rounded-full bg-[#009AFF] blur-[140px] opacity-15"></div>
+        <div className="absolute left-[-120px] top-24 h-[260px] w-[260px] rounded-full bg-[#1E90FF] blur-[120px] opacity-25"></div>
+        <div className="absolute right-[-100px] top-[520px] h-[300px] w-[300px] rounded-full bg-[#1E90FF] blur-[140px] opacity-20"></div>
+        <div className="absolute left-1/3 bottom-[-120px] h-[280px] w-[280px] rounded-full bg-[#1E90FF] blur-[140px] opacity-15"></div>
       </div>
    
 
       {/* ================== HERO ================== */}
-      <section className={`${tokens.gutter} pt-24 pb-16 bg-black text-white`}>
-        <div className={`mx-auto ${tokens.maxW}`}>
-          <div className={tokens.grid}>
-            {/* Left: copy */}
-            <div className="col-span-12 lg:col-span-6 flex flex-col justify-center">
-              <h1 className="font-[var(--font-display)] text-[48px] sm:text-[64px] lg:text-[88px] font-extrabold leading-[0.95] tracking-tight">
-                <span className="text-[#009AFF] drop-shadow-[0_0_22px_rgba(0,154,255,0.25)]">UNLOCK</span>
-                <br />
-                <span className="italic">GROWTH</span>
-              </h1>
-              <p className="mt-6 text-[16px] sm:text-[18px] lg:text-[20px] text-neutral-200 max-w-xl leading-relaxed">
-                Adopt the industry’s leading AI platform for in-house creation of PDP, Lookbook, and Campaign visuals.
-              </p>
-              <p className="mt-3 text-[#009AFF] drop-shadow-[0_0_16px_rgba(0,154,255,0.35)] font-semibold tracking-wider text-[18px] sm:text-[20px]">[ with Ginchy ]</p>
-              <div className="mt-6">
-                {/* CTA duplicated below hero media per screenshot; keep here for mobile */}
-                <a href="#try" className="inline-flex lg:hidden items-center justify-center gap-2 rounded-full bg-[#009AFF] px-8 py-3.5 text-white text-lg font-semibold hover:brightness-95 transition shadow-[0_0_0_8px_rgba(0,154,255,0.12)]">Try it now <ArrowRight className="w-5 h-5" /></a>
-              </div>
-            </div>
-
-            {/* Right: media frame placeholder */}
-            <div className="col-span-12 lg:col-span-6 mt-10 lg:mt-0">
-              <div className="relative overflow-hidden rounded-3xl border border-neutral-800 shadow-sm aspect-[16/10] bg-neutral-800">
-                <Image src="/images/video.png" alt="Hero video" unoptimized fill className="object-cover" priority />
-              </div>
-              {/* CTA under hero showcase on desktop */}
-              <div className="hidden lg:block mt-6">
-                <a href="#try" className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#009AFF] px-10 py-4 text-white text-xl font-semibold hover:brightness-95 transition shadow-[0_0_0_10px_rgba(0,154,255,0.12)]">Try it now <ArrowRight className="w-6 h-6" /></a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Hero />
 
       {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
       <section className="w-full bg-black pt-2 pb-4">
-        <div className="relative w-full h-20">
+        <div className="relative w-full h-16">
           <img 
             src="/images/logos.png" 
             alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain scale-125"
           />
         </div>
       </section>
@@ -377,20 +346,39 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left column: title + media with benefits on the right */}
             <div className="col-span-1 lg:col-span-7">
-              <h2 className="font-[var(--font-display)] text-[28px] sm:text-[36px] font-extrabold tracking-tight mb-6 max-w-2xl">
-                Create, amplify and scale professional product content.
-              </h2>
-              <div className="grid grid-cols-12 gap-6 items-start">
-                {/* media placeholder (video or image) */}
-                <div className="col-span-12 md:col-span-7">
-                  <div className="relative rounded-2xl overflow-hidden border border-neutral-700 bg-neutral-900 aspect-[4/3]">
-                    <Image src="https://images.pexels.com/photos/3268732/pexels-photo-3268732.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Fashion model" fill className="object-cover" unoptimized />
-                  </div>
-                  {/* small overlay thumbnail bottom-left */}
-                  <div className="relative -mt-10 ml-6 w-44 h-28 rounded-md overflow-hidden border border-neutral-700 bg-neutral-800">
-                    <Image src="https://images.pexels.com/photos/3775131/pexels-photo-3775131.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Fashion model thumbnail" fill className="object-cover" unoptimized />
-                  </div>
-                </div>
+               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight mb-6 max-w-2xl">
+                 Create, amplify and scale<br/>
+                 professional product content.
+               </h2>
+               <div className="grid grid-cols-12 gap-6 items-start">
+                 {/* media placeholder (video or image) */}
+                 <div className="col-span-12 md:col-span-7">
+                   <div className="relative inline-block mt-8 overflow-hidden">
+                     <Image 
+                       src="https://images.pexels.com/photos/3268732/pexels-photo-3268732.jpeg?auto=compress&cs=tinysrgb&w=800" 
+                       alt="Fashion model" 
+                       width={520}
+                       height={385}
+                       className="w-[520px] h-[385px] object-cover object-center"
+                       style={{
+                         objectFit: 'cover', 
+                         objectPosition: 'center',
+                         borderRadius: '0px'
+                       }}
+                       unoptimized 
+                     />
+                     <div 
+                       className="absolute left-[-24px] bottom-[-24px] w-[260px] h-[180px]"
+                       style={{
+                         backgroundColor: '#1E90FF',
+                         opacity: 0.2,
+                         borderRadius: '0px',
+                         border: '1px solid rgba(255,255,255,0.12)',
+                         boxShadow: '0 8px 24px rgba(0,0,0,0.35)'
+                       }}
+                     />
+                   </div>
+                 </div>
                 {/* benefits text list */}
                 <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-6">
                   <div className="space-y-5">
@@ -416,7 +404,7 @@ export default function LandingPage() {
               <h2 className="font-[var(--font-display)] text-[30px] sm:text-[40px] font-extrabold tracking-tight mb-6 uppercase">
                 ALL TYPES OF
                 <br />
-                <span className="italic text-[#009AFF]">[ fashion items ]</span>
+                <span className="italic text-[#1E90FF]">[ fashion items ]</span>
               </h2>
               <div className="grid grid-cols-1 gap-4">
                 {/* Top row: shoes with small label on the right */}
@@ -468,8 +456,8 @@ export default function LandingPage() {
                 className="relative h-full w-12 rounded-full overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
                 onClick={handleGetAccess}
               >
-                {/* lime gradient fill */}
-                <div className="absolute inset-0 bg-[#009AFF]" />
+                {/* blue gradient fill */}
+                <div className="absolute inset-0 bg-[#1E90FF]" />
                 {/* vertical label - text from bottom to top */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="rotate-[-90deg] font-black text-black text-sm tracking-wider whitespace-nowrap">
@@ -482,31 +470,31 @@ export default function LandingPage() {
             {/* four tall images row - professional images as specified */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
               {/* Sample placeholder - Desert scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png" alt="Sample placeholder" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(30,144,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(30,144,255,0.5)]"></div>
               </div>
               
               {/* Customized 2 - New York scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png" alt="Customized 2" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 3 - White studio scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 4 - Snow environment scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#009AFF] bg-neutral-800">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png" alt="Customized 4" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#009AFF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#009AFF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
             </div>
 
@@ -608,7 +596,7 @@ export default function LandingPage() {
               </div>
 
               {/* Section label */}
-              <p className="text-center text-[#009AFF] font-bold text-sm tracking-wider">
+              <p className="text-center text-[#1E90FF] font-bold text-sm tracking-wider">
                 [SOCIAL MEDIA]
               </p>
 
@@ -622,12 +610,12 @@ export default function LandingPage() {
             {/* RIGHT SECTION - PRODUCT PAGES */}
             <div className="space-y-6">
               {/* Product page image */}
-              <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-800 border-2 border-[#009AFF]">
+              <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-800 border-2 border-[#1E90FF]">
                 <Image src="/images/website.png" alt="Product page" unoptimized fill className="object-cover" />
               </div>
 
               {/* Section label */}
-              <p className="text-center text-[#009AFF] font-bold text-sm tracking-wider">
+              <p className="text-center text-[#1E90FF] font-bold text-sm tracking-wider">
                 [PRODUCT PAGES]
               </p>
 
@@ -651,7 +639,7 @@ export default function LandingPage() {
           {/* divider with glow */}
           <div className="relative mt-16">
             <div className="h-px bg-white/30 mx-auto max-w-2xl"></div>
-            <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-56 w-56 rounded-full bg-[#009AFF] blur-3xl opacity-20"></div>
+            <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-56 w-56 rounded-full bg-[#1E90FF] blur-3xl opacity-20"></div>
           </div>
         </div>
       </section>
@@ -671,7 +659,7 @@ export default function LandingPage() {
 
           {/* Testimonial Cards */}
           <div className="flex justify-center">
-            <div className="relative w-[400px] max-w-full rounded-2xl bg-white text-black p-6 shadow-[0_0_40px_rgba(0,154,255,0.60)] border border-[#009AFF]">
+            <div className="relative w-[400px] max-w-full rounded-2xl bg-white text-black p-6 shadow-[0_0_40px_rgba(0,154,255,0.60)] border border-[#1E90FF]">
               {/* Profile Picture */}
               <div className="flex items-start space-x-4 mb-4">
                 <div className="relative">
@@ -723,7 +711,7 @@ export default function LandingPage() {
             </div>
 
             {/* Pro (highlighted) */}
-            <div className="rounded-2xl bg-neutral-900 border-2 border-[#009AFF] p-6 shadow-[0_0_0_4px_rgba(0,154,255,0.15)]">
+            <div className="rounded-2xl bg-neutral-900 border-2 border-[#1E90FF] p-6 shadow-[0_0_0_4px_rgba(0,154,255,0.15)]">
               <p className="text-sm text-neutral-400">PRO</p>
               <div className="mt-2 text-3xl font-extrabold tracking-tight">$19<span className="text-base font-medium">/month</span></div>
               <p className="text-xs text-neutral-400">50 credits / month</p>
@@ -764,7 +752,7 @@ export default function LandingPage() {
 
       {/* ================== SECTION 8 — Final CTA (blue “Perfect”) ================== */}
       <section className={`${tokens.gutter} py-16 bg-white relative`}>
-        <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-60 w-60 rounded-full bg-[#009AFF] blur-3xl opacity-25"></div>
+        <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-60 w-60 rounded-full bg-[#1E90FF] blur-3xl opacity-25"></div>
         <div className={`relative mx-auto ${tokens.maxW} text-center`}>
           <h3 className="text-[24px] sm:text-[32px] font-semibold text-neutral-800 tracking-tight">
             Ready to <span className="font-extrabold text-[#1DA1FF]">Perfect</span> Your AI Art?
@@ -899,7 +887,7 @@ function SubmitButton() {
     <button
       type="submit"
       aria-disabled={pending}
-      className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#009AFF] px-8 py-3.5 text-white text-lg font-semibold hover:brightness-95 transition disabled:opacity-50"
+      className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#1E90FF] px-8 py-3.5 text-white text-lg font-semibold hover:brightness-95 transition disabled:opacity-50"
     >
       {pending ? 'Submitting...' : 'Submit'}
     </button>
