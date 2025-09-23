@@ -447,7 +447,6 @@ export default function LandingPage() {
 
       {/* ================== HERO ================== */}
       <Hero />
-
       {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
       <section className="w-full bg-black pt-2 pb-4 overflow-hidden">
         <div className="relative w-full h-20">
@@ -479,8 +478,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-     
 
       {/* ================== SECTION 2 — Create/All types ================== */}
       <section className={`${tokens.gutter} py-20 bg-black text-white`} id="about">
