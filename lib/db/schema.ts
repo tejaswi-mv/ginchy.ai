@@ -5,6 +5,8 @@ import {
   text,
   timestamp,
   integer,
+  index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -18,7 +20,9 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
-});
+}, (table) => ({
+  emailIndex: uniqueIndex('users_email_idx').on(table.email), 
+}));
 
 export const teams = pgTable('teams', {
   id: serial('id').primaryKey(),
@@ -42,7 +46,10 @@ export const teamMembers = pgTable('team_members', {
     .references(() => teams.id),
   role: varchar('role', { length: 50 }).notNull(),
   joinedAt: timestamp('joined_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  userIdIndex: index('team_members_user_id_idx').on(table.userId), // CRITICAL for user-to-team lookup
+  teamIdIndex: index('team_members_team_id_idx').on(table.teamId),
+}));
 
 export const activityLogs = pgTable('activity_logs', {
   id: serial('id').primaryKey(),
@@ -53,7 +60,10 @@ export const activityLogs = pgTable('activity_logs', {
   action: text('action').notNull(),
   timestamp: timestamp('timestamp').notNull().defaultNow(),
   ipAddress: varchar('ip_address', { length: 45 }),
-});
+}, (table) => ({
+  // CRITICAL: Composite index for filtering by userId and ordering by timestamp
+  userTimeIdx: index('user_time_idx').on(table.userId, table.timestamp), 
+}));
 
 export const invitations = pgTable('invitations', {
   id: serial('id').primaryKey(),
@@ -78,7 +88,13 @@ export const assets = pgTable('assets', {
   name: varchar('name', { length: 255 }),
   metadata: text('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  // Add indexes for faster queries
+  userIdIdx: index('assets_user_id_idx').on(table.userId),
+  typeIdx: index('assets_type_idx').on(table.type),
+  userIdTypeIdx: index('assets_user_type_idx').on(table.userId, table.type),
+  createdAtIdx: index('assets_created_at_idx').on(table.createdAt),
+}));
 
 export const generatedImages = pgTable('generated_images', {
   id: serial('id').primaryKey(),
@@ -87,7 +103,12 @@ export const generatedImages = pgTable('generated_images', {
   prompt: text('prompt'),
   imageUrl: text('image_url').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  // Add indexes for faster queries
+  userIdIdx: index('generated_images_user_id_idx').on(table.userId),
+  createdAtIdx: index('generated_images_created_at_idx').on(table.createdAt),
+  userIdCreatedAtIdx: index('generated_images_user_created_idx').on(table.userId, table.createdAt),
+}));
 
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),

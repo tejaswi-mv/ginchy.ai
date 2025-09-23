@@ -15,6 +15,27 @@
       "when": 1757917523439,
       "tag": "0001_cynical_lady_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758523013189,
+      "tag": "0002_mushy_titania",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758523547241,
+      "tag": "0003_bright_hydra",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1758524074212,
+      "tag": "0004_common_blob",
+      "breakpoints": true
     }
   ]
 }
