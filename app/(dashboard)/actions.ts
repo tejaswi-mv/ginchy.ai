@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import { validatedAction } from '@/lib/auth/middleware';
 import { getPublicImages } from '../(login)/actions';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 
 const askQuestionSchema = z.object({
   email: z.string().email().min(3).max(255),
@@ -28,6 +28,7 @@ export const askQuestion = validatedAction(askQuestionSchema, async (data) => {
 export async function getPublicCharacters() {
   // This action fetches images from the 'characters' directory in your public bucket.
   // It reuses the getPublicImages function for efficiency.
+  const supabase = await createClient();
   const { data: fileList } = await supabase.storage
     .from('public-assets')
     .list('characters');

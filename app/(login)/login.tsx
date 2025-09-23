@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { CircleIcon, Loader2 } from 'lucide-react';
 import { signIn, signUp } from './actions';
 import { ActionState } from '@/lib/auth/middleware';
+import GoogleOAuthButton from '@/components/GoogleOAuthButton';
 
 export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
   const searchParams = useSearchParams();
@@ -111,6 +112,23 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
             </Button>
           </div>
         </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-neutral-700" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-black text-neutral-300">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <GoogleOAuthButton />
+          </div>
+        </div>
 
         <div className="mt-6">
           <div className="relative">
