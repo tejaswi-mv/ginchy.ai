@@ -271,3 +271,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Logo scrolling animation */
+@keyframes scroll-seamless {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.animate-scroll-seamless {
+  animation: scroll-seamless 25s linear infinite;
+  width: 300%;
+  display: flex;
+  will-change: transform;
+}

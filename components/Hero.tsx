@@ -43,19 +43,19 @@ export default function Hero() {
                   {/* Right: Hero Image with Custom Dimensions */}
                   <div className="col-span-12 lg:col-span-6 mt-10 lg:mt-0 lg:ml-[-8rem]">
                     <div 
-                      className="relative overflow-hidden rounded-3xl border-2 border-white/20 shadow-2xl"
+                      className="relative overflow-hidden border-2 border-white/20 shadow-2xl"
                       style={{
                         aspectRatio: '3764/2056', // Custom aspect ratio based on your dimensions
-                        maxWidth: '75%',
-                        width: '75%'
+                        maxWidth: '95%',
+                        width: '95%'
                       }}
                     >
               {/* Image Container with Custom Dimensions */}
-              <div className="relative w-full h-full rounded-3xl overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-800 to-black">
+              <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-800 to-black">
                 {/* Placeholder for your custom photo (3764w × 2056h) */}
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-900">
                   <div className="text-center text-white/60">
-                    <div className="text-sm font-mono mb-2">Photo Placeholder</div>
+                    <div className="text-sm font-mono mb-2">Video Placeholder</div>
                     <div className="text-xs font-mono">3764 × 2056</div>
                   </div>
                 </div>
@@ -72,10 +72,10 @@ export default function Hero() {
               </div>
             </div>
             {/* CTA under hero showcase on desktop */}
-            <div className="hidden lg:block mt-4" style={{marginLeft: 'calc(-8rem + 7rem)', width: '75%'}}>
+            <div className="hidden lg:block mt-4" style={{marginLeft: 'calc(-8rem + 8rem)', width: '95%'}}>
               <a 
                 href="#try" 
-                className="w-full inline-flex items-center justify-center gap-3 rounded-lg bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-8 py-4 text-white text-lg font-bold hover:shadow-lg transition-all duration-300"
+                className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-8 py-2 text-white text-lg font-bold hover:shadow-lg transition-all duration-300 rounded-lg"
               >
                 <span>Try it now</span>
                 <ArrowRight className="w-5 h-5" />

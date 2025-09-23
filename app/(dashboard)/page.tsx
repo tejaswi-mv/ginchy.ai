@@ -36,12 +36,12 @@ function ModelLibraryModal({ isOpen, onClose, characters, onSelect }: {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="relative bg-white rounded-2xl p-6 max-w-4xl w-full text-black">
+            <div className="relative bg-white  p-6 max-w-4xl w-full text-black">
                 <h3 className="text-xl font-bold">Model Library</h3>
                 <p className="text-neutral-600 text-sm mt-1">Select a model to preview.</p>
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 mt-6 max-h-[70vh] overflow-y-auto">
                     {characters.map((char) => (
-                        <div key={char.name} className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group" onClick={() => onSelect(char)}>
+                        <div key={char.name} className="relative aspect-square  overflow-hidden cursor-pointer group" onClick={() => onSelect(char)}>
                             <Image src={char.url} alt={char.name} fill className="object-cover transition-transform duration-200 group-hover:scale-105"/>
                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
@@ -106,7 +106,7 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
         </button>
         
         {/* Main image */}
-        <div className="relative w-full h-[80vh] rounded-lg overflow-hidden">
+        <div className="relative w-full h-[80vh]  overflow-hidden">
           <Image
             src={allImages[currentIndex]}
             alt="Gallery image"
@@ -122,7 +122,7 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
             <button
               key={image}
               onClick={() => setCurrentIndex(index)}
-              className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition ${
+              className={`relative w-16 h-16  overflow-hidden border-2 transition ${
                 index === currentIndex ? 'border-[#1E90FF]' : 'border-transparent'
               }`}
             >
@@ -206,17 +206,17 @@ function ChooseModelSection() {
                         </p>
                         <div className="grid grid-cols-12 gap-6 items-center">
                             <div className="col-span-12 lg:col-span-7">
-                                <div className="relative rounded-lg overflow-hidden mb-6 p-4 border border-neutral-200">
+                                <div className="relative  overflow-hidden mb-6 p-4 border border-neutral-200">
                                     {isLoading ? (
                                         <div className="grid grid-cols-6 gap-2">
                                             {Array.from({ length: 18 }).map((_, i) => (
-                                                <div key={i} className="aspect-square rounded-md bg-neutral-200 animate-pulse"></div>
+                                                <div key={i} className="aspect-square  bg-neutral-200 animate-pulse"></div>
                                             ))}
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-6 gap-2">
                                             {previewCharacters.map((char) => (
-                                            <div key={char.name} className="relative aspect-square rounded-md overflow-hidden cursor-pointer group" onClick={() => handleSelectCharacter(char)}>
+                                            <div key={char.name} className="relative aspect-square  overflow-hidden cursor-pointer group" onClick={() => handleSelectCharacter(char)}>
                                                 <Image 
                                                     src={char.url} 
                                                     alt={char.name} 
@@ -244,7 +244,7 @@ function ChooseModelSection() {
                                 </div>
                             </div>
                             <div className="col-span-12 lg:col-span-5">
-                                <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200">
+                                <div className="relative w-full h-[400px] lg:h-[500px]  overflow-hidden bg-neutral-100 border border-neutral-200">
                                     {selectedCharacter ? (
                                         <Image 
                                             src={selectedCharacter.url} 
@@ -329,15 +329,34 @@ export default function LandingPage() {
       <Hero />
 
       {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
-      <section className="w-full bg-black pt-2 pb-4">
+      <section className="w-full bg-black pt-2 pb-4 overflow-hidden">
         <div className="relative w-full h-20">
-          <Image 
-            src="/images/logos.png" 
-            alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-            fill
-            className="object-contain"
-            unoptimized
-          />
+          <div className="flex animate-scroll-seamless">
+            <Image 
+              src="/images/logos.png" 
+              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+              width={1200}
+              height={80}
+              className="object-contain flex-shrink-0 filter contrast-200 brightness-150"
+              unoptimized
+            />
+            <Image 
+              src="/images/logos.png" 
+              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+              width={1200}
+              height={80}
+              className="object-contain flex-shrink-0 filter contrast-200 brightness-150"
+              unoptimized
+            />
+            <Image 
+              src="/images/logos.png" 
+              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+              width={1200}
+              height={80}
+              className="object-contain flex-shrink-0 filter contrast-200 brightness-150"
+              unoptimized
+            />
+          </div>
         </div>
       </section>
 
@@ -382,18 +401,18 @@ export default function LandingPage() {
                    </div>
                  </div>
                 {/* benefits text list */}
-                <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-6">
-                  <div className="space-y-5">
+                <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-6 flex items-end">
+                  <div className="space-y-5 mt-8">
                     <div>
-                      <h3 className="font-semibold text-white">Production efficiency</h3>
+                      <h3 className="font-black text-white">Production efficiency</h3>
                       <p className="text-neutral-300">Speed up the design-to-production process by eliminating the need for physical sample to respond quickly to market demands.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">Cost reduction</h3>
+                      <h3 className="font-black text-white">Cost reduction</h3>
                       <p className="text-neutral-300">Eliminates the need for traditional photoshoots, reducing costs and resource consumption while simplifying content creation.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">Sustainability</h3>
+                      <h3 className="font-black text-white">Sustainability</h3>
                       <p className="text-neutral-300">Reduces the environmental impact by minimizing the need for physical photoshoots and associated logistics.</p>
                     </div>
                   </div>
@@ -403,33 +422,33 @@ export default function LandingPage() {
 
             {/* Right column: heading + three cards layout */}
             <div className="col-span-12 lg:col-span-5">
-              <h2 className="font-[var(--font-display)] text-[30px] sm:text-[40px] font-extrabold tracking-tight mb-6 uppercase">
+              <h2 className="font-[var(--font-display)] text-[40px] sm:text-[50px] lg:text-[60px] font-extrabold tracking-tight mb-6 uppercase">
                 ALL TYPES OF
                 <br />
-                <span className="italic text-[#1E90FF]">[ fashion items ]</span>
+                <span className="italic text-[#1E90FF] font-['IBM_Plex_Serif','Georgia',serif] font-medium lowercase">[ fashion items ]</span>
               </h2>
               <div className="grid grid-cols-1 gap-4">
                 {/* Top row: shoes with small label on the right */}
                 <div className="relative flex justify-start">
-                  <div className="relative w-[360px] max-w-full rounded-2xl overflow-hidden border border-neutral-700 bg-neutral-100 aspect-[4/3]">
-                    <Image src="/images/Shoes.png" alt="Shoes" fill className="object-cover" unoptimized />
+                  <div className="relative w-[250px] h-[200px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
+                    <Image src="/images/Shoes.png" alt="Shoes" fill className="object-cover object-center" style={{objectPosition: 'center 20%'}} unoptimized />
                   </div>
-                  <div className="absolute top-1/2 -translate-y-1/2 -right-1 rounded-md border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Shoes</div>
+                  <div className="absolute top-1/2 -translate-y-1/2 left-[260px] border border-neutral-600 bg-black/60 px-4 py-2 text-[11px]">Shoes</div>
                 </div>
                 {/* second row: jewelry small square with label below */}
                 <div className="grid grid-cols-2 gap-4 items-start">
                   <div className="relative flex justify-start">
-                    <div className="relative w-[180px] max-w-full rounded-2xl overflow-hidden border border-neutral-700 bg-neutral-100 aspect-square">
+                    <div className="relative w-[190px] h-[150px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
                       <Image src="/images/Garment.png" alt="Accessories" fill className="object-cover" unoptimized />
                     </div>
-                    <div className="absolute -bottom-7 left-[90px] -translate-x-1/2 w-[110px] text-center rounded-md border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
+                    <div className="absolute -bottom-7 left-[90px] -translate-x-1/2 w-[110px] text-center border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
                   </div>
                   {/* sunglasses big square with label on right */}
                   <div className="flex items-center gap-2">
-                    <div className="relative w-[260px] max-w-full rounded-2xl overflow-hidden border border-neutral-700 bg-neutral-100 aspect-square">
+                    <div className="relative w-[260px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100 aspect-square">
                       <Image src="/images/glasses.png" alt="Sunglasses" fill className="object-cover" unoptimized />
                     </div>
-                    <div className="rounded-md border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
+                    <div className="border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
                   </div>
                 </div>
               </div>
@@ -472,31 +491,31 @@ export default function LandingPage() {
             {/* four tall images row - professional images as specified */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
               {/* Sample placeholder - Desert scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png" alt="Sample placeholder" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(30,144,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(30,144,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(30,144,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(30,144,255,0.5)]"></div>
               </div>
               
               {/* Customized 2 - New York scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png" alt="Customized 2" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 3 - White studio scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 4 - Snow environment scene */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
                 <Image src="/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png" alt="Customized 4" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] rounded-sm shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
             </div>
 
@@ -538,7 +557,7 @@ export default function LandingPage() {
 
           {/* Main Application Interface */}
           <div className="relative w-full max-w-5xl mx-auto mb-12">
-            <div className="relative w-full h-[400px] rounded-2xl overflow-hidden bg-neutral-900 border-2 border-neutral-700 shadow-2xl">
+            <div className="relative w-full h-[400px]  overflow-hidden bg-neutral-900 border-2 border-neutral-700 shadow-2xl">
               <Image 
                 src="/images/app-interface.png" 
                 alt="Main application interface with AI editing tools" 
@@ -583,7 +602,7 @@ export default function LandingPage() {
             {/* LEFT SECTION - SOCIAL MEDIA */}
             <div className="space-y-6">
               {/* Profile card */}
-              <div className="flex items-center space-x-3 bg-white/5 rounded-lg p-3 w-fit">
+              <div className="flex items-center space-x-3 bg-white/5  p-3 w-fit">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-500"></div>
                 <div>
                   <p className="text-white font-semibold text-sm">Lil Miquela</p>
@@ -593,10 +612,10 @@ export default function LandingPage() {
 
               {/* Main images - increased size to match right side */}
               <div className="grid grid-cols-2 gap-8">
-                <div className="relative aspect-[4/5] rounded-lg overflow-hidden bg-neutral-800">
+                <div className="relative aspect-[4/5]  overflow-hidden bg-neutral-800">
                   <Image src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" alt="Woman in floral top" unoptimized fill className="object-cover" />
                 </div>
-                <div className="relative aspect-[4/5] rounded-lg overflow-hidden bg-neutral-800">
+                <div className="relative aspect-[4/5]  overflow-hidden bg-neutral-800">
                   <Image src="/images/woman v2.png" alt="Woman in grey hoodie" unoptimized fill className="object-cover" />
                 </div>
               </div>
@@ -616,7 +635,7 @@ export default function LandingPage() {
             {/* RIGHT SECTION - PRODUCT PAGES */}
             <div className="space-y-6">
               {/* Product page image */}
-              <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-800 border-2 border-[#1E90FF]">
+              <div className="relative aspect-[4/3]  overflow-hidden bg-neutral-800 border-2 border-[#1E90FF]">
                 <Image src="/images/website.png" alt="Product page" unoptimized fill className="object-cover" />
               </div>
 
@@ -665,7 +684,7 @@ export default function LandingPage() {
 
           {/* Testimonial Cards */}
           <div className="flex justify-center">
-            <div className="relative w-[400px] max-w-full rounded-2xl bg-white text-black p-6 shadow-[0_0_40px_rgba(0,154,255,0.60)] border border-[#1E90FF]">
+            <div className="relative w-[400px] max-w-full  bg-white text-black p-6 shadow-[0_0_40px_rgba(0,154,255,0.60)] border border-[#1E90FF]">
               {/* Profile Picture */}
               <div className="flex items-start space-x-4 mb-4">
                 <div className="relative">
@@ -700,7 +719,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
             {/* Starter */}
-            <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
+            <div className=" bg-neutral-900 border border-neutral-800 p-6">
               <p className="text-sm text-neutral-400">STARTER</p>
               <div className="mt-2 text-3xl font-extrabold tracking-tight">$0<span className="text-base font-medium">/month</span></div>
               <p className="text-xs text-neutral-400">5 credits / month</p>
@@ -717,7 +736,7 @@ export default function LandingPage() {
             </div>
 
             {/* Pro (highlighted) */}
-            <div className="rounded-2xl bg-neutral-900 border-2 border-[#1E90FF] p-6 shadow-[0_0_0_4px_rgba(0,154,255,0.15)]">
+            <div className=" bg-neutral-900 border-2 border-[#1E90FF] p-6 shadow-[0_0_0_4px_rgba(0,154,255,0.15)]">
               <p className="text-sm text-neutral-400">PRO</p>
               <div className="mt-2 text-3xl font-extrabold tracking-tight">$19<span className="text-base font-medium">/month</span></div>
               <p className="text-xs text-neutral-400">50 credits / month</p>
@@ -735,7 +754,7 @@ export default function LandingPage() {
             </div>
 
             {/* Enterprise */}
-            <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
+            <div className=" bg-neutral-900 border border-neutral-800 p-6">
               <p className="text-sm text-neutral-400">ENTERPRISE</p>
               <div className="mt-2 text-3xl font-extrabold tracking-tight">Custom pricing</div>
               <p className="text-xs text-neutral-400">Unlimited credits</p>
@@ -803,7 +822,7 @@ export default function LandingPage() {
                     type="email"
                     name="email"
                     id="email"
-                    className="block w-full rounded-md border-neutral-700 bg-neutral-900 text-white shadow-sm focus:border-lime-500 focus:ring-lime-500 sm:text-sm h-10 px-3"
+                    className="block w-full  border-neutral-700 bg-neutral-900 text-white shadow-sm focus:border-lime-500 focus:ring-lime-500 sm:text-sm h-10 px-3"
                     placeholder="you@example.com"
                     required
                   />
@@ -818,7 +837,7 @@ export default function LandingPage() {
                     id="question"
                     name="question"
                     rows={4}
-                    className="block w-full rounded-md border-neutral-700 bg-neutral-900 text-white shadow-sm focus:border-lime-500 focus:ring-lime-500 sm:text-sm p-3"
+                    className="block w-full  border-neutral-700 bg-neutral-900 text-white shadow-sm focus:border-lime-500 focus:ring-lime-500 sm:text-sm p-3"
                     placeholder="Your question..."
                     required
                   />
@@ -843,7 +862,7 @@ export default function LandingPage() {
         <div className={`mx-auto ${tokens.maxW}`}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 text-sm">
             <div>
-              <div className="rounded-md border border-neutral-800 bg-black p-4">
+              <div className=" border border-neutral-800 bg-black p-4">
                 <div className="text-white font-extrabold tracking-[0.22em] uppercase">GINCHY</div>
                 <p className="mt-2 text-xs text-neutral-400">AI models for fashion brands. Studio-quality visuals without studio overhead.</p>
               </div>
