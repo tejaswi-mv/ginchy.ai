@@ -42,18 +42,18 @@ function ManageSubscription() {
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
 
   return (
-    <Card className="mb-6 bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-white">Team Subscription</CardTitle>
+    <Card className="mb-4 lg:mb-6 bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
+      <CardHeader className="pb-3 lg:pb-4">
+        <CardTitle className="text-base lg:text-lg font-semibold text-white">Team Subscription</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div className="mb-4 sm:mb-0">
-              <p className="font-medium text-white">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
+            <div>
+              <p className="font-medium text-white text-sm lg:text-base">
                 Current Plan: {teamData?.planName || 'Free'}
               </p>
-              <p className="text-sm text-slate-300">
+              <p className="text-xs lg:text-sm text-slate-300">
                 {teamData?.subscriptionStatus === 'active'
                   ? 'Billed monthly'
                   : teamData?.subscriptionStatus === 'trialing'
@@ -61,8 +61,8 @@ function ManageSubscription() {
                   : 'No active subscription'}
               </p>
             </div>
-            <form action={customerPortalAction}>
-              <Button type="submit" variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 shadow-lg shadow-blue-500/20">
+            <form action={customerPortalAction} className="w-full sm:w-auto">
+              <Button type="submit" variant="outline" className="w-full sm:w-auto border-blue-500 text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 shadow-lg shadow-blue-500/20 text-sm">
                 Manage Subscription
               </Button>
             </form>
@@ -198,13 +198,13 @@ function InviteTeamMember() {
 
   return (
     <Card className="bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-white">Invite Team Member</CardTitle>
+      <CardHeader className="pb-3 lg:pb-4">
+        <CardTitle className="text-base lg:text-lg font-semibold text-white">Invite Team Member</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={inviteAction} className="space-y-4">
           <div>
-            <Label htmlFor="email" className="mb-2 text-slate-300 font-medium">
+            <Label htmlFor="email" className="mb-2 text-slate-300 font-medium text-sm lg:text-base">
               Email
             </Label>
             <Input
@@ -214,11 +214,11 @@ function InviteTeamMember() {
               placeholder="Enter email"
               required
               disabled={!isOwner}
-              className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
+              className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm lg:text-base"
             />
           </div>
           <div>
-            <Label className="text-slate-300 font-medium">Role</Label>
+            <Label className="text-slate-300 font-medium text-sm lg:text-base">Role</Label>
             <RadioGroup
               defaultValue="member"
               name="role"
@@ -227,11 +227,11 @@ function InviteTeamMember() {
             >
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member" className="text-slate-300">Member</Label>
+                <Label htmlFor="member" className="text-slate-300 text-sm lg:text-base">Member</Label>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner" className="text-slate-300">Owner</Label>
+                <Label htmlFor="owner" className="text-slate-300 text-sm lg:text-base">Owner</Label>
               </div>
             </RadioGroup>
           </div>
@@ -243,7 +243,7 @@ function InviteTeamMember() {
           )}
           <Button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-200"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-200 text-sm lg:text-base"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -273,10 +273,10 @@ function InviteTeamMember() {
 
 export default function SettingsPage() {
   return (
-    <section className="flex-1 p-6 lg:p-8 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Team Settings</h1>
-        <p className="text-slate-300">Manage your team members and subscription</p>
+    <section className="flex-1 p-4 lg:p-6 min-h-screen">
+      <div className="mb-6 lg:mb-8">
+        <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2">Team Settings</h1>
+        <p className="text-slate-300 text-sm lg:text-base">Manage your team members and subscription</p>
       </div>
       <Suspense fallback={<SubscriptionSkeleton />}>
         <ManageSubscription />
