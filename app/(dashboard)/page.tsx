@@ -627,33 +627,25 @@ export default function LandingPage() {
 
             {/* four tall images row - professional images as specified */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
-              {/* Sample placeholder - Desert scene */}
-              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
-                <Image src="/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png" alt="Sample placeholder" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] shadow-[0_0_12px_rgba(30,144,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] shadow-[0_0_14px_rgba(30,144,255,0.5)]"></div>
-              </div>
+               {/* Sample placeholder - Desert scene */}
+               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+                 <Image src="/images/1left-desert-lady.jpg" alt="Sample placeholder" unoptimized fill className="object-cover" />
+               </div>
               
-              {/* Customized 2 - New York scene */}
-              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
-                <Image src="/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png" alt="Customized 2" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
-              </div>
+               {/* Customized 2 - New York scene */}
+               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+                 <Image src="/images/city-2left.jpg" alt="Customized 2" unoptimized fill className="object-cover" />
+               </div>
               
-              {/* Customized 3 - White studio scene */}
-              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
-                <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
-              </div>
+               {/* Customized 3 - White studio scene */}
+               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+                 <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
+               </div>
               
-              {/* Customized 4 - Snow environment scene */}
-              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
-                <Image src="/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png" alt="Customized 4" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
-              </div>
+               {/* Customized 4 - Snow environment scene */}
+               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+                 <Image src="/images/snow-lady.jpg" alt="Customized 4" unoptimized fill className="object-cover" />
+               </div>
             </div>
 
             {/* Bottom text - professional styling */}
