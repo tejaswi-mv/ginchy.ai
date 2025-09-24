@@ -324,65 +324,66 @@ function ChooseModelSection() {
     const previewCharacters = characters.slice(0, 18);
 
     return (
-        <section className={`${tokens.gutter} pt-2 pb-8 bg-white`}>
+        <section className={`${tokens.gutter} pt-3 pb-8 bg-white`}>
             <div className={`mx-auto ${tokens.maxW}`}>
-                <div className="relative rounded-[24px] bg-white p-6 sm:p-8 lg:p-10">
+                <div className="relative rounded-[24px] bg-white p-3 sm:p-3 lg:p-8">
                     <div>
-                        <h2 className="text-center text-[32px] font-bold text-black mb-2">
-                            CHOOSE YOUR MODEL
-                        </h2>
-                        <p className="text-center text-[14px] text-neutral-600 mb-8">
-                            Browse our diverse library or generate a custom one.
-                        </p>
-                        <div className="grid grid-cols-12 gap-6 items-center">
-                            <div className="col-span-12 lg:col-span-7">
-                                <div className="relative  overflow-hidden mb-6 p-4 border border-neutral-200">
-                                    {isLoading ? (
-                                        <div className="grid grid-cols-6 gap-2">
-                                            {Array.from({ length: 18 }).map((_, i) => (
-                                                <div key={i} className="aspect-square  bg-neutral-200 animate-pulse"></div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-6 gap-2">
-                                            {previewCharacters.map((char) => (
-                                            <div 
-                                                key={char.name} 
-                                                className={`relative aspect-square overflow-hidden cursor-pointer group transition-all duration-200 ${
-                                                    selectedCharacter?.name === char.name 
-                                                        ? 'border-2 border-blue-500' 
-                                                        : 'border-2 border-transparent hover:border-blue-300'
-                                                }`} 
-                                                onClick={() => handleSelectCharacter(char)}
-                                            >
-                                                <Image 
-                                                    src={char.url} 
-                                                    alt={char.name} 
-                                                    fill 
-                                                    className="object-cover"
-                                                    onError={(e) => {
-                                                        console.error('Image failed to load:', char.url);
-                                                        e.currentTarget.style.display = 'none';
-                                                    }}
-                                                    onLoad={() => console.log('Image loaded successfully:', char.url)}
-                                                />
-                                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                                            </div>
-                                        ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-xl px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
-                                        BROWSE LIBRARY
-                                    </button>
-                                    <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-xl px-6 py-3 font-semibold hover:bg-neutral-700 transition">
-                                        GENERATE CUSTOM MODEL
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="col-span-12 lg:col-span-5">
-                                <div className="relative w-full h-[400px] lg:h-[500px]  overflow-hidden bg-neutral-100 border border-neutral-200">
+                       
+                          <div className="grid grid-cols-13 gap-25 items-center">
+                              <div className="col-span-12 lg:col-span-8">
+                              <h2 className="text-center text-[32px] font-bold text-black mb-2">
+                              CHOOSE YOUR MODEL
+                          </h2>
+                          <p className="text-center text-[14px] text-neutral-600 mb-8">
+                              Browse our diverse library or generate a custom one.
+                          </p>
+                                 <div className="relative  overflow-hidden mb-6 p-0 border border-neutral-200">
+                                      {isLoading ? (
+                                          <div className="grid grid-cols-6 gap-2">
+                                              {Array.from({ length: 18 }).map((_, i) => (
+                                                  <div key={i} className="aspect-square  bg-neutral-200 animate-pulse"></div>
+                                              ))}
+                                          </div>
+                                      ) : (
+                                          <div className="grid grid-cols-6 gap-2">
+                                              {previewCharacters.map((char) => (
+                                              <div 
+                                                  key={char.name} 
+                                                  className={`relative aspect-square overflow-hidden cursor-pointer group transition-all duration-200 ${
+                                                      selectedCharacter?.name === char.name 
+                                                          ? 'border-2 border-blue-500' 
+                                                          : 'border-2 border-transparent hover:border-blue-300'
+                                                  }`} 
+                                                  onClick={() => handleSelectCharacter(char)}
+                                              >
+                                                  <Image 
+                                                      src={char.url} 
+                                                      alt={char.name} 
+                                                      fill 
+                                                      className="object-cover"
+                                                      onError={(e) => {
+                                                          console.error('Image failed to load:', char.url);
+                                                          e.currentTarget.style.display = 'none';
+                                                      }}
+                                                      onLoad={() => console.log('Image loaded successfully:', char.url)}
+                                                  />
+                                                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                                              </div>
+                                          ))}
+                                          </div>
+                                      )}
+                                  </div>
+                                 <div className="flex flex-col sm:flex-row gap-2">
+                                      <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-xl px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
+                                          BROWSE LIBRARY
+                                      </button>
+                                      <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-xl px-6 py-3 font-semibold hover:bg-neutral-700 transition">
+                                          GENERATE CUSTOM MODEL
+                                      </button>
+                                  </div>
+                              </div>
+                              <div className="col-span-12 lg:col-span-5">
+                                <div className="relative w-full h-[900px] lg:h-[600px]  overflow-hidden bg-neutral-100 border border-neutral-200">
                                     {selectedCharacter ? (
                                         <Image 
                                             src={selectedCharacter.url} 
@@ -746,13 +747,40 @@ export default function LandingPage() {
       {/* ================== SECTION 5 — Personalize your outfit ================== */}
       <section className={`${tokens.gutter} py-24 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
-          <h2 className="text-center font-[var(--font-display)] text-white text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-16">
-            Personalize your outfit<span className="ml-2 text-white">✦</span>
+          <h2 className="text-center font-[var(--font-display)] text-[#1E90FF] text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-16">
+            Personalize your outfit<span className="ml-2 text-[#1E90FF]">✦</span>
           </h2>
 
           {/* two main sections - SOCIAL MEDIA and PRODUCT PAGES */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-45 relative">
             
+            {/* CENTER CIRCULAR IMAGES */}
+            <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 z-10 hidden lg:block">
+              <div className="flex flex-col gap-30">
+                {/* Top circle - sunglasses */}
+                <div className="w-25 h-25 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                  <Image 
+                    src="/images/sunglasses.png" 
+                    alt="Sunglasses" 
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                </div>
+                {/* Bottom circle - shoes */}
+                <div className="w-40 h-40 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                  <Image 
+                    src="/images/Shoes.png" 
+                    alt="Shoes" 
+                    width={150}
+                    height={150}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                </div>
+              </div>
+            </div>
             {/* LEFT SECTION - SOCIAL MEDIA */}
             <div className="space-y-6 bg-white ">
                {/* Profile card */}
@@ -774,7 +802,7 @@ export default function LandingPage() {
                </div>
 
               {/* Main images - increased size to match right side */}
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-2 gap-1">
                 <div className="relative aspect-[4/5]  overflow-hidden bg-neutral-800">
                   <Image src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" alt="Woman in floral top" unoptimized fill className="object-cover" />
                 </div>
