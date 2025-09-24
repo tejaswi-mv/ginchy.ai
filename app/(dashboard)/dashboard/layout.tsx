@@ -24,12 +24,12 @@ export default function DashboardLayout({
   return (
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full bg-slate-900">
       {/* Mobile header */}
-      <div className="lg:hidden flex items-center justify-between bg-slate-800 border-b border-slate-700 p-4">
+      <div className="lg:hidden flex items-center justify-between bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
         <div className="flex items-center">
-          <span className="font-medium text-white">Settings</span>
+          <span className="font-semibold text-white text-lg">Dashboard</span>
         </div>
         <Button
-          className="-mr-3 text-white hover:bg-slate-700"
+          className="text-white hover:bg-slate-700 p-2"
           variant="ghost"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
@@ -47,6 +47,13 @@ export default function DashboardLayout({
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
+          {/* Mobile overlay */}
+          {isSidebarOpen && (
+            <div 
+              className="lg:hidden fixed inset-0 bg-black/50 z-30"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
           <nav className="h-full overflow-y-auto p-4">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} passHref>
@@ -54,7 +61,8 @@ export default function DashboardLayout({
                   variant={pathname === item.href ? 'secondary' : 'ghost'}
                   className={`shadow-none my-1 w-full justify-start transition-all duration-200 rounded-lg ${
                     pathname === item.href
-                      ? 'bg-blue-600 text-white border-l-4 border-blue-400 font-medium shadow-lg shadow-blue-500/25'
+
+                    ? 'bg-blue-600 text-white border-l-4 border-blue-400 font-medium shadow-lg shadow-blue-500/25'
                       : 'text-slate-300 hover:text-white hover:bg-slate-700 hover:border-l-4 hover:border-blue-500/50'
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
@@ -68,7 +76,7 @@ export default function DashboardLayout({
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-0 lg:p-4">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
       </div>
     </div>
   );
