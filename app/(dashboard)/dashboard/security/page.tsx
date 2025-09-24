@@ -35,10 +35,10 @@ export default function SecurityPage() {
   >(deleteAccount, {});
 
   return (
-    <section className="flex-1 p-6 lg:p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Security Settings</h1>
-        <p className="text-slate-300">Manage your password and account security</p>
+    <section className="flex-1 p-4 lg:p-6">
+      <div className="mb-6 lg:mb-8">
+        <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2">Security Settings</h1>
+        <p className="text-slate-300 text-sm lg:text-base">Manage your password and account security</p>
       </div>
       <Card className="mb-6 bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
         <CardHeader className="pb-4">
