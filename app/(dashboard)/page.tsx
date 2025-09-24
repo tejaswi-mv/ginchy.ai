@@ -26,11 +26,12 @@ type Character = {
 
 // ================== MODAL COMPONENTS ==================
 
-function ModelLibraryModal({ isOpen, onClose, characters, onSelect }: {
+function ModelLibraryModal({ isOpen, onClose, characters, onSelect, selectedCharacter }: {
     isOpen: boolean;
     onClose: () => void;
     characters: Character[];
     onSelect: (character: Character) => void;
+    selectedCharacter: Character | null;
 }) {
     if (!isOpen) return null;
 
@@ -41,7 +42,15 @@ function ModelLibraryModal({ isOpen, onClose, characters, onSelect }: {
                 <p className="text-neutral-600 text-sm mt-1">Select a model to preview.</p>
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 mt-6 max-h-[70vh] overflow-y-auto">
                     {characters.map((char) => (
-                        <div key={char.name} className="relative aspect-square  overflow-hidden cursor-pointer group" onClick={() => onSelect(char)}>
+                        <div 
+                            key={char.name} 
+                            className={`relative aspect-square overflow-hidden cursor-pointer group transition-all duration-200 ${
+                                selectedCharacter?.name === char.name 
+                                    ? 'border-2 border-blue-500' 
+                                    : 'border-2 border-transparent hover:border-blue-300'
+                            }`} 
+                            onClick={() => onSelect(char)}
+                        >
                             <Image src={char.url} alt={char.name} fill className="object-cover"/>
                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
@@ -336,7 +345,15 @@ function ChooseModelSection() {
                                     ) : (
                                         <div className="grid grid-cols-6 gap-2">
                                             {previewCharacters.map((char) => (
-                                            <div key={char.name} className="relative aspect-square  overflow-hidden cursor-pointer group" onClick={() => handleSelectCharacter(char)}>
+                                            <div 
+                                                key={char.name} 
+                                                className={`relative aspect-square overflow-hidden cursor-pointer group transition-all duration-200 ${
+                                                    selectedCharacter?.name === char.name 
+                                                        ? 'border-2 border-blue-500' 
+                                                        : 'border-2 border-transparent hover:border-blue-300'
+                                                }`} 
+                                                onClick={() => handleSelectCharacter(char)}
+                                            >
                                                 <Image 
                                                     src={char.url} 
                                                     alt={char.name} 
@@ -392,6 +409,7 @@ function ChooseModelSection() {
                 onClose={() => setIsModalOpen(false)}
                 characters={characters}
                 onSelect={handleSelectCharacter}
+                selectedCharacter={selectedCharacter}
             />
         </section>
     );
