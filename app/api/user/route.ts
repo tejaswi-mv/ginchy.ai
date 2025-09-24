@@ -1,5 +1,8 @@
 import { getUser } from '@/lib/db/queries';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const user = await getUser();

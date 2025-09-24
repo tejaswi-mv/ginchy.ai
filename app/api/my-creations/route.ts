@@ -4,6 +4,9 @@ import { generatedImages } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getUser, getCreationsForUser } from '@/lib/db/queries';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const user = await getUser();
