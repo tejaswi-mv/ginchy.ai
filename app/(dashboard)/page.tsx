@@ -160,12 +160,12 @@ function ClothingSelectionSection() {
   const [selectedItem, setSelectedItem] = useState<number | null>(3); // Default to item 3 (strapless long dress)
   
   const clothingItems = [
-      { id: 1, name: "seamless baby tee", image: "/images/Garment.png", type: "top" },
-      { id: 2, name: "tech cargo vest", image: "/images/Garment.png", type: "vest" },
-      { id: 3, name: "strapless long dress", image: "/images/Garment.png", type: "dress", featured: true },
-      { id: 4, name: "strapless long dress", image: "/images/Garment.png", type: "dress", confirmed: true },
-      { id: 5, name: "flared pants", image: "/images/5.jpg", type: "pants" },
-      { id: 6, name: "asymmetrical top", image: "/images/Garment.png", type: "top" }
+      { id: 1, name: "White Jacket", image: "https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__white-background-blue-puffer-jacet__19944.png", type: "top" },
+      { id: 2, name: "tech cargo vest", image: "https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__the-style-is-candid-image-photography-with-natural__77571.png", type: "vest" },
+      { id: 3, name: "strapless long dress", image: "https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__white-background-fpuffer-jacet__19943.png", type: "dress", featured: true },
+      { id: 4, name: "strapless long dress", image: "https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__white-background-baggy-jeans__19937.png", type: "dress", confirmed: true },
+      { id: 5, name: "flared pants", image: "https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__white-background-dark-sneakers__66186.png", type: "pants" },
+      { id: 6, name: "asymmetrical top", image: "https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__the-style-is-candid-image-photography-with-natural__77569.png", type: "top" }
   ];
 
   const handleItemSelect = (itemId: number) => {
@@ -174,7 +174,7 @@ function ClothingSelectionSection() {
 
   return (
       <section className="py-8" style={{ backgroundColor: '#F9F9F9' }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-10xl mx-auto px-4 sm:px-3 lg:px-1">
               {/* Title */}
               <h2 className="text-center text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8" style={{ fontFamily: 'Inter, Helvetica, sans-serif' }}>
                   AI outfit generated with Genchy AI technology
@@ -183,8 +183,8 @@ function ClothingSelectionSection() {
               {/* Main Content - Horizontal Layout */}
               <div className="flex flex-col lg:flex-row items-stretch justify-between">
                   {/* Panel 1: Woman in Car (Far Left) */}
-                  <div className="w-full lg:w-[30%]">
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
+                  <div className="w-full lg:w-[40%]">
+                      <div className="relative aspect-[2/3]  overflow-hidden">
                           <Image 
                               src="/images/Woman.png" 
                               alt="Woman in car" 
@@ -195,8 +195,8 @@ function ClothingSelectionSection() {
                   </div>
 
                   {/* Panel 2: Woman in Black Outfit */}
-                  <div className="w-full lg:w-[30%]">
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
+                  <div className="w-full lg:w-[40%]">
+                      <div className="relative aspect-[2/3]  overflow-hidden">
                           <Image 
                               src="/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg" 
                               alt="Woman in black outfit" 
@@ -207,14 +207,14 @@ function ClothingSelectionSection() {
                   </div>
 
                   {/* Panel 3: Interactive Generator (Center) */}
-                  <div className="w-full lg:w-[22%]">
-                      <div className="p-4 rounded-xl h-full" style={{ backgroundColor: '#EEEEEE' }}>
-                          <div className="grid grid-cols-2 gap-2">
+                  <div className="w-full lg:w-[30%]">
+                      <div className="p-4  h-full" style={{ backgroundColor: '#EEEEEE' }}>
+                          <div className="grid grid-cols-2 gap-4">
                               {clothingItems.map((item) => (
                                   <div
                                       key={item.id}
                                       onClick={() => handleItemSelect(item.id)}
-                                      className={`relative rounded-lg cursor-pointer bg-white p-1 flex flex-col transition-all duration-200 ${
+                                      className={`relative  cursor-pointer bg-white p-1 flex flex-col transition-all duration-200 ${
                                           selectedItem === item.id ? 'border-2' : 'border-2 border-transparent'
                                       }`}
                                       style={{
@@ -249,8 +249,8 @@ function ClothingSelectionSection() {
                   </div>
 
                   {/* Panel 4: Man in Black Shirt */}
-                  <div className="w-full lg:w-[30%]">
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
+                  <div className="w-full lg:w-[40%]">
+                      <div className="relative aspect-[2/3]  overflow-hidden">
                           <Image 
                               src="/images/5.jpg" 
                               alt="Man in black shirt" 
@@ -262,8 +262,8 @@ function ClothingSelectionSection() {
                   </div>
 
                   {/* Panel 5: Man on Couch (Far Right) */}
-                  <div className="w-full lg:w-[30%]">
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
+                  <div className="w-full lg:w-[40%]">
+                      <div className="relative aspect-[2/3]  overflow-hidden">
                           <Image 
                               src="/images/4.jpg" 
                               alt="Man on couch" 
@@ -754,15 +754,24 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             
             {/* LEFT SECTION - SOCIAL MEDIA */}
-            <div className="space-y-6">
-              {/* Profile card */}
-              <div className="flex items-center space-x-3 bg-white/5  p-3 w-fit">
-                <div className="w-10 h-10  bg-gradient-to-br from-pink-400 to-purple-500"></div>
-                <div>
-                  <p className="text-white font-semibold text-sm">Lil Miquela</p>
-                  <p className="text-gray-400 text-xs">@lilmiquela • 2.7M followers</p>
-                </div>
-              </div>
+            <div className="space-y-6 bg-white ">
+               {/* Profile card */}
+               <div className="flex items-center space-x-3 bg-white/5  p-3 w-fit">
+                 <div className="w-10 h-10 rounded-full overflow-hidden">
+                   <Image 
+                     src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" 
+                     alt="Profile picture" 
+                     width={40}
+                     height={40}
+                     className="w-full h-full object-cover"
+                     unoptimized
+                   />
+                 </div>
+                 <div>
+                   <p className="text-black font-semibold text-sm">Lil Miquela</p>
+                   <p className="text-gray-400 text-xs">@lilmiquela • 2.7M followers</p>
+                 </div>
+               </div>
 
               {/* Main images - increased size to match right side */}
               <div className="grid grid-cols-2 gap-8">
@@ -775,12 +784,12 @@ export default function LandingPage() {
               </div>
 
               {/* Section label */}
-              <p className="text-center text-[#1E90FF] font-bold text-sm tracking-wider">
+              <p className="text-center bg text-[#1E90FF] font-bold text-sm tracking-wider">
                 [SOCIAL MEDIA]
               </p>
 
               {/* Description text */}
-              <p className="text-gray-300 text-base leading-relaxed">
+              <p className="text-gray-300 bg-black text-base leading-relaxed">
                 Swap garments and create on-brand looks that elevate your Instagram, website, and campaigns<br />
                 — driving more engagement and a consistent visual identity.
               </p>
