@@ -752,29 +752,29 @@ export default function LandingPage() {
           </h2>
 
           {/* two main sections - SOCIAL MEDIA and PRODUCT PAGES */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-45 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 relative">
             
             {/* CENTER CIRCULAR IMAGES */}
             <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 z-10 hidden lg:block">
-              <div className="flex flex-col gap-30">
+              <div className="flex flex-col gap-8">
                 {/* Top circle - sunglasses */}
-                <div className="w-25 h-25 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg">
                   <Image 
                     src="/images/sunglasses.png" 
                     alt="Sunglasses" 
-                    width={80}
-                    height={80}
+                    width={96}
+                    height={96}
                     className="w-full h-full object-cover"
                     unoptimized
                   />
                 </div>
                 {/* Bottom circle - shoes */}
-                <div className="w-40 h-40 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white shadow-lg">
                   <Image 
                     src="/images/Shoes.png" 
                     alt="Shoes" 
-                    width={150}
-                    height={150}
+                    width={128}
+                    height={128}
                     className="w-full h-full object-cover"
                     unoptimized
                   />
