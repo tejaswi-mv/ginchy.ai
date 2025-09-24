@@ -35,18 +35,19 @@ export default function SecurityPage() {
   >(deleteAccount, {});
 
   return (
-    <section className="flex-1 p-4 lg:p-8 bg-black">
-      <h1 className="text-2xl lg:text-3xl font-extrabold text-white font-[var(--font-display)] mb-8">
-        Security Settings
-      </h1>
-      <Card className="mb-8 bg-gradient-to-br from-neutral-900 to-black border-2 border-neutral-700">
-        <CardHeader>
-          <CardTitle className="text-white text-xl font-[var(--font-display)]">Password</CardTitle>
+    <section className="flex-1 p-6 lg:p-8">
+      <div className="mb-8">
+        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Security Settings</h1>
+        <p className="text-slate-300">Manage your password and account security</p>
+      </div>
+      <Card className="mb-6 bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-white">Password</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" action={passwordAction}>
             <div>
-              <Label htmlFor="current-password" className="mb-2 text-white font-medium">
+              <Label htmlFor="current-password" className="mb-2 text-slate-300 font-medium">
                 Current Password
               </Label>
               <Input
@@ -58,11 +59,11 @@ export default function SecurityPage() {
                 minLength={8}
                 maxLength={100}
                 defaultValue={passwordState.currentPassword}
-                className="bg-neutral-800 border-neutral-600 text-white placeholder-neutral-400 focus:ring-[#009AFF] focus:border-[#009AFF]"
+                className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
               />
             </div>
             <div>
-              <Label htmlFor="new-password" className="mb-2 text-white font-medium">
+              <Label htmlFor="new-password" className="mb-2 text-slate-300 font-medium">
                 New Password
               </Label>
               <Input
@@ -74,11 +75,11 @@ export default function SecurityPage() {
                 minLength={8}
                 maxLength={100}
                 defaultValue={passwordState.newPassword}
-                className="bg-neutral-800 border-neutral-600 text-white placeholder-neutral-400 focus:ring-[#009AFF] focus:border-[#009AFF]"
+                className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
               />
             </div>
             <div>
-              <Label htmlFor="confirm-password" className="mb-2 text-white font-medium">
+              <Label htmlFor="confirm-password" className="mb-2 text-slate-300 font-medium">
                 Confirm New Password
               </Label>
               <Input
@@ -89,7 +90,7 @@ export default function SecurityPage() {
                 minLength={8}
                 maxLength={100}
                 defaultValue={passwordState.confirmPassword}
-                className="bg-neutral-800 border-neutral-600 text-white placeholder-neutral-400 focus:ring-[#009AFF] focus:border-[#009AFF]"
+                className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
               />
             </div>
             {passwordState.error && (
@@ -100,7 +101,7 @@ export default function SecurityPage() {
             )}
             <Button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#009AFF] px-6 py-3 text-white text-sm font-semibold hover:bg-[#009AFF]/90 transition-all duration-200 shadow-[0_0_0_6px_rgba(0,154,255,0.12)] hover:shadow-[0_0_0_8px_rgba(0,154,255,0.18)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-200"
               disabled={isPasswordPending}
             >
               {isPasswordPending ? (
@@ -119,17 +120,17 @@ export default function SecurityPage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-neutral-900 to-black border-2 border-neutral-700">
-        <CardHeader>
-          <CardTitle className="text-white text-xl font-[var(--font-display)]">Delete Account</CardTitle>
+      <Card className="bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-white">Delete Account</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-neutral-300 mb-6">
+          <p className="text-sm text-slate-300 mb-6">
             Account deletion is non-reversable. Please proceed with caution.
           </p>
           <form action={deleteAction} className="space-y-6">
             <div>
-              <Label htmlFor="delete-password" className="mb-2 text-white font-medium">
+              <Label htmlFor="delete-password" className="mb-2 text-slate-300 font-medium">
                 Confirm Password
               </Label>
               <Input
@@ -140,7 +141,7 @@ export default function SecurityPage() {
                 minLength={8}
                 maxLength={100}
                 defaultValue={deleteState.password}
-                className="bg-neutral-800 border-neutral-600 text-white placeholder-neutral-400 focus:ring-[#009AFF] focus:border-[#009AFF]"
+                className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
               />
             </div>
             {deleteState.error && (
