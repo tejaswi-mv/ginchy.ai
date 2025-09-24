@@ -42,12 +42,12 @@ function ModelLibraryModal({ isOpen, onClose, characters, onSelect }: {
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 mt-6 max-h-[70vh] overflow-y-auto">
                     {characters.map((char) => (
                         <div key={char.name} className="relative aspect-square  overflow-hidden cursor-pointer group" onClick={() => onSelect(char)}>
-                            <Image src={char.url} alt={char.name} fill className="object-cover transition-transform duration-200 group-hover:scale-105"/>
+                            <Image src={char.url} alt={char.name} fill className="object-cover"/>
                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
                     ))}
                 </div>
-                <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition">
+                <button onClick={onClose} className="absolute top-4 right-4 p-2  bg-neutral-100 hover:bg-neutral-200 transition">
                     <X className="w-5 h-5 text-black"/>
                 </button>
             </div>
@@ -85,7 +85,7 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+          className="absolute top-4 right-4 z-10 p-2  bg-black/50 text-white hover:bg-black/70 transition"
         >
           <X className="w-6 h-6" />
         </button>
@@ -93,14 +93,14 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
         {/* Navigation buttons */}
         <button
           onClick={prevImage}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2  bg-black/50 text-white hover:bg-black/70 transition"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
         
         <button
           onClick={nextImage}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2  bg-black/50 text-white hover:bg-black/70 transition"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
@@ -229,7 +229,7 @@ function ClothingSelectionSection() {
 
                                       {/* Confirmed State - Checkmark Icon */}
                                       {item.confirmed && (
-                                          <div className="absolute top-1 right-1 w-4 h-4 bg-gray-600 text-white rounded-full flex items-center justify-center">
+                                          <div className="absolute top-1 right-1 w-4 h-4 bg-gray-600 text-white  flex items-center justify-center">
                                               <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                                           </div>
                                       )}
@@ -341,7 +341,7 @@ function ChooseModelSection() {
                                                     src={char.url} 
                                                     alt={char.name} 
                                                     fill 
-                                                    className="object-cover transition-transform duration-200 group-hover:scale-105"
+                                                    className="object-cover"
                                                     onError={(e) => {
                                                         console.error('Image failed to load:', char.url);
                                                         e.currentTarget.style.display = 'none';
@@ -355,10 +355,10 @@ function ChooseModelSection() {
                                     )}
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-4">
-                                    <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-full px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
+                                    <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-xl px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
                                         BROWSE LIBRARY
                                     </button>
-                                    <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-full px-6 py-3 font-semibold hover:bg-neutral-700 transition">
+                                    <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-xl px-6 py-3 font-semibold hover:bg-neutral-700 transition">
                                         GENERATE CUSTOM MODEL
                                     </button>
                                 </div>
@@ -439,9 +439,9 @@ export default function LandingPage() {
     <main className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-black text-white antialiased overflow-hidden">
       {/* neon background accents */}
       <div className="pointer-events-none absolute -z-10 inset-0">
-        <div className="absolute left-[-120px] top-24 h-[260px] w-[260px] rounded-full bg-[#1E90FF] blur-[120px] opacity-25"></div>
-        <div className="absolute right-[-100px] top-[520px] h-[300px] w-[300px] rounded-full bg-[#1E90FF] blur-[140px] opacity-20"></div>
-        <div className="absolute left-1/3 bottom-[-120px] h-[280px] w-[280px] rounded-full bg-[#1E90FF] blur-[140px] opacity-15"></div>
+        <div className="absolute left-[-120px] top-24 h-[260px] w-[260px]  bg-[#1E90FF] blur-[120px] opacity-25"></div>
+        <div className="absolute right-[-100px] top-[520px] h-[300px] w-[300px]  bg-[#1E90FF] blur-[140px] opacity-20"></div>
+        <div className="absolute left-1/3 bottom-[-120px] h-[280px] w-[280px]  bg-[#1E90FF] blur-[140px] opacity-15"></div>
       </div>
    
 
@@ -590,18 +590,18 @@ export default function LandingPage() {
 
           {/* container with left padding so the vertical pill is always visible */}
           <div className="relative pl-16 sm:pl-20 overflow-visible">
-            {/* vertical lime pill - exact styling from screenshot */}
+            {/* vertical pill - professional styling */}
             <div className="absolute left-0 top-0 h-full z-10">
               <div 
-                className="relative h-full w-12 rounded-full overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
+                className="relative h-5/6 w-14 rounded-full overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
                 onClick={handleGetAccess}
               >
                 {/* blue gradient fill */}
-                <div className="absolute inset-0 bg-[#1E90FF]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-400 to-blue-600" />
                 {/* vertical label - text from bottom to top */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="rotate-[-90deg] font-black text-black text-sm tracking-wider whitespace-nowrap">
-                    GET ACCESS
+                <div className="absolute inset-0 flex items-center justify-center pb-2">
+                  <span className="rotate-[-90deg] font-black text-white text-base tracking-wider whitespace-nowrap">
+                    Get Access Now →
                   </span>
                 </div>
               </div>
@@ -610,28 +610,28 @@ export default function LandingPage() {
             {/* four tall images row - professional images as specified */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
               {/* Sample placeholder - Desert scene */}
-              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
                 <Image src="/images/freepik__we-see-in-derset-with-a-new-pose__53446 (1).png" alt="Sample placeholder" unoptimized fill className="object-cover" />
-                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(30,144,255,0.5)]"></div>
-                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(30,144,255,0.5)]"></div>
+                <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF] shadow-[0_0_12px_rgba(30,144,255,0.5)]"></div>
+                <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF] shadow-[0_0_14px_rgba(30,144,255,0.5)]"></div>
               </div>
               
               {/* Customized 2 - New York scene */}
-              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
                 <Image src="/images/freepik__we-see-in-new-york-with-a-new-pose__53447 (1).png" alt="Customized 2" unoptimized fill className="object-cover" />
                 <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
                 <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 3 - White studio scene */}
-              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
                 <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
                 <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
                 <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
               </div>
               
               {/* Customized 4 - Snow environment scene */}
-              <div className="relative aspect-[3/4]  overflow-hidden border-2 border-[#1E90FF] bg-neutral-800">
+              <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
                 <Image src="/images/freepik__we-see-her-in-snow-enviorment-with-a-new-pose__53458 (1).png" alt="Customized 4" unoptimized fill className="object-cover" />
                 <div className="absolute top-3 left-3 h-6 w-6 border-2 border-[#1E90FF]  shadow-[0_0_12px_rgba(0,154,255,0.5)]"></div>
                 <div className="absolute bottom-4 right-4 h-8 w-8 border-2 border-[#1E90FF]  shadow-[0_0_14px_rgba(0,154,255,0.5)]"></div>
@@ -660,15 +660,38 @@ export default function LandingPage() {
         </div>
         
         {/* Full Width Company Logos Banner */}
-        <div className="w-full bg-black py-8">
-          <div className="relative w-full h-24 px-4">
-            <Image 
-              src="/images/logos.png" 
-              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-              fill
-              className="object-contain"
-              unoptimized
-            />
+        <div className="w-full bg-black py-8 overflow-hidden">
+          <div className="animate-scroll-seamless">
+            <div className="flex items-center justify-center h-24 px-8">
+              <Image 
+                src="/images/logos.png" 
+                alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+                width={1200}
+                height={96}
+                className="object-contain h-full"
+                unoptimized
+              />
+            </div>
+            <div className="flex items-center justify-center h-24 px-8">
+              <Image 
+                src="/images/logos.png" 
+                alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+                width={1200}
+                height={96}
+                className="object-contain h-full"
+                unoptimized
+              />
+            </div>
+            <div className="flex items-center justify-center h-24 px-8">
+              <Image 
+                src="/images/logos.png" 
+                alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+                width={1200}
+                height={96}
+                className="object-contain h-full"
+                unoptimized
+              />
+            </div>
           </div>
         </div>
         
@@ -722,7 +745,7 @@ export default function LandingPage() {
             <div className="space-y-6">
               {/* Profile card */}
               <div className="flex items-center space-x-3 bg-white/5  p-3 w-fit">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-500"></div>
+                <div className="w-10 h-10  bg-gradient-to-br from-pink-400 to-purple-500"></div>
                 <div>
                   <p className="text-white font-semibold text-sm">Lil Miquela</p>
                   <p className="text-gray-400 text-xs">@lilmiquela • 2.7M followers</p>
@@ -773,7 +796,7 @@ export default function LandingPage() {
 
           <div className="mt-16 text-center">
             <button 
-              className="inline-flex items-center justify-center rounded-full bg-white px-12 py-6 text-black font-bold text-xl shadow-[0_0_0_6px_rgba(255,255,255,0.08)] hover:scale-105 transition-transform duration-200 cursor-pointer"
+              className="inline-flex items-center justify-center rounded-xl bg-white px-16 py-4 text-black font-bold text-xl shadow-[0_0_0_6px_rgba(255,255,255,0.08)] hover:scale-105 transition-transform duration-200 cursor-pointer"
               onClick={handleGetAccess}
             >
               Get Access Now →
@@ -783,7 +806,7 @@ export default function LandingPage() {
           {/* divider with glow */}
           <div className="relative mt-16">
             <div className="h-px bg-white/30 mx-auto max-w-2xl"></div>
-            <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-56 w-56 rounded-full bg-[#1E90FF] blur-3xl opacity-20"></div>
+            <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-56 w-56  bg-[#1E90FF] blur-3xl opacity-20"></div>
           </div>
         </div>
       </section>
@@ -807,10 +830,10 @@ export default function LandingPage() {
               {/* Profile Picture */}
               <div className="flex items-start space-x-4 mb-4">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                  <div className="w-12 h-12  bg-gray-300 flex items-center justify-center overflow-hidden">
                     <Image src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Alina M." fill className="object-cover" unoptimized/>
                   </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500  flex items-center justify-center text-white text-xs font-bold">
                     0
                   </div>
                 </div>
@@ -836,57 +859,208 @@ export default function LandingPage() {
         <div className={`mx-auto ${tokens.maxW}`}>
           <h2 className="text-center text-3xl sm:text-4xl font-extrabold tracking-tight mb-10">Select Package</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 max-w-6xl mx-auto">
             {/* Starter */}
-            <div className=" bg-neutral-900 border border-neutral-800 p-6">
-              <p className="text-sm text-neutral-400">STARTER</p>
-              <div className="mt-2 text-3xl font-extrabold tracking-tight">$0<span className="text-base font-medium">/month</span></div>
-              <p className="text-xs text-neutral-400">5 credits / month</p>
-              <a href="/pricing" className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-neutral-600 px-4 py-2 text-sm hover:bg-neutral-800 transition">
-                Sign up Free <Cog className="w-4 h-4" />
-              </a>
-              <ul className="mt-6 space-y-2 text-sm text-neutral-300">
-                <li>5 AI background replacements</li>
-                <li>1 virtual models</li>
-                <li>1 brand style presets</li>
-                <li>720p resolution</li>
-                <li>Community support</li>
-              </ul>
+            <div className=" bg-neutral-900 border border-neutral-800 p-8 h-[600px] flex flex-col rounded-xl">
+              <div className="text-center mb-6">
+                <p className="text-sm text-neutral-400 font-semibold tracking-wide">STARTER</p>
+                <p className="text-xs text-neutral-400 mt-2 leading-relaxed">Best for individuals &<br />small small projects</p>
+              </div>
+              
+              <div className="text-center mb-6">
+                <div className="text-4xl font-extrabold tracking-tight text-white">$0<span className="text-lg font-medium text-neutral-400"> /month</span></div>
+                <p className="text-sm text-neutral-400 mt-1">5 credits/month</p>
+              </div>
+              
+              <div className="text-center mb-8">
+                <a href="/pricing" className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-600 px-6 py-3 text-sm font-medium hover:bg-neutral-800 transition-all duration-200 hover:border-neutral-500">
+                  Sign up Free <Cog className="w-4 h-4" />
+                </a>
+              </div>
+              
+              <div className="flex-grow">
+                <p className="text-sm text-neutral-300 font-semibold mb-4 text-center">FEATURES INCLUDED:</p>
+                <ul className="space-y-6 text-sm text-neutral-300">
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>5 Al background replacements</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>1 virtual models</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>1 brand style presets</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>720p resolution</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>Community support</span>
+                  </li>
+                </ul>
+              </div>
             </div>
 
             {/* Pro (highlighted) */}
-            <div className=" bg-neutral-900 border-2 border-[#1E90FF] p-6 shadow-[0_0_0_4px_rgba(0,154,255,0.15)]">
-              <p className="text-sm text-neutral-400">PRO</p>
-              <div className="mt-2 text-3xl font-extrabold tracking-tight">$19<span className="text-base font-medium">/month</span></div>
-              <p className="text-xs text-neutral-400">50 credits / month</p>
-              <div className="mt-4 inline-flex rounded-full bg-white p-1 text-sm text-black">
-                <a href="/pricing" className="px-5 py-2 rounded-full font-semibold hover:bg-neutral-100 transition">Go Pro</a>
-                <button className="px-5 py-2 rounded-full text-neutral-600">•</button>
+            <div className=" bg-neutral-900 border-2 border-[#1E90FF] p-8 h-[600px] flex flex-col shadow-[0_0_0_4px_rgba(0,154,255,0.15)] rounded-xl">
+              <div className="text-center mb-6">
+                <p className="text-sm text-neutral-400 font-semibold tracking-wide">PRO</p>
+                <p className="text-xs text-neutral-400 mt-2 leading-relaxed">Ideal for growing<br />eCormences & freeloncers</p>
               </div>
-              <ul className="mt-6 space-y-2 text-sm text-neutral-300">
-                <li>50+ virtual models</li>
-                <li>10+ virtual models</li>
-                <li>Unlimited brand style presets</li>
-                <li>4K resolution exports</li>
-                <li>Priority email support</li>
-              </ul>
+              
+              <div className="text-center mb-6">
+                <div className="text-4xl font-extrabold tracking-tight text-white">$19<span className="text-lg font-medium text-neutral-400">/month</span></div>
+                <p className="text-sm text-neutral-400 mt-1">50 credits/month</p>
+              </div>
+              
+              <div className="text-center mb-8">
+                <a href="/pricing" className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-white text-black py-3 text-sm font-medium hover:bg-neutral-100 transition-all duration-200">
+                  Go Pro <Cog className="w-4 h-4" />
+                </a>
+              </div>
+              
+              <div className="flex-grow">
+                <p className="text-sm text-neutral-300 font-semibold mb-4 text-center">FEATURES INCLUDED:</p>
+                <ul className="space-y-6 text-sm text-neutral-300">
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>50+ virtual models</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>10+ virtual models</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>Unlimited brand style presets</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>4K resolution exports</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>Priority email support</span>
+                  </li>
+                </ul>
+              </div>
             </div>
 
             {/* Enterprise */}
-            <div className=" bg-neutral-900 border border-neutral-800 p-6">
-              <p className="text-sm text-neutral-400">ENTERPRISE</p>
-              <div className="mt-2 text-3xl font-extrabold tracking-tight">Custom pricing</div>
-              <p className="text-xs text-neutral-400">Unlimited credits</p>
-              <a href="/pricing" className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-neutral-600 px-4 py-2 text-sm hover:bg-neutral-800 transition">
-                Contact Sales <Cog className="w-4 h-4" />
-              </a>
-              <ul className="mt-6 space-y-2 text-sm text-neutral-300">
-                <li>Dedicated AI model training</li>
-                <li>Team collaboration (Shopify seats)</li>
-                <li>API access</li>
-                <li>Custom watermark designs</li>
-                <li>24/7 VIP support</li>
-              </ul>
+            <div className=" bg-neutral-900 border border-neutral-800 p-8 h-[600px] flex flex-col rounded-xl">
+              <div className="text-center mb-6">
+                <p className="text-sm text-neutral-400 font-semibold tracking-wide">ENTERPRISE</p>
+                <p className="text-xs text-neutral-400 mt-2 leading-relaxed">For teams & businesses<br />with high high volume</p>
+              </div>
+              
+              <div className="text-center mb-6">
+                <div className="text-4xl font-medium tracking-tight text-white">Custom pricing</div>
+                <p className="text-sm text-neutral-400 mt-1">Unlimited credits</p>
+              </div>
+              
+              <div className="text-center mb-8">
+                <a href="/pricing" className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-600 px-6 py-3 text-sm font-medium hover:bg-neutral-800 transition-all duration-200 hover:border-neutral-500">
+                  Contact Sales <Cog className="w-4 h-4" />
+                </a>
+              </div>
+              
+              <div className="flex-grow">
+                <p className="text-sm text-neutral-300 font-semibold mb-4 text-center">FEATURES INCLUDED:</p>
+                <ul className="space-y-6 text-sm text-neutral-300">
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>Dedicated Al model training</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>Team callaboration (Shopily (seats)</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>API access</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>API access</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>Custom watermark designs</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-4 h-4  bg-white flex items-center justify-center flex-shrink-0">
+                      <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span>24/7 VIP support</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -896,7 +1070,7 @@ export default function LandingPage() {
 
       {/* ================== SECTION 8 — Final CTA (blue “Perfect”) ================== */}
       <section className={`${tokens.gutter} py-16 bg-white relative`}>
-        <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-60 w-60 rounded-full bg-[#1E90FF] blur-3xl opacity-25"></div>
+        <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-60 w-60  bg-[#1E90FF] blur-3xl opacity-25"></div>
         <div className={`relative mx-auto ${tokens.maxW} text-center`}>
           <h3 className="text-[24px] sm:text-[32px] font-semibold text-neutral-800 tracking-tight">
             Ready to <span className="font-extrabold text-[#1DA1FF]">Perfect</span> Your AI Art?
@@ -906,13 +1080,13 @@ export default function LandingPage() {
           </p>
           <div className="mt-5 flex items-center justify-center gap-3">
             <button 
-              className="inline-flex items-center justify-center rounded-full bg-[#1DA1FF] px-5 py-2.5 text-white text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
+              className="inline-flex items-center justify-center  bg-[#1DA1FF] px-5 py-2.5 text-white text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
               onClick={handleEnhanceNow}
             >
               Enhance Now
             </button>
             <button 
-              className="inline-flex items-center justify-center rounded-full bg-neutral-100 px-5 py-2.5 text-neutral-700 text-sm font-semibold border border-neutral-300 hover:scale-105 transition-transform duration-200 cursor-pointer"
+              className="inline-flex items-center justify-center  bg-neutral-100 px-5 py-2.5 text-neutral-700 text-sm font-semibold border border-neutral-300 hover:scale-105 transition-transform duration-200 cursor-pointer"
               onClick={handleViewPricing}
             >
               View Pricing
@@ -1031,7 +1205,7 @@ function SubmitButton() {
     <button
       type="submit"
       aria-disabled={pending}
-      className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#1E90FF] px-8 py-3.5 text-white text-lg font-semibold hover:brightness-95 transition disabled:opacity-50"
+      className="w-full inline-flex items-center justify-center gap-2  bg-[#1E90FF] px-8 py-3.5 text-white text-lg font-semibold hover:brightness-95 transition disabled:opacity-50"
     >
       {pending ? 'Submitting...' : 'Submit'}
     </button>
