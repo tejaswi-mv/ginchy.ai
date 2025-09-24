@@ -164,7 +164,7 @@ function ClothingSelectionSection() {
       { id: 2, name: "tech cargo vest", image: "/images/Garment.png", type: "vest" },
       { id: 3, name: "strapless long dress", image: "/images/Garment.png", type: "dress", featured: true },
       { id: 4, name: "strapless long dress", image: "/images/Garment.png", type: "dress", confirmed: true },
-      { id: 5, name: "flared pants", image: "/images/Garment.png", type: "pants" },
+      { id: 5, name: "flared pants", image: "/images/5.jpg", type: "pants" },
       { id: 6, name: "asymmetrical top", image: "/images/Garment.png", type: "top" }
   ];
 
@@ -173,10 +173,10 @@ function ClothingSelectionSection() {
   };
 
   return (
-      <section className="py-20" style={{ backgroundColor: '#F9F9F9' }}>
+      <section className="py-8" style={{ backgroundColor: '#F9F9F9' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {/* Title */}
-              <h2 className="text-center text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-16" style={{ fontFamily: 'Inter, Helvetica, sans-serif' }}>
+              <h2 className="text-center text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8" style={{ fontFamily: 'Inter, Helvetica, sans-serif' }}>
                   AI outfit generated with Genchy AI technology
               </h2>
 
@@ -184,9 +184,9 @@ function ClothingSelectionSection() {
               <div className="flex flex-col lg:flex-row items-stretch justify-between">
                   {/* Panel 1: Woman in Car (Far Left) */}
                   <div className="w-full lg:w-[30%]">
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden" style={{ border: '3px solid #9370DB' }}>
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
                           <Image 
-                              src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" 
+                              src="/images/Woman.png" 
                               alt="Woman in car" 
                               fill 
                               className="object-cover"
@@ -252,10 +252,11 @@ function ClothingSelectionSection() {
                   <div className="w-full lg:w-[30%]">
                       <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
                           <Image 
-                              src="/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg" 
+                              src="/images/5.jpg" 
                               alt="Man in black shirt" 
                               fill 
                               className="object-cover"
+                              style={{ objectPosition: 'center 40%' }}
                           />
                       </div>
                   </div>
@@ -264,7 +265,7 @@ function ClothingSelectionSection() {
                   <div className="w-full lg:w-[30%]">
                       <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
                           <Image 
-                              src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" 
+                              src="/images/4.jpg" 
                               alt="Man on couch" 
                               fill 
                               className="object-cover"
@@ -323,9 +324,9 @@ function ChooseModelSection() {
     const previewCharacters = characters.slice(0, 18);
 
     return (
-        <section className={`${tokens.gutter} py-20 bg-white`}>
+        <section className={`${tokens.gutter} pt-2 pb-8 bg-white`}>
             <div className={`mx-auto ${tokens.maxW}`}>
-                <div className="relative rounded-[24px] bg-white border-[8px] border-black p-6 sm:p-8 lg:p-10">
+                <div className="relative rounded-[24px] bg-white p-6 sm:p-8 lg:p-10">
                     <div>
                         <h2 className="text-center text-[32px] font-bold text-black mb-2">
                             CHOOSE YOUR MODEL
@@ -823,15 +824,17 @@ export default function LandingPage() {
       </section>
 
       {/* ================== TESTIMONIAL SECTION ================== */}
-      <section className={`${tokens.gutter} py-24 bg-black text-white`}>
+      <section className={`${tokens.gutter} pt-4 pb-24 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Section Title */}
-          <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-4 uppercase tracking-wide">
-            WHAT OUR USERS THINK ABOUT GENCHY AI
+          <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-2 uppercase tracking-wide">
+            WHAT OUR USERS<br />
+            THINK ABOUT<br />
+            GENCHY AI
           </h2>
           
           {/* Subtitle */}
-          <p className="text-center text-white/80 text-base sm:text-lg mb-16">
+          <p className="text-center text-white/80 text-base sm:text-lg mb-8">
             Real feedback from real people<br />I've had the pleasure to work with.
           </p>
 
@@ -1194,7 +1197,7 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          <div className="mt-8 text-xs text-neutral-500">© {new Date().getFullYear()} Create Without Limits Technologies INC.</div>
+          <div className="mt-8 text-xs text-neutral-500 text-center">© {new Date().getFullYear()} Create Without Limits Technologies INC.</div>
         </div>
       </footer>
 

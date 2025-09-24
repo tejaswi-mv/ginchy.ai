@@ -107,19 +107,19 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 79 100% 50%; /* Lime Green #d1ff00 */
-    --primary-foreground: 0 0% 5%; /* Black text on lime */
+    --primary: 210 100% 50%; /* DodgerBlue #1E90FF */
+    --primary-foreground: 0 0% 100%; /* White text on blue */
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 79 100% 50%; /* Lime Green #d1ff00 */
-    --accent-foreground: 0 0% 5%; /* Black text on lime */
+    --accent: 210 100% 50%; /* DodgerBlue #1E90FF */
+    --accent-foreground: 0 0% 100%; /* White text on blue */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 79 100% 50%; /* Lime Green #d1ff00 for focus */
+    --ring: 210 100% 50%; /* DodgerBlue #1E90FF for focus */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -127,12 +127,12 @@
     --chart-5: 340 75% 55%;
     --sidebar-background: 240 10% 3.9%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 79 100% 50%;
-    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 79 100% 50%;
+    --sidebar-ring: 210 100% 50%;
   }
 }
 

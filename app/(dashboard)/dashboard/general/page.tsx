@@ -34,7 +34,7 @@ function AccountForm({
   return (
     <>
       <div>
-        <Label htmlFor="name" className="mb-2 text-white font-medium">
+        <Label htmlFor="name" className="mb-2 text-slate-300 font-medium">
           Name
         </Label>
         <Input
@@ -43,11 +43,11 @@ function AccountForm({
           placeholder="Enter your name"
           defaultValue={state.name || nameValue}
           required
-          className="bg-neutral-800 border-neutral-600 text-white placeholder-neutral-400 focus:ring-[#009AFF] focus:border-[#009AFF]"
+          className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
         />
       </div>
       <div>
-        <Label htmlFor="email" className="mb-2 text-white font-medium">
+        <Label htmlFor="email" className="mb-2 text-slate-300 font-medium">
           Email
         </Label>
         <Input
@@ -57,7 +57,7 @@ function AccountForm({
           placeholder="Enter your email"
           defaultValue={emailValue}
           required
-          className="bg-neutral-800 border-neutral-600 text-white placeholder-neutral-400 focus:ring-[#009AFF] focus:border-[#009AFF]"
+          className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
         />
       </div>
     </>
@@ -82,14 +82,15 @@ export default function GeneralPage() {
   );
 
   return (
-    <section className="flex-1 p-4 lg:p-8 bg-black">
-      <h1 className="text-2xl lg:text-3xl font-extrabold text-white font-[var(--font-display)] mb-8">
-        General Settings
-      </h1>
+    <section className="flex-1 p-6 lg:p-8">
+      <div className="mb-8">
+        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">General Settings</h1>
+        <p className="text-slate-300">Manage your account information</p>
+      </div>
 
-      <Card className="bg-gradient-to-br from-neutral-900 to-black border-2 border-neutral-700">
-        <CardHeader>
-          <CardTitle className="text-white text-xl font-[var(--font-display)]">Account Information</CardTitle>
+      <Card className="bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-white">Account Information</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" action={formAction}>
@@ -104,7 +105,7 @@ export default function GeneralPage() {
             )}
             <Button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#009AFF] px-6 py-3 text-white text-sm font-semibold hover:bg-[#009AFF]/90 transition-all duration-200 shadow-[0_0_0_6px_rgba(0,154,255,0.12)] hover:shadow-[0_0_0_8px_rgba(0,154,255,0.18)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-200"
               disabled={isPending}
             >
               {isPending ? (
