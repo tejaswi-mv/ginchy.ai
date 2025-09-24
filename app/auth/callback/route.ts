@@ -4,6 +4,9 @@ import { db } from '@/lib/db/drizzle';
 import { users, teams, teamMembers, activityLogs, type NewUser, type NewTeam, type NewTeamMember, ActivityType } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
