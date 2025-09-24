@@ -510,9 +510,9 @@ export default function LandingPage() {
                <div className="grid grid-cols-12 gap-6 items-start">
                  {/* media placeholder (video or image) */}
                  <div className="col-span-12 md:col-span-7">
-                   <div className="relative inline-block mt-8 overflow-hidden">
+                   <div className="relative inline-block mt-8 overflow-hidden group">
                      <Image 
-                       src="https://images.pexels.com/photos/3268732/pexels-photo-3268732.jpeg?auto=compress&cs=tinysrgb&w=800" 
+                       src="/images/ginchy-vi.gif" 
                        alt="Fashion model" 
                        width={520}
                        height={385}
@@ -524,16 +524,17 @@ export default function LandingPage() {
                        }}
                        unoptimized 
                      />
-                     <div 
-                       className="absolute left-[-24px] bottom-[-24px] w-[260px] h-[180px]"
-                       style={{
-                         backgroundColor: '#1E90FF',
-                         opacity: 0.2,
-                         borderRadius: '0px',
-                         border: '1px solid rgba(255,255,255,0.12)',
-                         boxShadow: '0 8px 24px rgba(0,0,0,0.35)'
-                       }}
-                     />
+                     {/* Center Play Button */}
+                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                       <button 
+                         className="bg-black/70 hover:bg-black/90 text-white p-4 rounded-full transition-all duration-200 hover:scale-110"
+                         title="Play"
+                       >
+                         <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                           <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                         </svg>
+                       </button>
+                     </div>
                    </div>
                  </div>
                 {/* benefits text list */}
@@ -567,22 +568,22 @@ export default function LandingPage() {
                 {/* Top row: shoes with small label on the right */}
                 <div className="relative flex justify-start">
                   <div className="relative w-[250px] h-[200px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
-                    <Image src="/images/Shoes.png" alt="Shoes" fill className="object-cover object-center" style={{objectPosition: 'center 20%'}} unoptimized />
+                    <Image src="/images/1.jpg" alt="Shoes" fill className="object-cover object-center" style={{objectPosition: 'center 20%'}} unoptimized />
                   </div>
                   <div className="absolute top-1/2 -translate-y-1/2 left-[260px] border border-neutral-600 bg-black/60 px-4 py-2 text-[11px]">Shoes</div>
                 </div>
                 {/* second row: jewelry small square with label below */}
                 <div className="grid grid-cols-2 gap-4 items-start">
-                  <div className="relative flex justify-start">
-                    <div className="relative w-[190px] h-[150px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
-                      <Image src="/images/Garment.png" alt="Accessories" fill className="object-cover" unoptimized />
+                  <div className="relative flex justify-start ml-8">
+                    <div className="relative w-[160px] h-[150px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
+                      <Image src="/images/2.jpg" alt="Accessories" fill className="object-cover" unoptimized />
                     </div>
-                    <div className="absolute -bottom-7 left-[90px] -translate-x-1/2 w-[110px] text-center border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
+                    <div className="absolute -bottom-9 left-[90px] -translate-x-1/2 w-[110px] text-center border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
                   </div>
                   {/* sunglasses big square with label on right */}
-                  <div className="flex items-center gap-2">
-                    <div className="relative w-[260px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100 aspect-square">
-                      <Image src="/images/glasses.png" alt="Sunglasses" fill className="object-cover" unoptimized />
+                  <div className="flex items-center gap-2 ml-4">
+                    <div className="relative w-[300px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100 aspect-square">
+                      <Image src="/images/3.jpg" alt="Sunglasses" fill className="object-cover" unoptimized />
                     </div>
                     <div className="border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
                   </div>
