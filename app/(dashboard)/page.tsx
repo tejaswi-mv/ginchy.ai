@@ -337,7 +337,22 @@ function ChooseModelSection() {
                           <p className="text-center text-[14px] text-neutral-600 mb-8">
                               Browse our diverse library or generate a custom one.
                           </p>
-                                 <div className="relative  overflow-hidden mb-6 p-0 border border-neutral-200">
+                                 <div className="relative flex overflow-hidden mb-6">
+                                     {/* Vertical text outside the box */}
+                                     <div className="flex items-center justify-center" style={{ width: '30px' }}>
+                                         <span 
+                                             className="text-[14px] font-extrabold text-neutral-600 tracking-tight whitespace-nowrap"
+                                             style={{ 
+                                                 transform: 'rotate(-90deg)',
+                                                 transformOrigin: 'center',
+                                                 lineHeight: '1'
+                                             }}
+                                         >
+                                             Explore 100+ of avatar options
+                                         </span>
+                                     </div>
+                                     {/* Model grid container */}
+                                     <div className="flex-1 p-0 border border-neutral-200">
                                       {isLoading ? (
                                           <div className="grid grid-cols-6 gap-2">
                                               {Array.from({ length: 18 }).map((_, i) => (
@@ -373,6 +388,7 @@ function ChooseModelSection() {
                                           </div>
                                       )}
                                   </div>
+                                 </div>
                                  <div className="flex flex-col sm:flex-row gap-2">
                                       <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-xl px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
                                           BROWSE LIBRARY
@@ -745,9 +761,9 @@ export default function LandingPage() {
       </section>
 
       {/* ================== SECTION 5 — Personalize your outfit ================== */}
-      <section className={`${tokens.gutter} py-24 bg-black text-white`}>
+      <section className={`${tokens.gutter} py-8 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
-          <h2 className="text-center font-[var(--font-display)] text-[#1E90FF] text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-16">
+          <h2 className="text-left font-[var(--font-display)] text-[#1E90FF] text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-16">
             Personalize your outfit<span className="ml-2 text-[#1E90FF]">✦</span>
           </h2>
 
@@ -760,8 +776,8 @@ export default function LandingPage() {
                 {/* Top circle - sunglasses */}
                 <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg">
                   <Image 
-                    src="/images/sunglasses.png" 
-                    alt="Sunglasses" 
+                    src="/images/glasses.png" 
+                    alt="Glasses" 
                     width={96}
                     height={96}
                     className="w-full h-full object-cover"
@@ -771,8 +787,8 @@ export default function LandingPage() {
                 {/* Bottom circle - shoes */}
                 <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white shadow-lg">
                   <Image 
-                    src="/images/Shoes.png" 
-                    alt="Shoes" 
+                    src="/images/Garment.png" 
+                    alt="Garment" 
                     width={128}
                     height={128}
                     className="w-full h-full object-cover"
@@ -817,8 +833,9 @@ export default function LandingPage() {
               </p>
 
               {/* Description text */}
-              <p className="text-gray-300 bg-black text-base leading-relaxed">
-                Swap garments and create on-brand looks that elevate your Instagram, website, and campaigns<br />
+              <p className="text-gray-300 bg-black text-base leading-none font-bold font-sans mt-4">
+                Swap garments and create on-brand looks that elevate your<br />
+                Instagram, website, and campaigns<br />
                 — driving more engagement and a consistent visual identity.
               </p>
             </div>
@@ -826,19 +843,20 @@ export default function LandingPage() {
             {/* RIGHT SECTION - PRODUCT PAGES */}
             <div className="space-y-6">
               {/* Product page image */}
-              <div className="relative aspect-[4/3]  overflow-hidden bg-neutral-800 border-2 border-[#1E90FF]">
+              <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-800 translate-x-8">
                 <Image src="/images/website.png" alt="Product page" unoptimized fill className="object-cover" />
               </div>
 
               {/* Section label */}
-              <p className="text-center text-[#1E90FF] font-bold text-sm tracking-wider">
+              <p className="text-center text-gray-500 font-bold text-sm tracking-wider">
                 [PRODUCT PAGES]
               </p>
 
               {/* Description text */}
-              <p className="text-gray-300 text-base leading-relaxed">
-                try outfits on your AI self first and see the perfect fit<br />
-                before you buy.
+              <p className="text-gray-300 text-base leading-none font-bold font-sans">
+                try outfits on your AI self first<br />
+                and see the perfect fit before<br />
+                you buy.
               </p>
             </div>
           </div>
