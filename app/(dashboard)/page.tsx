@@ -861,46 +861,78 @@ export default function LandingPage() {
       </section>
 
       {/* ================== TESTIMONIAL SECTION ================== */}
-      <section className={`${tokens.gutter} pt-4 pb-24 bg-black text-white`}>
+      <section className={`${tokens.gutter} pt-4 pb-24 bg-black text-white`} style={{ background: 'radial-gradient(circle at 49% 55%, rgb(23, 11, 243) 10%, rgb(32, 32, 255) 12%, rgba(0, 0, 0, 1) 17%)' }}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Section Title */}
           <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-2 uppercase tracking-wide">
-            WHAT OUR USERS<br />
-            THINK ABOUT<br />
+            WHAT OUR USERS
+            <br />
+            THINK ABOUT
+            <br />
             GENCHY AI
           </h2>
-          
+
           {/* Subtitle */}
           <p className="text-center text-white/80 text-base sm:text-lg mb-8">
-            Real feedback from real people<br />I've had the pleasure to work with.
+            Real feedback from real people
+            <br />
+            I've had the pleasure to work with.
           </p>
 
-          {/* Testimonial Cards */}
-          <div className="flex justify-center">
-            <div className="relative w-[400px] max-w-full  bg-white text-black p-6 shadow-[0_0_40px_rgba(0,154,255,0.60)] border border-[#1E90FF]">
-              {/* Profile Picture */}
-              <div className="flex items-start space-x-4 mb-4">
-                <div className="relative">
-                  <div className="w-12 h-12  bg-gray-300 flex items-center justify-center overflow-hidden">
-                    <Image src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Alina M." fill className="object-cover" unoptimized/>
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500  flex items-center justify-center text-white text-xs font-bold">
-                    0
+          {/* Testimonial Cards Container (for positioning lines and the card) */}
+          <div className="flex justify-center relative" >
+            {/* Left Underline */}
+            <div className="hidden sm:block absolute left-0 top-1/1 -translate-y-1/2 w-16 h-0.5 bg-white rounded-full md:w-24 lg:w-40 xl:w-90"></div>
+            
+            {/* Testimonial Card with separate gradient glow */}
+            <div className="relative z-10"> {/* Added z-10 to ensure card is above glow */}
+              {/* Gradient Glow - positioned behind the card */}
+              <div className="absolute inset-0 -m-4 rounded-full blur-lg opacity-70" /* Adjust -m- values to control how much it extends */
+                   style={{ 
+                    
+                     transform: 'scale(1.2)' /* Scale it up to make it bigger than the card */
+                   }}>
+              </div>
+
+              {/* Actual Testimonial Card */}
+              <div className="relative w-[280px] max-w-full rounded-xl text-white p-6  border border-white" > {/* Added bg-black to the card itself */}
+                
+                {/* Profile Picture */}
+                <div className="flex items-start rounded-xl space-x-4 mb-4">
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                      <Image src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Alina M." fill className="object-cover rounded-full" unoptimized />
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                      o
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Quote */}
-              <p className="text-gray-800 leading-relaxed mb-4">
-                &ldquo;It&apos;s the small touches that made the big difference. The attention to detail made everything feel so well-crafted.&rdquo;
-              </p>
-              
-              {/* Author */}
-              <div>
-                <p className="font-bold text-gray-900">Alina M.</p>
-                <p className="text-sm text-gray-600">Co-founder of Noura Skincare</p>
+
+                {/* Quote */}
+                <p className="text-white leading-relaxed mb-4">
+                  &ldquo;It&apos;s the small touches that made the big difference. The attention to detail made everything feel so well-crafted.&rdquo;
+                </p>
+
+                {/* Author */}
+                <div>
+                  <p className="font-bold text-white">Alina M.</p>
+                  <p className="text-sm text-white/60">Co-founder of Noura Skincare</p>
+                </div>
               </div>
             </div>
+            
+            {/* Right Underline */}
+            <div className="hidden sm:block absolute right-0 top-1/1 -translate-y-1/2 w-16 h-0.5 bg-white rounded-full md:w-24 lg:w-40 xl:w-90"></div>
+          </div>
+
+          {/* Pagination Dots */}
+          <div className="flex justify-center mt-8 space-x-2">
+            <span className="w-2 h-2 bg-blue-500 rounded-full"></span> {/* Active dot */}
+            <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
+            <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
+            <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
+            <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
           </div>
         </div>
       </section>
