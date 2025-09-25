@@ -33,7 +33,7 @@ export default function RootLayout({
       className={`${serif.variable} dark`}
       suppressHydrationWarning={true}
     >
-      <body className="min-h-[100dvh] bg-gradient-to-br from-slate-900 via-blue-900 to-black">
+      <body className="min-h-[100dvh]">
         <SWRConfig
           value={{
             fallback: {
