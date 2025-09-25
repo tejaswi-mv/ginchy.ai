@@ -505,14 +505,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left column: title + media with benefits on the right */}
             <div className="col-span-1 lg:col-span-7">
-               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight mb-6 max-w-2xl">
+               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight mb-1 max-w-2xl">
                  Create, amplify and scale<br/>
                  professional product content.
                </h2>
                <div className="grid grid-cols-12 gap-6 items-start">
                  {/* media placeholder (video or image) */}
                  <div className="col-span-12 md:col-span-7">
-                   <div className="relative inline-block mt-8 overflow-hidden group">
+                   <div className="relative inline-block mt-8 group">
                      <Image 
                        src="/images/ginchy-vi.gif" 
                        alt="Fashion model" 
@@ -526,10 +526,28 @@ export default function LandingPage() {
                        }}
                        unoptimized 
                      />
+                     
+                     {/* Overlay Image on top of video */}
+                     <div className="absolute bottom-2 left-0 z-20" style={{ transform: 'translate(-70px, -170px) scale(1) rotate(0deg)' }}>
+                       <Image 
+                         src="/images/landingvidside.jpg" 
+                         alt="Fashion overlay" 
+                         width={250}
+                         height={120}
+                         className="w-[200px] h-[120px] object-cover shadow-lg border-0 border-white/20"
+                         style={{
+                           objectFit: 'cover', 
+                           objectPosition: 'center',
+                           borderRadius: '8px'
+                         }}
+                         unoptimized 
+                       />
+                     </div>
+                     
                      {/* Center Play Button */}
                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                        <button 
-                         className="bg-black/70 hover:bg-black/90 text-white p-4 rounded-full transition-all duration-200 hover:scale-110"
+                         className="bg-black/70 hover:bg-black/90 text-white p-2 rounded-full transition-all duration-200 hover:scale-110"
                          title="Play"
                        >
                          <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -541,7 +559,7 @@ export default function LandingPage() {
                  </div>
                 {/* benefits text list */}
                 <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-6 flex items-end">
-                  <div className="space-y-5 mt-8">
+                  <div className="space-y-0 mt-1">
                     <div>
                       <h3 className="font-black text-white">Production efficiency</h3>
                       <p className="text-neutral-300">Speed up the design-to-production process by eliminating the need for physical sample to respond quickly to market demands.</p>
@@ -745,10 +763,20 @@ export default function LandingPage() {
       </section>
 
       {/* ================== SECTION 5 — Personalize your outfit ================== */}
-      <section className={`${tokens.gutter} py-24 bg-black text-white`}>
-        <div className={`mx-auto ${tokens.maxW}`}>
-          <h2 className="text-center font-[var(--font-display)] text-[#1E90FF] text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-16">
-            Personalize your outfit<span className="ml-2 text-[#1E90FF]">✦</span>
+      <section className={`${tokens.gutter} py-50  bg-black text-white relative`}>
+        {/* Background gradient image positioned like in screenshot */}
+        <div className="absolute top-5 -right-4 w-1/2 h-full opacity-80 pointer-events-none">
+          <Image 
+            src="/images/sidegradient1.png" 
+            alt="Side gradient background" 
+            fill
+            className="object-cover object-right"
+            unoptimized
+          />
+        </div>
+        <div className={`mx-auto ${tokens.maxW} relative z-10`}> 
+          <h2 className=" font-[var(--font-display)] text-[#1E90FF] text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-16 -ml-0">
+            Personalize your outfit<sup className="ml-2 text-[#1E90FF] text- -top-2 relative">✦</sup>
           </h2>
 
           {/* two main sections - SOCIAL MEDIA and PRODUCT PAGES */}
