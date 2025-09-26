@@ -208,7 +208,7 @@ function ClothingSelectionSection() {
                   </div>
 
                   {/* Panel 3: Interactive Generator (Center) */}
-                  <div className="w-full lg:w-[30%]">
+                  <div className="w-full lg:w-[35%]">
                       <div className="p-4  h-full" style={{ backgroundColor: '#EEEEEE' }}>
                           <div className="grid grid-cols-2 gap-4">
                               {clothingItems.map((item) => (
@@ -228,12 +228,12 @@ function ClothingSelectionSection() {
                                               src={item.image}
                                               alt={item.name}
                                               fill
-                                              className="object-contain p-1"
+                                              className="object-contain "
                                           />
                                       </div>
 
                                       {/* Text Label Below Image */}
-                                      <p className="text-xs text-center text-gray-500 lowercase pt-1 pb-1" style={{ fontFamily: 'Inter, Helvetica, sans-serif' }}>
+                                      <p className="text-xs text-center text-gray-500 lowercase " style={{ fontFamily: 'Inter, Helvetica, sans-serif' }}>
                                           {item.name}
                                       </p>
 
@@ -253,7 +253,7 @@ function ClothingSelectionSection() {
                   <div className="w-full lg:w-[40%]">
                       <div className="relative aspect-[2/3]  overflow-hidden">
                           <Image 
-                              src="/images/5.jpg" 
+                              src="/images/56black.jpg" 
                               alt="Man in black shirt" 
                               fill 
                               className="object-cover"
@@ -676,22 +676,22 @@ export default function LandingPage() {
             {/* four tall images row - professional images as specified */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-3">
                {/* Sample placeholder - Desert scene */}
-               <div className="relative h-[600px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/1left-desert-lady.jpg" alt="Sample placeholder" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 2 - New York scene */}
-               <div className="relative h-[600px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/city-2left.jpg" alt="Customized 2" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 3 - White studio scene */}
-               <div className="relative h-[600px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 4 - Snow environment scene */}
-               <div className="relative h-[600px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/snow-lady.jpg" alt="Customized 4" unoptimized fill className="object-cover" />
                </div>
             </div>
