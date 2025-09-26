@@ -853,15 +853,15 @@ export default function LandingPage() {
               </div>
 
               {/* Section label */}
-              <p className="text-center bg-black text-[#1E90FF] font-bold text-sm tracking-wider">
+              <p className="text-center bg-black text-gray-500 font-bold text-sm tracking-wider italic font-['Times_New_Roman','Georgia',serif] transform translate-x-0.5 mt-4">
                 [SOCIAL MEDIA]
               </p>
 
               {/* Description text */}
-              <p className="text-gray-300 bg-black text-base leading-none font-bold font-sans mt-16">
+              <p className="text-gray-300 bg-black text-[15px] leading-none font-bold font-sans mt-16">
                 Swap garments and create on-brand looks that elevate your<br />
-                Instagram, website, and campaigns<br />
-                — driving more engagement and a consistent visual identity.
+                Instagram, website, and campaigns — driving more engagement<br />
+                and a consistent visual identity.
               </p>
             </div>
 
@@ -873,7 +873,7 @@ export default function LandingPage() {
               </div>
 
               {/* Section label */}
-              <p className="text-center text-gray-500 font-bold text-sm tracking-wider">
+              <p className="text-center text-gray-500 font-bold text-sm tracking-wider italic font-['Times_New_Roman','Georgia',serif] transform translate-x-0.5">
                 [PRODUCT PAGES]
               </p>
 
