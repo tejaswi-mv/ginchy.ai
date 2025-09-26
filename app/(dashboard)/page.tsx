@@ -482,7 +482,7 @@ export default function LandingPage() {
    
 
       {/* ================== HERO ================== */}
-      <Hero />
+      <Hero largeOnHome={true} />
       {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
       <section className="w-full bg-black pt-2 pb-4 overflow-hidden">
         <div className="relative w-full h-20">
@@ -521,7 +521,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left column: title + media with benefits on the right */}
             <div className="col-span-1 lg:col-span-7">
-               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight mb-1 max-w-2xl">
+               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight  max-w-2xl">
                  Create, amplify and scale<br/>
                  professional product content.
                </h2>
@@ -544,13 +544,13 @@ export default function LandingPage() {
                      />
                      
                      {/* Overlay Image on top of video */}
-                     <div className="absolute bottom-2 left-0 z-20" style={{ transform: 'translate(-70px, -170px) scale(1) rotate(0deg)' }}>
+                     <div className="absolute bottom-2 left-0 z-20" style={{ transform: 'translate(-36px, 50px) scale(1) rotate(0deg)' }}>
                        <Image 
                          src="/images/landingvidside.jpg" 
                          alt="Fashion overlay" 
-                         width={250}
-                         height={120}
-                         className="w-[200px] h-[120px] object-cover shadow-lg border-0 border-white/20"
+                         width={300}
+                         height={220}
+                         className="w-[200px] h-[170px] object-cover shadow-lg"
                          style={{
                            objectFit: 'cover', 
                            objectPosition: 'center',
