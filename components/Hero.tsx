@@ -230,12 +230,12 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
               <br />
               <span className="italic font-['IBM_Plex_Serif','Georgia',serif] text-white ml-[0.6em]">GROWTH</span>
             </h1>
-            <p className="mt-6 text-[18px] sm:text-[20px] lg:text-[24px] text-white max-w-[560px] leading-relaxed font-bold">
+            <p className="mt-6 ml-[0.6em] text-[18px] sm:text-[20px] lg:text-[24px] text-white max-w-[560px] leading-normal font-bold">
               Adopt the industry's leading AI platform<br/>
               for in-house creation of PDP, Lookbook,<br/>
               and Campaign visuals.
             </p>
-            <p className="mt-6 ml-[0.6em] text-[#1E90FF] italic font-['IBM_Plex_Serif','Georgia',serif] text-[32px] sm:text-[36px] lg:text-[40px] font-medium">[ with Ginchy ]</p>
+            <p className="mt-6 ml-[0.6em] text-[#1E90FF] italic font-['IBM_Plex_Serif','Georgia',serif] text-[36px] sm:text-[42px] lg:text-[48px] font-medium">[ with Ginchy ]</p>
             <div className="mt-6">
               <a 
                 href="#try" 
@@ -281,30 +281,6 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
                   />
                 </video>
                 
-                {/* Center Play/Pause Button */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button 
-                    onClick={() => {
-                      const video = document.getElementById('hero-video') as HTMLVideoElement;
-                      if (video) {
-                        if (video.paused) {
-                          video.play();
-                        } else {
-                          video.pause();
-                        }
-                      }
-                    }}
-                    className="bg-black/70 hover:bg-black/90 text-white p-4 rounded-full transition-all duration-200 hover:scale-110"
-                    title="Play/Pause"
-                  >
-                    <svg id="play-icon" className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-                    </svg>
-                    <svg id="pause-icon" className="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M5 4a1 1 0 011-1h1.5a1 1 0 011 1v12a1 1 0 01-1 1H6a1 1 0 01-1-1V4zM12 4a1 1 0 011-1H14.5a1 1 0 011 1v12a1 1 0 01-1 1H13a1 1 0 01-1-1V4z"/>
-                    </svg>
-                  </button>
-                </div>
 
                 {/* YouTube-style Progress Bar */}
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-transparent cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"

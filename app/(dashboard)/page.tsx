@@ -485,30 +485,30 @@ export default function LandingPage() {
       <Hero largeOnHome={true} />
       {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
       <section className="w-full bg-black pt-2 pb-4 overflow-hidden">
-        <div className="relative w-full h-20">
+        <div className="relative w-full h-24">
           <div className="flex animate-scroll-seamless">
             <Image 
               src="/images/logos.png" 
               alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
               width={1200}
-              height={80}
-              className="object-contain flex-shrink-0 filter contrast-200 brightness-150"
+              height={96}
+              className="object-contain flex-shrink-0 filter contrast-200 brightness-150 saturate-110 invert-0"
               unoptimized
             />
             <Image 
               src="/images/logos.png" 
               alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
               width={1200}
-              height={80}
-              className="object-contain flex-shrink-0 filter contrast-200 brightness-150"
+              height={96}
+              className="object-contain flex-shrink-0 filter contrast-200 brightness-150 saturate-110 invert-0"
               unoptimized
             />
             <Image 
               src="/images/logos.png" 
               alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
               width={1200}
-              height={80}
-              className="object-contain flex-shrink-0 filter contrast-200 brightness-150"
+              height={96}
+              className="object-contain flex-shrink-0 filter contrast-200 brightness-150 saturate-110 invert-0"
               unoptimized
             />
           </div>
@@ -575,18 +575,18 @@ export default function LandingPage() {
                  </div>
                 {/* benefits text list */}
                 <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-6 flex items-end">
-                  <div className="space-y-0 mt-1">
+                  <div className="space-y-0 mt-12">
                     <div>
-                      <h3 className="font-black text-white">Production efficiency</h3>
-                      <p className="text-neutral-300">Speed up the design-to-production process by eliminating the need for physical sample to respond quickly to market demands.</p>
+                      <h3 className="font-black text-white mb-0">Production efficiency</h3>
+                      <p className="text-neutral-300 mt-1">Speed up the design-to-production process by eliminating the need for physical sample to respond quickly to market demands.</p>
                     </div>
                     <div>
-                      <h3 className="font-black text-white">Cost reduction</h3>
-                      <p className="text-neutral-300">Eliminates the need for traditional photoshoots, reducing costs and resource consumption while simplifying content creation.</p>
+                      <h3 className="font-black text-white mb-0">Cost reduction</h3>
+                      <p className="text-neutral-300 mt-1">Eliminates the need for traditional photoshoots, reducing costs and resource consumption while simplifying content creation.</p>
                     </div>
                     <div>
-                      <h3 className="font-black text-white">Sustainability</h3>
-                      <p className="text-neutral-300">Reduces the environmental impact by minimizing the need for physical photoshoots and associated logistics.</p>
+                      <h3 className="font-black text-white mb-0">Sustainability</h3>
+                      <p className="text-neutral-300 mt-1">Reduces the environmental impact by minimizing the need for physical photoshoots and associated logistics.</p>
                     </div>
                   </div>
                 </div>
@@ -635,12 +635,12 @@ export default function LandingPage() {
       <ChooseModelSection />
 
       {/* ================== SECTION 4 — Customize your pictures ================== */}
-      <section className={`${tokens.gutter} py-24 bg-black text-white`} id="examples">
+      <section className={`${tokens.gutter} pt-24 pb-8 bg-black text-white`} id="examples">
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Professional title styling */}
-          <h2 className="text-center font-[var(--font-display)] text-white text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold tracking-tight leading-[1.1] mb-10">
+          <h2 className="text-left ml-12 font-[var(--font-display)] text-[#1E90FF] text-[28px] sm:text-[36px] lg:text-[42px] font-extrabold tracking-tight leading-[1.1] mb-10">
             Customize your pictures the way you want
-            <span className="text-white ml-2">✦</span>
+            <span className="text-[#1E90FF] ml-2">✦</span>
           </h2>
 
           {/* container with left padding so the vertical pill is always visible */}
@@ -663,30 +663,30 @@ export default function LandingPage() {
             </div>
 
             {/* four tall images row - professional images as specified */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
                {/* Sample placeholder - Desert scene */}
-               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/1left-desert-lady.jpg" alt="Sample placeholder" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 2 - New York scene */}
-               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/city-2left.jpg" alt="Customized 2" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 3 - White studio scene */}
-               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 4 - Snow environment scene */}
-               <div className="relative h-[500px] overflow-hidden border-2 border-[#1E90FF] bg-neutral-800 rounded-lg">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/snow-lady.jpg" alt="Customized 4" unoptimized fill className="object-cover" />
                </div>
             </div>
 
             {/* Bottom text - professional styling */}
-            <p className="mt-8 text-center font-[var(--font-display)] text-white text-[24px] sm:text-[32px] lg:text-[36px] font-extrabold tracking-tight leading-[1.1]">
+            <p className="mt-6 text-center font-[var(--font-display)] text-[#1E90FF] text-[24px] sm:text-[32px] lg:text-[36px] font-extrabold tracking-tight leading-[1.1]">
               Consistency Models + Unlimited Environments + Much more
             </p>
           </div>
@@ -694,11 +694,11 @@ export default function LandingPage() {
       </section>
 
       {/* ================== GENAI PLATFORM SECTION ================== */}
-      <section className={`${tokens.gutter} pt-4 pb-20 bg-black text-white`}>
+      <section className={`${tokens.gutter} pt-0 pb-20 bg-black text-white`}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Company Logos Banner */}
-          <div className="text-center mb-12">
-            <p className="text-white text-xl mb-6">
+          <div className="text-center mb-0">
+            <p className="text-white text-xl mb-0">
               All the top GenAI models—plus Magnific, recently acquired
               <br />
               by Freepik
@@ -709,33 +709,33 @@ export default function LandingPage() {
         {/* Full Width Company Logos Banner */}
         <div className="w-full bg-black py-8 overflow-hidden">
           <div className="animate-scroll-seamless">
-            <div className="flex items-center justify-center h-24 px-8">
+            <div className="flex items-center justify-center h-28 px-8">
               <Image 
                 src="/images/logos.png" 
                 alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
                 width={1200}
                 height={96}
-                className="object-contain h-full"
+                className="object-contain h-full filter contrast-200 brightness-150 saturate-110 invert-0"
                 unoptimized
               />
             </div>
-            <div className="flex items-center justify-center h-24 px-8">
+            <div className="flex items-center justify-center h-28 px-8">
               <Image 
                 src="/images/logos.png" 
                 alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
                 width={1200}
                 height={96}
-                className="object-contain h-full"
+                className="object-contain h-full filter contrast-200 brightness-150 saturate-110 invert-0"
                 unoptimized
               />
             </div>
-            <div className="flex items-center justify-center h-24 px-8">
+            <div className="flex items-center justify-center h-28 px-8">
               <Image 
                 src="/images/logos.png" 
                 alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
                 width={1200}
                 height={96}
-                className="object-contain h-full"
+                className="object-contain h-full filter contrast-200 brightness-150 saturate-110 invert-0"
                 unoptimized
               />
             </div>
@@ -848,10 +848,10 @@ export default function LandingPage() {
               {/* Main images - increased size to match right side */}
               <div className="grid grid-cols-2 gap-1">
                 <div className="relative aspect-[4/5]  overflow-hidden bg-neutral-800">
-                  <Image src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" alt="Woman in floral top" unoptimized fill className="object-cover" />
+                  <Image src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" alt="Woman in floral top" unoptimized fill className="object-cover object-top" style={{objectPosition: 'center top'}} />
                 </div>
                 <div className="relative aspect-[4/5]  overflow-hidden bg-neutral-800">
-                  <Image src="/images/woman v2.png" alt="Woman in grey hoodie" unoptimized fill className="object-cover" />
+                  <Image src="/images/woman v2.png" alt="Woman in grey hoodie" unoptimized fill className="object-cover object-top" style={{objectPosition: 'center top'}} />
                 </div>
               </div>
 
@@ -861,7 +861,7 @@ export default function LandingPage() {
               </p>
 
               {/* Description text */}
-              <p className="text-gray-300 bg-black text-base leading-none font-bold font-sans mt-4">
+              <p className="text-gray-300 bg-black text-base leading-none font-bold font-sans mt-16">
                 Swap garments and create on-brand looks that elevate your<br />
                 Instagram, website, and campaigns<br />
                 — driving more engagement and a consistent visual identity.
@@ -889,7 +889,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-16 text-center">
+          <div className="mt-32 text-center">
             <button 
               className="inline-flex items-center justify-center rounded-xl bg-white px-16 py-4 text-black font-bold text-xl shadow-[0_0_0_6px_rgba(255,255,255,0.08)] hover:scale-105 transition-transform duration-200 cursor-pointer"
               onClick={handleGetAccess}
