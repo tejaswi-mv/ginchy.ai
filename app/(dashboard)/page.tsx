@@ -342,7 +342,7 @@ function ChooseModelSection() {
                                      {/* Vertical text outside the box */}
                                      <div className="flex items-center justify-center" style={{ width: '30px' }}>
                                          <span 
-                                             className="text-[14px] font-extrabold text-black tracking-tight whitespace-nowrap"
+                                              className="text-[14px] font-medium text-black tracking-tight whitespace-nowrap"
                                              style={{ 
                                                  transform: 'rotate(-90deg)',
                                                  transformOrigin: 'center',
@@ -485,31 +485,15 @@ export default function LandingPage() {
       {/* ================== HERO ================== */}
       <Hero largeOnHome={true} />
       {/* ================== FULL WIDTH COMPANY LOGOS BANNER ================== */}
-      <section className="w-full bg-black pt-2 pb-4 overflow-hidden">
+      <section className="w-full bg-black pt-2 pb-4">
         <div className="relative w-full h-24">
-          <div className="flex animate-scroll-seamless">
+          <div className="flex items-center justify-center h-full">
             <Image 
               src="/images/logos.png" 
               alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
               width={1200}
               height={96}
-              className="object-contain flex-shrink-0 filter contrast-200 brightness-150 saturate-110 invert-0"
-              unoptimized
-            />
-            <Image 
-              src="/images/logos.png" 
-              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-              width={1200}
-              height={96}
-              className="object-contain flex-shrink-0 filter contrast-200 brightness-150 saturate-110 invert-0"
-              unoptimized
-            />
-            <Image 
-              src="/images/logos.png" 
-              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-              width={1200}
-              height={96}
-              className="object-contain flex-shrink-0 filter contrast-200 brightness-150 saturate-110 invert-0"
+              className="object-contain filter contrast-200 brightness-150 saturate-110 invert-0"
               unoptimized
             />
           </div>
@@ -718,38 +702,16 @@ export default function LandingPage() {
         </div>
         
         {/* Full Width Company Logos Banner */}
-        <div className="w-full bg-black py-8 overflow-hidden">
-          <div className="animate-scroll-seamless">
-            <div className="flex items-center justify-center h-28 px-8">
-              <Image 
-                src="/images/logos.png" 
-                alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-                width={1200}
-                height={96}
-                className="object-contain h-full filter contrast-200 brightness-150 saturate-110 invert-0"
-                unoptimized
-              />
-            </div>
-            <div className="flex items-center justify-center h-28 px-8">
-              <Image 
-                src="/images/logos.png" 
-                alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-                width={1200}
-                height={96}
-                className="object-contain h-full filter contrast-200 brightness-150 saturate-110 invert-0"
-                unoptimized
-              />
-            </div>
-            <div className="flex items-center justify-center h-28 px-8">
-              <Image 
-                src="/images/logos.png" 
-                alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
-                width={1200}
-                height={96}
-                className="object-contain h-full filter contrast-200 brightness-150 saturate-110 invert-0"
-                unoptimized
-              />
-            </div>
+        <div className="w-full bg-black py-8">
+          <div className="flex items-center justify-center h-28 px-8">
+            <Image 
+              src="/images/logos.png" 
+              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+              width={1200}
+              height={96}
+              className="object-contain h-full filter contrast-200 brightness-150 saturate-110 invert-0"
+              unoptimized
+            />
           </div>
         </div>
         
@@ -848,7 +810,20 @@ export default function LandingPage() {
                  </div>
                  <div>
                    <p className="text-black font-semibold text-sm">Lil Miquela</p>
-                   <p className="text-gray-400 text-xs">@lilmiquela • 2.7M followers</p>
+                    <p className="text-xs whitespace-nowrap flex items-center gap-1">
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+                        <defs>
+                          <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#833AB4" />
+                            <stop offset="50%" stopColor="#E1306C" />
+                            <stop offset="100%" stopColor="#F77737" />
+                          </linearGradient>
+                        </defs>
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                      </svg>
+                      <span className="text-[#0095F6]">lilmiquela</span>
+                      <span className="text-gray-400">• 2.7M followers</span>
+                    </p>
                    
                  </div>
                  
@@ -936,7 +911,7 @@ export default function LandingPage() {
       <section className={`${tokens.gutter} pt-0 pb-24 bg-black text-white`} style={{ background: 'radial-gradient(circle at 49% 55%, rgba(89, 175, 255,1) 10%,rgb(74, 155, 232) 12%, rgba(0, 0, 0, 1) 17%)' }}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Section Title */}
-          <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-6 uppercase tracking-wide leading-none">
+          <h2 className="text-center text-[18px] sm:text-[22px] font-bold text-white mb-6 uppercase tracking-wide leading-none">
             WHAT OUR USERS
             <br />
             THINK ABOUT
