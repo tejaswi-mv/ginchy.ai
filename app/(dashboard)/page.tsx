@@ -636,8 +636,18 @@ export default function LandingPage() {
       <ChooseModelSection />
 
       {/* ================== SECTION 4 — Customize your pictures ================== */}
-      <section className={`${tokens.gutter} pt-24 pb-8 bg-black text-white`} id="examples">
-        <div className={`mx-auto ${tokens.maxW}`}>
+      <section className={`${tokens.gutter} pt-24 pb-8 bg-black text-white relative`} id="examples">
+        {/* Get Access Gradient - positioned at far left without margin */}
+        <div className="absolute left-0 top-0 h-full w-64 pointer-events-none z-0">
+          <Image 
+            src="/images/getaacessgrad.svg"
+            alt="Get access gradient"
+            fill
+            className="object-contain object-left"
+            unoptimized
+          />
+        </div>
+        <div className={`mx-auto ${tokens.maxW} relative z-10`}>
           {/* Professional title styling */}
           <h2 className="text-left ml-12 font-[var(--font-display)] text-[#1E90FF] text-[28px] sm:text-[36px] lg:text-[42px] font-extrabold tracking-tight leading-[1.1] mb-10">
             Customize your pictures the way you want
@@ -821,9 +831,11 @@ export default function LandingPage() {
               fixed={true}
             />
             {/* LEFT SECTION - SOCIAL MEDIA */}
-            <div className="bg-black">
+            <div className="bg-black relative">
+              {/* Social left gradient background */}
+             
                {/* Profile card */}
-               <div className="flex items-center space-x-3 bg-white  p-3 w-fit pr-81">
+               <div className="relative flex items-center space-x-3 bg-white  p-3 w-fit pr-81 z-10">
                  <div className="w-10 h-10 rounded-full overflow-hidden">
                    <Image 
                      src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" 
@@ -843,7 +855,7 @@ export default function LandingPage() {
                </div>
 
               {/* Main images - increased size to match right side */}
-              <div className="grid grid-cols-2 gap-0">
+              <div className="relative grid grid-cols-2 gap-0 z-10">
                 <div className="relative aspect-[4/5]  overflow-hidden bg-neutral-800">
                   <Image src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" alt="Woman in floral top" unoptimized fill className="object-cover object-top" style={{objectPosition: 'center top'}} />
                 </div>
@@ -853,16 +865,33 @@ export default function LandingPage() {
               </div>
 
               {/* Section label */}
-              <p className="text-center bg-black text-[#1E90FF] font-bold text-sm tracking-wider">
+              <p className="relative text-center  text-[#1E90FF] font-bold text-sm tracking-wider z-10">
                 [SOCIAL MEDIA]
               </p>
 
               {/* Description text */}
-              <p className="text-gray-300 bg-black text-base leading-none font-bold font-sans mt-16">
+              <p className="relative text-gray-300  text-base leading-none font-bold font-sans mt-16 z-10">
                 Swap garments and create on-brand looks that elevate your<br />
                 Instagram, website, and campaigns<br />
                 — driving more engagement and a consistent visual identity.
               </p>
+
+              {/* Social left gradient below content */}
+              <div 
+                className="relative mt-8 h-32 w-full"
+                style={{
+                  transform: 'translateX(-100px) translateY(-190px) scale(5) rotate(0deg)',
+                  transformOrigin: 'left center'
+                }}
+              >
+                <Image 
+                  src="/images/socialleftgrad.svg"
+                  alt="Social left gradient"
+                  fill
+                  className="object-contain object-left"
+                  unoptimized
+                />
+              </div>
             </div>
 
             {/* RIGHT SECTION - PRODUCT PAGES */}
@@ -886,7 +915,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-32 text-center">
+          <div className="mt- text-center">
             <button 
               className="inline-flex items-center justify-center rounded-xl bg-white px-16 py-4 text-black font-bold text-xl shadow-[0_0_0_6px_rgba(255,255,255,0.08)] hover:scale-105 transition-transform duration-200 cursor-pointer"
               onClick={handleGetAccess}
