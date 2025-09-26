@@ -574,18 +574,18 @@ export default function LandingPage() {
                    </div>
                  </div>
                 {/* benefits text list */}
-                <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-6 flex items-end">
-                  <div className="space-y-0 mt-12">
+                <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-tight flex items-end">
+                  <div className="space-y-4 mt-12">
                     <div>
-                      <h3 className="font-black text-white mb-0">Production efficiency</h3>
+                      <h3 className="font-black text-white mb-0 text-base">Production efficiency</h3>
                       <p className="text-neutral-300 mt-1">Speed up the design-to-production process by eliminating the need for physical sample to respond quickly to market demands.</p>
                     </div>
                     <div>
-                      <h3 className="font-black text-white mb-0">Cost reduction</h3>
+                      <h3 className="font-black text-white mb-0 text-base">Cost reduction</h3>
                       <p className="text-neutral-300 mt-1">Eliminates the need for traditional photoshoots, reducing costs and resource consumption while simplifying content creation.</p>
                     </div>
                     <div>
-                      <h3 className="font-black text-white mb-0">Sustainability</h3>
+                      <h3 className="font-black text-white mb-0 text-base">Sustainability</h3>
                       <p className="text-neutral-300 mt-1">Reduces the environmental impact by minimizing the need for physical photoshoots and associated logistics.</p>
                     </div>
                   </div>
