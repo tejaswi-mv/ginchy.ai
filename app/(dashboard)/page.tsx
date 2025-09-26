@@ -341,7 +341,7 @@ function ChooseModelSection() {
                                      {/* Vertical text outside the box */}
                                      <div className="flex items-center justify-center" style={{ width: '30px' }}>
                                          <span 
-                                             className="text-[14px] font-extrabold text-neutral-600 tracking-tight whitespace-nowrap"
+                                             className="text-[14px] font-extrabold text-black tracking-tight whitespace-nowrap"
                                              style={{ 
                                                  transform: 'rotate(-90deg)',
                                                  transformOrigin: 'center',
@@ -516,12 +516,12 @@ export default function LandingPage() {
       </section>
 
       {/* ================== SECTION 2 — Create/All types ================== */}
-      <section className={`${tokens.gutter} py-20 bg-black text-white`} id="about">
+      <section className={`${tokens.gutter} pt-4 pb-20 bg-black text-white`} id="about">
         <div className={`mx-auto ${tokens.maxW}`}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left column: title + media with benefits on the right */}
             <div className="col-span-1 lg:col-span-7">
-               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight  max-w-2xl">
+               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight leading-none max-w-2xl">
                  Create, amplify and scale<br/>
                  professional product content.
                </h2>
@@ -595,11 +595,11 @@ export default function LandingPage() {
 
             {/* Right column: heading + three cards layout */}
             <div className="col-span-12 lg:col-span-5">
-              <h2 className="font-[var(--font-display)] text-[40px] sm:text-[50px] lg:text-[60px] font-extrabold tracking-tight mb-6 uppercase">
-                ALL TYPES OF
-                <br />
-                <span className="italic text-[#1E90FF] font-['IBM_Plex_Serif','Georgia',serif] font-medium lowercase">[ fashion items ]</span>
-              </h2>
+               <h2 className="font-[var(--font-display)] text-[40px] sm:text-[50px] lg:text-[60px] font-extrabold tracking-tight mb-3 uppercase leading-tight">
+                 ALL TYPES OF
+                 <br />
+                 <span className="italic text-[#1E90FF] font-['IBM_Plex_Serif','Georgia',serif] font-medium lowercase">[ fashion items ]</span>
+               </h2>
               <div className="grid grid-cols-1 gap-4">
                 {/* Top row: shoes with small label on the right */}
                 <div className="relative flex justify-start">
@@ -907,10 +907,10 @@ export default function LandingPage() {
       </section>
 
       {/* ================== TESTIMONIAL SECTION ================== */}
-      <section className={`${tokens.gutter} pt-4 pb-24 bg-black text-white`} style={{ background: 'radial-gradient(circle at 49% 55%, rgb(23, 11, 243) 10%, rgb(32, 32, 255) 12%, rgba(0, 0, 0, 1) 17%)' }}>
+      <section className={`${tokens.gutter} pt-0 pb-24 bg-black text-white`} style={{ background: 'radial-gradient(circle at 49% 55%, rgb(23, 11, 243) 10%, rgb(32, 32, 255) 12%, rgba(0, 0, 0, 1) 17%)' }}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Section Title */}
-          <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-2 uppercase tracking-wide">
+          <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-6 uppercase tracking-wide leading-none">
             WHAT OUR USERS
             <br />
             THINK ABOUT
@@ -919,10 +919,10 @@ export default function LandingPage() {
           </h2>
 
           {/* Subtitle */}
-          <p className="text-center text-white/80 text-base sm:text-lg mb-8">
-            Real feedback from real people
+          <p className="text-center text-white/80 text-[11px] mb-8">
+            Real feedback from real people I've
             <br />
-            I've had the pleasure to work with.
+            had the pleasure to work with.
           </p>
 
           {/* Testimonial Cards Container (for positioning lines and the card) */}
@@ -974,25 +974,25 @@ export default function LandingPage() {
 
           {/* Pagination Dots */}
           <div className="flex justify-center mt-8 space-x-2">
-            <span className="w-2 h-2 bg-blue-500 rounded-full"></span> {/* Active dot */}
             <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
             <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
             <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
             <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
+            <span className="w-2 h-2 border border-gray-600 rounded-full"></span> {/* Outlined dot */}
           </div>
         </div>
       </section>
 
       {/* ================== SECTION 6 — Pricing ================== */}
-      <section className={`${tokens.gutter} py-24 bg-black text-white`} id="pricing">
+      <section className={`${tokens.gutter} pt-4 pb-24 bg-black text-white`} id="pricing">
         <div className={`mx-auto ${tokens.maxW}`}>
-          <h2 className="text-center text-3xl sm:text-4xl font-extrabold tracking-tight mb-10">Select Package</h2>
+          <h2 className="text-center text-4xl sm:text-5xl font-extrabold tracking-tight mb-10">Select Package</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 max-w-6xl mx-auto">
             {/* Starter */}
             <div className=" bg-neutral-900 border border-neutral-800 p-8 h-[600px] flex flex-col rounded-xl">
               <div className="text-center mb-6">
-                <p className="text-sm text-neutral-400 font-semibold tracking-wide">STARTER</p>
+                <p className="text-sm text-neutral-400 font-bold tracking-wide">STARTER</p>
                 <p className="text-xs text-neutral-400 mt-2 leading-relaxed">Best for individuals &<br />small small projects</p>
               </div>
               
@@ -1057,7 +1057,7 @@ export default function LandingPage() {
             {/* Pro (highlighted) */}
             <div className=" bg-neutral-900 border-2 border-[#1E90FF] p-8 h-[600px] flex flex-col shadow-[0_0_0_4px_rgba(0,154,255,0.15)] rounded-xl">
               <div className="text-center mb-6">
-                <p className="text-sm text-neutral-400 font-semibold tracking-wide">PRO</p>
+                <p className="text-sm text-neutral-400 font-bold tracking-wide">PRO</p>
                 <p className="text-xs text-neutral-400 mt-2 leading-relaxed">Ideal for growing<br />eCormences & freeloncers</p>
               </div>
               
@@ -1122,7 +1122,7 @@ export default function LandingPage() {
             {/* Enterprise */}
             <div className=" bg-neutral-900 border border-neutral-800 p-8 h-[600px] flex flex-col rounded-xl">
               <div className="text-center mb-6">
-                <p className="text-sm text-neutral-400 font-semibold tracking-wide">ENTERPRISE</p>
+                <p className="text-sm text-neutral-400 font-bold tracking-wide">ENTERPRISE</p>
                 <p className="text-xs text-neutral-400 mt-2 leading-relaxed">For teams & businesses<br />with high high volume</p>
               </div>
               

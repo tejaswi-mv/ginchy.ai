@@ -230,7 +230,7 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
               <br />
               <span className="italic font-['IBM_Plex_Serif','Georgia',serif] text-white ml-[0.6em]">GROWTH</span>
             </h1>
-            <p className="mt-6 ml-[0.6em] text-[18px] sm:text-[20px] lg:text-[24px] text-white max-w-[560px] leading-normal font-bold">
+            <p className="mt-6 ml-[0.6em] text-[18px] sm:text-[20px] lg:text-[24px] text-white max-w-[560px] leading-none font-bold">
               Adopt the industry's leading AI platform<br/>
               for in-house creation of PDP, Lookbook,<br/>
               and Campaign visuals.
