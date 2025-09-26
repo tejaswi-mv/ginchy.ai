@@ -208,7 +208,7 @@ function ClothingSelectionSection() {
                   </div>
 
                   {/* Panel 3: Interactive Generator (Center) */}
-                  <div className="w-full lg:w-[30%]">
+                  <div className="w-full lg:w-[35%]">
                       <div className="p-4  h-full" style={{ backgroundColor: '#EEEEEE' }}>
                           <div className="grid grid-cols-2 gap-4">
                               {clothingItems.map((item) => (
@@ -228,12 +228,12 @@ function ClothingSelectionSection() {
                                               src={item.image}
                                               alt={item.name}
                                               fill
-                                              className="object-contain p-1"
+                                              className="object-contain "
                                           />
                                       </div>
 
                                       {/* Text Label Below Image */}
-                                      <p className="text-xs text-center text-gray-500 lowercase pt-1 pb-1" style={{ fontFamily: 'Inter, Helvetica, sans-serif' }}>
+                                      <p className="text-xs text-center text-gray-500 lowercase " style={{ fontFamily: 'Inter, Helvetica, sans-serif' }}>
                                           {item.name}
                                       </p>
 
@@ -253,7 +253,7 @@ function ClothingSelectionSection() {
                   <div className="w-full lg:w-[40%]">
                       <div className="relative aspect-[2/3]  overflow-hidden">
                           <Image 
-                              src="/images/5.jpg" 
+                              src="/images/56black.jpg" 
                               alt="Man in black shirt" 
                               fill 
                               className="object-cover"
@@ -655,9 +655,9 @@ export default function LandingPage() {
           </h2>
 
           {/* container with left padding so the vertical pill is always visible */}
-          <div className="relative pl-16 sm:pl-20 overflow-visible">
+          <div className="relative pl-8 sm:pl-12 overflow-visible">
             {/* vertical pill - professional styling */}
-            <div className="absolute left-0 top-0 h-full z-10">
+            <div className="absolute -left-30 top-0 h-full z-10">
               <div 
                 className="relative h-5/6 w-14 rounded-full overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
                 onClick={handleGetAccess}
@@ -674,24 +674,24 @@ export default function LandingPage() {
             </div>
 
             {/* four tall images row - professional images as specified */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-3">
                {/* Sample placeholder - Desert scene */}
-               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/1left-desert-lady.jpg" alt="Sample placeholder" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 2 - New York scene */}
-               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/city-2left.jpg" alt="Customized 2" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 3 - White studio scene */}
-               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 4 - Snow environment scene */}
-               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
                  <Image src="/images/snow-lady.jpg" alt="Customized 4" unoptimized fill className="object-cover" />
                </div>
             </div>
@@ -933,7 +933,7 @@ export default function LandingPage() {
       </section>
 
       {/* ================== TESTIMONIAL SECTION ================== */}
-      <section className={`${tokens.gutter} pt-0 pb-24 bg-black text-white`} style={{ background: 'radial-gradient(circle at 49% 55%, rgb(23, 11, 243) 10%, rgb(32, 32, 255) 12%, rgba(0, 0, 0, 1) 17%)' }}>
+      <section className={`${tokens.gutter} pt-0 pb-24 bg-black text-white`} style={{ background: 'radial-gradient(circle at 49% 55%, rgba(89, 175, 255,1) 10%,rgb(74, 155, 232) 12%, rgba(0, 0, 0, 1) 17%)' }}>
         <div className={`mx-auto ${tokens.maxW}`}>
           {/* Section Title */}
           <h2 className="text-center text-xl sm:text-2xl font-bold text-white mb-6 uppercase tracking-wide leading-none">
