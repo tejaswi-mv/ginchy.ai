@@ -10,6 +10,7 @@ import useSWR from 'swr';
 import { User } from '@/lib/db/schema';
 import { useRouter } from "next/navigation";
 import Hero from '@/components/Hero';
+import DraggableImage from '@/components/DraggableImage';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -796,39 +797,33 @@ export default function LandingPage() {
           </h2>
 
           {/* two main sections - SOCIAL MEDIA and PRODUCT PAGES */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-30 relative">
             
-            {/* CENTER CIRCULAR IMAGES */}
-            <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 z-10 hidden lg:block">
-              <div className="flex flex-col gap-8">
-                {/* Top circle - sunglasses */}
-                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg">
-                  <Image 
-                    src="/images/glasses.png" 
-                    alt="Glasses" 
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
-                </div>
-                {/* Bottom circle - shoes */}
-                <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white shadow-lg">
-                  <Image 
-                    src="/images/Garment.png" 
-                    alt="Garment" 
-                    width={128}
-                    height={128}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
-                </div>
-              </div>
-            </div>
+            {/* FIXED CIRCULAR IMAGES */}
+            <DraggableImage 
+              src="/images/glasses.png"
+              alt="Glasses"
+              initialX={560}
+              initialY={20}
+              width={120}
+              height={120}
+              className="hidden lg:block"
+              fixed={true}
+            />
+            <DraggableImage 
+              src="/images/Garment.png"
+              alt="Garment"
+              initialX={550}
+              initialY={280}
+              width={172}
+              height={172}
+              className="hidden lg:block"
+              fixed={true}
+            />
             {/* LEFT SECTION - SOCIAL MEDIA */}
-            <div className="space-y-6 bg-white ">
+            <div className="bg-black">
                {/* Profile card */}
-               <div className="flex items-center space-x-3 bg-white/5  p-3 w-fit">
+               <div className="flex items-center space-x-3 bg-white  p-3 w-fit pr-81">
                  <div className="w-10 h-10 rounded-full overflow-hidden">
                    <Image 
                      src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" 
@@ -842,11 +837,13 @@ export default function LandingPage() {
                  <div>
                    <p className="text-black font-semibold text-sm">Lil Miquela</p>
                    <p className="text-gray-400 text-xs">@lilmiquela • 2.7M followers</p>
+                   
                  </div>
+                 
                </div>
 
               {/* Main images - increased size to match right side */}
-              <div className="grid grid-cols-2 gap-1">
+              <div className="grid grid-cols-2 gap-0">
                 <div className="relative aspect-[4/5]  overflow-hidden bg-neutral-800">
                   <Image src="/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png" alt="Woman in floral top" unoptimized fill className="object-cover object-top" style={{objectPosition: 'center top'}} />
                 </div>
@@ -856,7 +853,7 @@ export default function LandingPage() {
               </div>
 
               {/* Section label */}
-              <p className="text-center bg text-[#1E90FF] font-bold text-sm tracking-wider">
+              <p className="text-center bg-black text-[#1E90FF] font-bold text-sm tracking-wider">
                 [SOCIAL MEDIA]
               </p>
 
