@@ -134,12 +134,7 @@ function NavigationLinks() {
       >
         Pricing
       </Link>
-      <a
-        href="#faq"
-        className="text-neutral-300 hover:text-white transition"
-      >
-        FAQ
-      </a>
+     
       <Link
         href="/generate"
         className="rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-600 transition"
@@ -154,7 +149,7 @@ export default function DashboardHeader({ largeOnHome = false }: { largeOnHome?:
   const { data: user, isLoading } = useSWR<User>('/api/user', fetcher);
   return (
     <header
-      className={`sticky top-0 z-50 bg-gradient-to-r from-slate-900/95 via-blue-900/95 to-black/95 backdrop-blur-md text-white ${tokens.gutter}`}
+      className={`sticky top-0 z-50 text-white ${tokens.gutter}`}
     >
       <div className={`mx-auto ${tokens.maxW} h-16 flex items-center`}>
         <div className="flex items-center gap-8">
