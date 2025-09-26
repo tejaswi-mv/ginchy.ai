@@ -602,29 +602,29 @@ export default function LandingPage() {
                  <span className="italic text-[#1E90FF] font-['IBM_Plex_Serif','Georgia',serif] font-medium lowercase">[ fashion items ]</span>
                </h2>
               <div className="grid grid-cols-1 gap-4">
-                {/* Top row: shoes with small label on the right */}
-                <div className="relative flex justify-start">
-                  <div className="relative w-[250px] h-[200px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
-                    <Image src="/images/1.jpg" alt="Shoes" fill className="object-cover object-center" style={{objectPosition: 'center 20%'}} unoptimized />
-                  </div>
-                  <div className="absolute top-1/2 -translate-y-1/2 left-[260px] border border-neutral-600 bg-black/60 px-4 py-2 text-[11px]">Shoes</div>
-                </div>
-                {/* second row: jewelry small square with label below */}
-                <div className="grid grid-cols-2 gap-4 items-start">
-                  <div className="relative flex justify-start ml-8">
-                    <div className="relative w-[160px] h-[150px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
-                      <Image src="/images/2.jpg" alt="Accessories" fill className="object-cover" unoptimized />
+                  {/* Top row: shoes with small label on the right */}
+                  <div className="relative flex justify-start">
+                    <div className="relative w-[180px] h-[180px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
+                      <Image src="/images/1.jpg" alt="Shoes" fill className="object-cover object-center" style={{objectPosition: 'center 20%'}} unoptimized />
                     </div>
-                    <div className="absolute -bottom-9 left-[90px] -translate-x-1/2 w-[110px] text-center border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
+                    <div className="absolute top-1/2 -translate-y-1/2 left-[190px] border border-neutral-600 bg-black/60 px-4 py-2 text-[11px]">Shoes</div>
                   </div>
-                  {/* sunglasses big square with label on right */}
-                  <div className="flex items-center gap-2 ml-4">
-                    <div className="relative w-[300px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100 aspect-square">
-                      <Image src="/images/3.jpg" alt="Sunglasses" fill className="object-cover" unoptimized />
-                    </div>
-                    <div className="border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
-                  </div>
-                </div>
+               {/* second row: jewelry small square with label below */}
+               <div className="flex items-start gap-6">
+                 <div className="relative flex justify-start ml-8">
+                   <div className="relative w-[160px] h-[150px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
+                     <Image src="/images/2.jpg" alt="Accessories" fill className="object-cover" unoptimized />
+                   </div>
+                   <div className="absolute -bottom-9 left-[90px] -translate-x-1/2 w-[110px] text-center border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
+                 </div>
+                 {/* sunglasses big square with label on right */}
+                 <div className="flex items-center gap-2">
+                   <div className="relative w-[200px] h-[200px] overflow-hidden border border-neutral-700 bg-neutral-100">
+                     <Image src="/images/3.jpg" alt="Sunglasses" fill className="object-cover" unoptimized />
+                   </div>
+                   <div className="border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
+                 </div>
+               </div>
               </div>
             </div>
           </div>
@@ -674,24 +674,24 @@ export default function LandingPage() {
             </div>
 
             {/* four tall images row - professional images as specified */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                {/* Sample placeholder - Desert scene */}
-               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/1left-desert-lady.jpg" alt="Sample placeholder" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 2 - New York scene */}
-               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/city-2left.jpg" alt="Customized 2" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 3 - White studio scene */}
-               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
                </div>
               
                {/* Customized 4 - Snow environment scene */}
-               <div className="relative h-[700px] overflow-hidden bg-neutral-800">
+               <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/snow-lady.jpg" alt="Customized 4" unoptimized fill className="object-cover" />
                </div>
             </div>
