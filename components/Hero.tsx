@@ -185,7 +185,7 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
     <section className={`text-white relative bg-black`}>
       {/* Background SVG on right side */}
       <div 
-        className="absolute top-0 right-0 w-1/2 h-full opacity-80 pointer-events-none"
+        className="absolute top-0 right-0 w-full sm:w-3/4 md:w-2/3 lg:w-1/2 h-full opacity-80 pointer-events-none"
         style={{
           transform: 'translateX(0px) translateY(0px) scale(1) rotate(0deg)',
           transformOrigin: 'right center'
@@ -226,22 +226,22 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
       </header>
       
       {/* Hero Content */}
-      <div className={`${tokens.gutter} pt-24 pb-20`}>
+      <div className={`${tokens.gutter} pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20`}>
         <div className={`mx-auto ${tokens.maxW}`}>
         <div className={tokens.grid}>
           {/* Left: copy */}
           <div className="col-span-12 lg:col-span-6 flex flex-col justify-center">
-            <h1 className="font-['Aileron','Inter',system-ui,sans-serif] text-[48px] sm:text-[64px] lg:text-[88px] font-bold leading-[0.95] tracking-tight">
+            <h1 className="font-['Aileron','Inter',system-ui,sans-serif] text-[32px] sm:text-[48px] md:text-[64px] lg:text-[88px] font-bold leading-[0.95] tracking-tight">
               <span className="text-[#1E90FF]">UNLOCK</span>
               <br />
-              <span className="italic font-['IBM_Plex_Serif','Georgia',serif] text-white ml-[0.6em]">GROWTH</span>
+              <span className="italic font-['IBM_Plex_Serif','Georgia',serif] text-white ml-[0.3em] sm:ml-[0.6em]">GROWTH</span>
             </h1>
-            <p className="mt-6 ml-[0.6em] text-[18px] sm:text-[20px] lg:text-[24px] text-white max-w-[560px] leading-none font-bold">
-              Adopt the industry's leading AI platform<br/>
-              for in-house creation of PDP, Lookbook,<br/>
-              and Campaign visuals.
+            <p className="mt-4 sm:mt-6 ml-[0.3em] sm:ml-[0.6em] text-[14px] sm:text-[18px] md:text-[20px] lg:text-[24px] text-white max-w-[90%] sm:max-w-[560px] leading-tight sm:leading-none font-bold">
+              Adopt the industry's leading AI platform<br className="hidden sm:block"/>
+              <span className="sm:hidden"> </span>for in-house creation of PDP, Lookbook,<br className="hidden sm:block"/>
+              <span className="sm:hidden"> </span>and Campaign visuals.
             </p>
-            <p className="mt-6 ml-[0.6em] text-[#1E90FF] italic font-['IBM_Plex_Serif','Georgia',serif] text-[36px] sm:text-[42px] lg:text-[48px] font-medium">[ with Ginchy ]</p>
+            <p className="mt-4 sm:mt-6 ml-[0.3em] sm:ml-[0.6em] text-[#1E90FF] italic font-['IBM_Plex_Serif','Georgia',serif] text-[24px] sm:text-[36px] md:text-[42px] lg:text-[48px] font-medium">[ with Ginchy ]</p>
             <div className="mt-6">
               <a 
                 href="#try" 
@@ -254,13 +254,13 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
           </div>
 
                   {/* Right: Hero Image with Custom Dimensions */}
-                  <div className="col-span-12 lg:col-span-6 mt-10 lg:mt-0 lg:ml-[-8rem] lg:mr-25">
+                  <div className="col-span-12 lg:col-span-6 mt-6 sm:mt-8 lg:mt-0 lg:ml-[-4rem] xl:ml-[-8rem] lg:mr-25">
                     <div 
-                      className="relative overflow-hidden border-2 border-white/20 shadow-2xl"
+                      className="relative overflow-hidden border-2 border-white/20 shadow-2xl mx-auto"
                       style={{
                         aspectRatio: '3764/2056', // Custom aspect ratio based on your dimensions
-                        maxWidth: '95%',
-                        width: '95%'
+                        maxWidth: '100%',
+                        width: '100%'
                       }}
                     >
               {/* Video Container with Custom Dimensions */}

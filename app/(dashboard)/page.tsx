@@ -330,19 +330,19 @@ function ChooseModelSection() {
                 <div className="relative rounded-[24px] bg-white p-3 sm:p-3 lg:p-8">
                     <div>
                        
-                          <div className="grid grid-cols-13 gap-25 items-center">
-                              <div className="col-span-12 lg:col-span-8">
-                              <h2 className="text-center text-[32px] font-bold text-black mb-2">
+                          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                              <div className="col-span-1 lg:col-span-8">
+                              <h2 className="text-center text-[24px] sm:text-[28px] lg:text-[32px] font-bold text-black mb-2">
                               CHOOSE YOUR MODEL
                           </h2>
-                          <p className="text-center text-[14px] text-neutral-600 mb-8">
+                          <p className="text-center text-[12px] sm:text-[14px] text-neutral-600 mb-6 sm:mb-8">
                               Browse our diverse library or generate a custom one.
                           </p>
                                  <div className="relative flex overflow-hidden mb-6">
-                                     {/* Vertical text outside the box */}
-                                     <div className="flex items-center justify-center" style={{ width: '30px' }}>
+                                     {/* Vertical text outside the box - hidden on mobile */}
+                                     <div className="hidden sm:flex items-center justify-center" style={{ width: '30px' }}>
                                          <span 
-                                              className="text-[14px] font-medium text-black tracking-tight whitespace-nowrap"
+                                              className="text-[12px] lg:text-[14px] font-medium text-black tracking-tight whitespace-nowrap"
                                              style={{ 
                                                  transform: 'rotate(-90deg)',
                                                  transformOrigin: 'center',
@@ -353,15 +353,15 @@ function ChooseModelSection() {
                                          </span>
                                      </div>
                                      {/* Model grid container */}
-                                     <div className="flex-1 p-0 border border-neutral-200">
+                                     <div className="flex-1 p-2 sm:p-0 border border-neutral-200">
                                       {isLoading ? (
-                                          <div className="grid grid-cols-6 gap-2">
+                                          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2">
                                               {Array.from({ length: 18 }).map((_, i) => (
-                                                  <div key={i} className="aspect-square  bg-neutral-200 animate-pulse"></div>
+                                                  <div key={i} className="aspect-square bg-neutral-200 animate-pulse"></div>
                                               ))}
                                           </div>
                                       ) : (
-                                          <div className="grid grid-cols-6 gap-2">
+                                          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2">
                                               {previewCharacters.map((char) => (
                                               <div 
                                                   key={char.name} 
@@ -390,17 +390,17 @@ function ChooseModelSection() {
                                       )}
                                   </div>
                                  </div>
-                                 <div className="flex flex-col sm:flex-row gap-2">
-                                      <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-xl px-6 py-3 text-black font-semibold hover:bg-neutral-100 transition">
-                                          BROWSE LIBRARY
-                                      </button>
-                                      <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-xl px-6 py-3 font-semibold hover:bg-neutral-700 transition">
-                                          GENERATE CUSTOM MODEL
-                                      </button>
-                                  </div>
-                              </div>
-                              <div className="col-span-12 lg:col-span-5">
-                                <div className="relative w-full h-[900px] lg:h-[600px]  overflow-hidden bg-neutral-100 border border-neutral-200">
+                                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                                       <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-black font-semibold hover:bg-neutral-100 transition">
+                                           BROWSE LIBRARY
+                                       </button>
+                                       <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold hover:bg-neutral-700 transition">
+                                           GENERATE CUSTOM MODEL
+                                       </button>
+                                   </div>
+                               </div>
+                               <div className="col-span-1 lg:col-span-4 mt-6 lg:mt-0">
+                                 <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[600px] overflow-hidden bg-neutral-100 border border-neutral-200">
                                     {selectedCharacter ? (
                                         <Image 
                                             src={selectedCharacter.url} 
@@ -500,26 +500,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================== SECTION 2 — Create/All types ================== */}
-      <section className={`${tokens.gutter} pt-4 pb-20 bg-black text-white`} id="about">
-        <div className={`mx-auto ${tokens.maxW}`}>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Left column: title + media with benefits on the right */}
-            <div className="col-span-1 lg:col-span-7">
-               <h2 className="font-[var(--font-display)] text-[32px] sm:text-[40px] font-extrabold tracking-tight leading-none max-w-2xl">
-                 Create, amplify and scale<br/>
-                 professional product content.
-               </h2>
-               <div className="grid grid-cols-12 gap-6 items-start">
+       {/* ================== SECTION 2 — Create/All types ================== */}
+      <section className="pt-4 pb-12 sm:pb-16 lg:pb-20 bg-black text-white px-4 sm:px-6 lg:px-8" id="about">
+        <div className="mx-auto max-w-[1200px] px-0">
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-12">
+             {/* Left column: title + media with benefits on the right */}
+             <div className="col-span-1 lg:col-span-7 w-full">
+                <h2 className="font-[var(--font-display)] text-[24px] sm:text-[32px] md:text-[36px] lg:text-[40px] font-extrabold tracking-tight leading-none max-w-full lg:max-w-2xl text-center lg:text-left">
+                  Create, amplify and scale<br className="hidden sm:block"/>
+                  <span className="sm:hidden"> </span>professional product content.
+                </h2>
+               <div className="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-4 md:gap-6 items-start w-full">
                  {/* media placeholder (video or image) */}
-                 <div className="col-span-12 md:col-span-7">
-                   <div className="relative inline-block mt-8 group">
+                 <div className="col-span-1 md:col-span-7 flex justify-center md:justify-start w-full">
+                   <div className="relative inline-block mt-4 sm:mt-6 lg:mt-8 group w-full max-w-[350px] sm:max-w-[400px] md:max-w-none">
                      <Image 
                        src="/images/ginchy-vi.gif" 
                        alt="Fashion model" 
                        width={520}
                        height={385}
-                       className="w-[520px] h-[385px] object-cover object-center"
+                       className="w-full h-auto object-cover object-center"
                        style={{
                          objectFit: 'cover', 
                          objectPosition: 'center',
@@ -529,13 +529,13 @@ export default function LandingPage() {
                      />
                      
                      {/* Overlay Image on top of video */}
-                     <div className="absolute bottom-2 left-0 z-20" style={{ transform: 'translate(-36px, 50px) scale(1) rotate(0deg)' }}>
+                     <div className="absolute bottom-2 left-0 z-20" style={{ transform: 'translate(-10px, 20px) scale(0.7) rotate(0deg)' }}>
                        <Image 
                          src="/images/landingvidside.jpg" 
                          alt="Fashion overlay" 
                          width={300}
                          height={220}
-                         className="w-[200px] h-[170px] object-cover shadow-lg"
+                         className="w-[100px] sm:w-[120px] md:w-[160px] lg:w-[200px] h-auto object-cover shadow-lg"
                          style={{
                            objectFit: 'cover', 
                            objectPosition: 'center',
@@ -558,55 +558,55 @@ export default function LandingPage() {
                      </div>
                    </div>
                  </div>
-                {/* benefits text list */}
-                <div className="col-span-12 md:col-span-5 text-sm sm:text-[15px] leading-tight flex items-end">
-                  <div className="space-y-4 mt-12">
-                    <div>
-                      <h3 className="font-black text-white mb-0 text-base">Production efficiency</h3>
-                      <p className="text-neutral-300 mt-1">Speed up the design-to-production process by eliminating the need for physical sample to respond quickly to market demands.</p>
-                    </div>
-                    <div>
-                      <h3 className="font-black text-white mb-0 text-base">Cost reduction</h3>
-                      <p className="text-neutral-300 mt-1">Eliminates the need for traditional photoshoots, reducing costs and resource consumption while simplifying content creation.</p>
-                    </div>
-                    <div>
-                      <h3 className="font-black text-white mb-0 text-base">Sustainability</h3>
-                      <p className="text-neutral-300 mt-1">Reduces the environmental impact by minimizing the need for physical photoshoots and associated logistics.</p>
-                    </div>
-                  </div>
-                </div>
+                 {/* benefits text list */}
+                 <div className="col-span-1 md:col-span-5 text-sm sm:text-[15px] leading-relaxed flex items-start md:items-end justify-center md:justify-start w-full">
+                  <div className="space-y-6 sm:space-y-5 mt-6 sm:mt-8 md:mt-12 text-center md:text-left max-w-full sm:max-w-md md:max-w-none w-full px-4 sm:px-0">
+                     <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-3 md:p-0 md:bg-transparent">
+                       <h3 className="font-bold text-white mb-2 text-base sm:text-lg md:text-base tracking-wide">Production efficiency</h3>
+                       <p className="text-neutral-200 leading-relaxed text-sm sm:text-base md:text-sm font-light">Speed up the design-to-production process by eliminating the need for physical samples to respond quickly to market demands.</p>
+                     </div>
+                     <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-3 md:p-0 md:bg-transparent">
+                       <h3 className="font-bold text-white mb-2 text-base sm:text-lg md:text-base tracking-wide">Cost reduction</h3>
+                       <p className="text-neutral-200 leading-relaxed text-sm sm:text-base md:text-sm font-light">Eliminates the need for traditional photoshoots, reducing costs and resource consumption while simplifying content creation.</p>
+                     </div>
+                     <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-3 md:p-0 md:bg-transparent">
+                       <h3 className="font-bold text-white mb-2 text-base sm:text-lg md:text-base tracking-wide">Sustainability</h3>
+                       <p className="text-neutral-200 leading-relaxed text-sm sm:text-base md:text-sm font-light">Reduces the environmental impact by minimizing the need for physical photoshoots and associated logistics.</p>
+                     </div>
+                   </div>
+                 </div>
               </div>
             </div>
 
             {/* Right column: heading + three cards layout */}
-            <div className="col-span-12 lg:col-span-5">
-               <h2 className="font-[var(--font-display)] text-[40px] sm:text-[50px] lg:text-[60px] font-extrabold tracking-tight mb-3 uppercase leading-tight">
+            <div className="col-span-12 lg:col-span-5 mt-6 lg:mt-0 w-full">
+               <h2 className="font-[var(--font-display)] text-[22px] sm:text-[28px] md:text-[36px] lg:text-[44px] xl:text-[50px] font-extrabold tracking-tight mb-3 uppercase leading-tight text-center lg:text-left">
                  ALL TYPES OF
                  <br />
                  <span className="italic text-[#1E90FF] font-['IBM_Plex_Serif','Georgia',serif] font-medium lowercase">[ fashion items ]</span>
                </h2>
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 w-full">
                   {/* Top row: shoes with small label on the right */}
-                  <div className="relative flex justify-start">
-                    <div className="relative w-[180px] h-[180px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
+                  <div className="relative flex justify-center lg:justify-start max-w-full overflow-hidden w-full">
+                    <div className="relative w-[120px] sm:w-[140px] md:w-[160px] lg:w-[180px] h-[120px] sm:h-[140px] md:h-[160px] lg:h-[180px] flex-shrink-0 overflow-hidden border border-neutral-700 bg-neutral-100">
                       <Image src="/images/1.jpg" alt="Shoes" fill className="object-cover object-center" style={{objectPosition: 'center 20%'}} unoptimized />
                     </div>
-                    <div className="absolute top-1/2 -translate-y-1/2 left-[190px] border border-neutral-600 bg-black/60 px-4 py-2 text-[11px]">Shoes</div>
+                    <div className="absolute top-1/2 -translate-y-1/2 left-[130px] sm:left-[150px] md:left-[170px] lg:left-[190px] border border-neutral-600 bg-black/60 px-2 sm:px-3 lg:px-4 py-1 sm:py-2 text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] whitespace-nowrap">Shoes</div>
                   </div>
                {/* second row: jewelry small square with label below */}
-               <div className="flex items-start gap-6">
-                 <div className="relative flex justify-start ml-8">
-                   <div className="relative w-[160px] h-[150px] max-w-full overflow-hidden border border-neutral-700 bg-neutral-100">
+               <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start lg:justify-start gap-3 sm:gap-4 lg:gap-6 max-w-full overflow-hidden w-full">
+                 <div className="relative flex justify-center sm:justify-start ml-0 sm:ml-0 lg:ml-6">
+                   <div className="relative w-[100px] sm:w-[120px] md:w-[140px] lg:w-[160px] h-[90px] sm:h-[110px] md:h-[130px] lg:h-[150px] flex-shrink-0 overflow-hidden border border-neutral-700 bg-neutral-100">
                      <Image src="/images/2.jpg" alt="Accessories" fill className="object-cover" unoptimized />
                    </div>
-                   <div className="absolute -bottom-9 left-[90px] -translate-x-1/2 w-[110px] text-center border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Accessories</div>
+                   <div className="absolute -bottom-5 sm:-bottom-6 lg:-bottom-8 left-[50px] sm:left-[60px] md:left-[70px] lg:left-[80px] -translate-x-1/2 w-[70px] sm:w-[80px] md:w-[90px] lg:w-[100px] text-center border border-neutral-600 bg-black/60 px-1 sm:px-2 lg:px-3 py-1 text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] whitespace-nowrap">Accessories</div>
                  </div>
                  {/* sunglasses big square with label on right */}
-                 <div className="flex items-center gap-2">
-                   <div className="relative w-[200px] h-[200px] overflow-hidden border border-neutral-700 bg-neutral-100">
+                 <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 mt-6 sm:mt-0 max-w-full w-full">
+                   <div className="relative w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] h-[140px] sm:h-[160px] md:h-[180px] lg:h-[200px] flex-shrink-0 overflow-hidden border border-neutral-700 bg-neutral-100">
                      <Image src="/images/3.jpg" alt="Sunglasses" fill className="object-cover" unoptimized />
                    </div>
-                   <div className="border border-neutral-600 bg-black/60 px-3.5 py-1 text-[10px]">Sunglasses</div>
+                   <div className="border border-neutral-600 bg-black/60 px-1 sm:px-2 lg:px-3 py-1 text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] whitespace-nowrap">Sunglasses</div>
                  </div>
                </div>
               </div>
