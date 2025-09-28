@@ -754,7 +754,7 @@ export default function LandingPage() {
       {/* ================== SECTION 5 — Personalize your outfit ================== */}
       <section className={`${tokens.gutter} py-8 bg-black text-white relative`}>
         {/* Background gradient image positioned like in screenshot */}
-        <div className="absolute top-5 -right-4 w-1/2 h-full opacity-80 pointer-events-none">
+        <div className="hidden sm:block absolute top-5 -right-4 w-1/2 h-full opacity-80 pointer-events-none">
           <Image 
             src="/images/sidegradient1.png" 
             alt="Side gradient background" 
