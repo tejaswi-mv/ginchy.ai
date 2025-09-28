@@ -184,7 +184,13 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
   return (
     <section className={`text-white relative bg-black`}>
       {/* Background SVG on right side */}
-      <div className="absolute top-0 right-0 w-1/2 h-full opacity-80 pointer-events-none">
+      <div 
+        className="absolute top-0 right-0 w-1/2 h-full opacity-80 pointer-events-none"
+        style={{
+          transform: 'translateX(0px) translateY(0px) scale(1) rotate(0deg)',
+          transformOrigin: 'right center'
+        }}
+      >
         <Image 
           src="/images/herogrd.svg" 
           alt="Hero gradient background" 
