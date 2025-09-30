@@ -22,6 +22,13 @@ import {
   Trash2,
   Play,
   Square,
+  Image as ImageIcon,
+  Video,
+  Aperture,
+  Film,
+  Package,
+  Layers,
+  
 } from 'lucide-react';
 import { getPublicImages, getUserAssets, uploadAsset, generateImage, deleteAsset, createCharacter } from '@/app/(login)/actions';
 import { useActionState } from 'react';
@@ -32,6 +39,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
 type Asset = {
   name: string;
@@ -407,6 +416,8 @@ export default function GeneratePage() {
   const [lensAngle, setLensAngle] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
   const [processor, setProcessor] = useState<'Nano Banana' | 'Kling'>('Nano Banana');
+  const [showModelMenu, setShowModelMenu] = useState<boolean>(false);
+  const [imagesToGenerate, setImagesToGenerate] = useState<number>(4);
 
   const handleGenerate = (formData: FormData) => {
     formData.append('modelUrl', selectedModel?.url || '');
@@ -429,8 +440,8 @@ export default function GeneratePage() {
   }, [generateState, user, mutateUser]);
 
   const assetCategories = [
-    { type: 'characters' as AssetType, title: 'Model', selected: selectedModel, setter: setSelectedModel, icon: UserIcon },
-    { type: 'poses' as AssetType, title: 'Model Poses', selected: selectedPose, setter: setSelectedPose, icon: Accessibility },
+    { type: 'characters' as AssetType, title: 'Character', selected: selectedModel, setter: setSelectedModel, icon: UserIcon },
+    { type: 'poses' as AssetType, title: 'Poses', selected: selectedPose, setter: setSelectedPose, icon: Accessibility },
     { type: 'garments' as AssetType, title: 'Garment', selected: selectedGarment, setter: setSelectedGarment, icon: Shirt },
     { type: 'environment' as AssetType, title: 'Environment', selected: selectedEnvironment, setter: setSelectedEnvironment, icon: Globe },
   ];
@@ -462,50 +473,37 @@ export default function GeneratePage() {
     <ErrorBoundary>
       <main className="bg-black text-neutral-100 min-h-[calc(100vh-64px)]">
         {/* Navigation Menu */}
-        <div className="border-b border-neutral-800 bg-neutral-900/50">
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-center gap-4">
-              <span className="text-sm text-neutral-400">My Creations / Generate Images</span>
+        <div className="border-b border-neutral-800 bg-neutral-950/60">
+          <div className="w-full px-4 py-2">
+            <div className="flex items-center justify-between mb-5">
+              <span className="text-white font-extrabold tracking-wide text-xl md:text-2xl mr-4">GINCHY</span>
+              {user && <ProfileDropdown user={user} />}
             </div>
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <Button 
-                variant="ghost" 
-                className="bg-neutral-800 text-white hover:bg-neutral-700 px-6 py-3 h-auto"
-              >
-                <Settings className="mr-2 h-5 w-5" />
-                Create an image
-              </Button>
-              <Button 
-                variant="ghost" 
-                asChild
-                className="bg-neutral-800 text-neutral-300 hover:bg-neutral-700 px-6 py-3 h-auto"
-              >
-                <Link href="/my-creations">
-                  <UserIcon className="mr-2 h-5 w-5" />
-                  My Creations
-                </Link>
-              </Button>
-              <Button 
-                variant="ghost" 
-                asChild
-                className="bg-neutral-800 text-neutral-300 hover:bg-neutral-700 px-6 py-3 h-auto"
-              >
-                <Link href="/create-video">
-                  <Play className="mr-2 h-5 w-5" />
-                  Create a video
-                </Link>
-              </Button>
-              <Button 
-                variant="ghost" 
-                asChild
-                className="bg-neutral-800 text-neutral-300 hover:bg-neutral-700 px-6 py-3 h-auto"
-              >
-                <Link href="/create-packshot">
-                  <Square className="mr-2 h-5 w-5" />
-                  Create packshot
-                </Link>
-              </Button>
+            <div className="mt-0 mb-3 md:mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button type="button" className="flex items-center h-14 w-full rounded-xl bg-neutral-900/70 border border-neutral-800 text-white px-5 shadow-inner hover:bg-neutral-900 text-base font-medium">
+                  <Aperture className="mr-3 h-5 w-5 text-neutral-300" />
+                  <span className="truncate">Create an image</span>
+              </button>
+                <Link href="/create-video" className="flex items-center h-14 w-full rounded-xl bg-neutral-900/60 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-900 px-5 shadow-inner text-base font-medium">
+                  <Film className="mr-3 h-5 w-5 text-neutral-300" />
+                  <span className="truncate">Create a video</span>
+              </Link>
+                <Link href="/create-packshot" className="flex items-center h-14 w-full rounded-xl bg-neutral-900/60 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-900 px-5 shadow-inner text-base font-medium">
+                  <Package className="mr-3 h-5 w-5 text-neutral-300" />
+                  <span className="truncate">Create packshot</span>
+              </Link>
+              </div>
             </div>
+          </div>
+        </div>
+
+        {/* Breadcrumb Navigation */}
+        <div className="px-4 py-2 bg-neutral-900/30 border-b border-neutral-800">
+          <div className="flex items-center text-sm text-neutral-400">
+            <span>My Creations</span>
+            <span className="mx-2">/</span>
+            <span className="text-neutral-300">Generate Images</span>
           </div>
         </div>
 
@@ -513,13 +511,32 @@ export default function GeneratePage() {
           <aside className="col-span-12 lg:col-span-3 border-r border-neutral-800 bg-neutral-900/50 p-4">
             <div className="flex flex-col h-full">
               <div className="flex-1 space-y-2 overflow-y-auto">
-                <h2 className="text-lg font-semibold text-neutral-100 mb-2 px-3">Generate Images</h2>
-                <form id="generate-form" action={handleGenerate} className="space-y-4 px-3">
-                  <textarea name="prompt" rows={3} placeholder="Describe your image style (e.g., 'red hoodie on tall male model')..."
-                    className="w-full rounded-lg border border-neutral-700 bg-neutral-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary" required />
-                  <Button type="button" variant="outline" className="w-full justify-start text-neutral-300 border-neutral-700 hover:bg-neutral-800">
+                <h2 className="text-lg font-semibold text-neutral-100 mt-2 mb-2 px-3">Generate Images</h2>
+                <form id="generate-form" action={handleGenerate} className="space-y-3 px-3">
+                  <textarea name="prompt" rows={4} placeholder="Describe your image style (e.g., 'red hoodie on tall male model')..."
+                    className="w-full rounded-xl border border-neutral-700 bg-neutral-900 p-3 text-sm text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary" required />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full justify-start text-neutral-300 border-neutral-700 hover:bg-neutral-800 rounded-xl"
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                  >
                     <Upload className="mr-2 h-4 w-4" /> Upload Images
                   </Button>
+                  <input 
+                    type="file" 
+                    id="image-upload" 
+                    className="hidden" 
+                    multiple 
+                    accept="image/*"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (files.length > 0) {
+                        console.log('Selected files:', files);
+                        // You can add file preview or processing logic here
+                      }
+                    }}
+                  />
                 </form>
                 <div className="border border-neutral-800 rounded-lg">
                   {assetCategories.map((category, index) => (
@@ -548,6 +565,37 @@ export default function GeneratePage() {
                         {['1:1', '9:16', '16:9', '3:2', '2:3'].map(ratio => (<Chip key={ratio} label={ratio} active={aspectRatio === ratio} onClick={() => setAspectRatio(ratio)} />))}
                       </div>
                   </CollapsibleSection>
+                  {/* Images to generate row */}
+                  <div className="flex items-center justify-between px-3 py-3 border-t border-neutral-800">
+                    <div className="text-sm text-neutral-200 flex items-center gap-3">
+                      <Layers className="h-5 w-5 text-neutral-400" />
+                      <span className="font-medium">Images to generate</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-neutral-300">
+                      <button type="button" onClick={() => setImagesToGenerate(Math.max(1, imagesToGenerate - 1))} className="h-7 w-7 rounded-md bg-neutral-800 border border-neutral-700 hover:bg-neutral-700">-</button>
+                      <span className="min-w-4 text-center">{imagesToGenerate}</span>
+                      <button type="button" onClick={() => setImagesToGenerate(Math.min(9, imagesToGenerate + 1))} className="h-7 w-7 rounded-md bg-neutral-800 border border-neutral-700 hover:bg-neutral-700">+</button>
+                    </div>
+                  </div>
+                  {/* Model row */}
+                  <div className="px-3 py-3 relative">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-neutral-200 flex items-center gap-3">
+                        <Sparkles className="h-5 w-5 text-neutral-400" />
+                        <span className="font-medium">Model</span>
+                      </div>
+                      <button type="button" onClick={() => setShowModelMenu(v => !v)} className="flex items-center gap-2 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-neutral-300 hover:bg-neutral-700">
+                        <span className="text-xs">{processor === 'Nano Banana' ? 'Nano banana' : processor}</span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${showModelMenu ? 'rotate-180' : ''}`} />
+                      </button>
+                    </div>
+                    {showModelMenu && (
+                      <div className="absolute right-3 mt-2 w-40 rounded-md border border-neutral-700 bg-neutral-900 shadow-lg z-10">
+                        <button type="button" onClick={() => { setProcessor('Nano Banana'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-t-md">Nano banana</button>
+                        <button type="button" onClick={() => { setProcessor('Kling'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-b-md">Kling</button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
