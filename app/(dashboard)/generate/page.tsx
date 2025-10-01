@@ -476,15 +476,17 @@ export default function GeneratePage() {
         <div className="border-b border-neutral-800 bg-neutral-950/60">
           <div className="w-full px-4 py-2">
             <div className="flex items-center justify-between mb-5">
-              <span className="text-white font-extrabold tracking-wide text-xl md:text-2xl mr-4">GINCHY</span>
+              <Link href="/" className="text-white font-extrabold tracking-wide text-xl md:text-2xl mr-4 hover:text-neutral-300 transition-colors">
+                GINCHY
+              </Link>
               {user && <ProfileDropdown user={user} />}
             </div>
             <div className="mt-0 mb-3 md:mb-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button type="button" className="flex items-center h-14 w-full rounded-xl bg-neutral-900/70 border border-neutral-800 text-white px-5 shadow-inner hover:bg-neutral-900 text-base font-medium">
+                <Link href="/generate" className="flex items-center h-14 w-full rounded-xl bg-neutral-900/70 border border-neutral-800 text-white px-5 shadow-inner hover:bg-neutral-900 text-base font-medium">
                   <Aperture className="mr-3 h-5 w-5 text-neutral-300" />
                   <span className="truncate">Create an image</span>
-              </button>
+                </Link>
                 <Link href="/create-video" className="flex items-center h-14 w-full rounded-xl bg-neutral-900/60 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-900 px-5 shadow-inner text-base font-medium">
                   <Film className="mr-3 h-5 w-5 text-neutral-300" />
                   <span className="truncate">Create a video</span>
@@ -551,11 +553,85 @@ export default function GeneratePage() {
                     </CollapsibleSection>
                   ))}
                    <CollapsibleSection title="Camera Settings" icon={Camera}>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
+                        {/* Camera Section */}
                         <div>
-                          <h3 className="text-xs font-medium text-neutral-400 mb-2">Camera</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {['Front view', 'Side view', 'Back view', 'Close up', 'Full body'].map(view => (<Chip key={view} label={view} active={cameraView === view} onClick={() => setCameraView(view)} />))}
+                          <h3 className="text-sm font-medium text-neutral-300 mb-3">Camera</h3>
+                          <div className="space-y-2">
+                            {/* Row 1: Front view, Side view */}
+                            <div className="flex gap-2">
+                              {['Front view', 'Side view'].map(view => (
+                                <button
+                                  key={view}
+                                  onClick={() => setCameraView(view)}
+                                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                    cameraView === view 
+                                      ? 'bg-primary text-white' 
+                                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                                  }`}
+                                >
+                                  {view}
+                                </button>
+                              ))}
+                            </div>
+                            
+                            {/* Row 2: Back view, Bottom view */}
+                            <div className="flex gap-2">
+                              {['Back view', 'Bottom view'].map(view => (
+                                <button
+                                  key={view}
+                                  onClick={() => setCameraView(view)}
+                                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                    cameraView === view 
+                                      ? 'bg-primary text-white' 
+                                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                                  }`}
+                                >
+                                  {view}
+                                </button>
+                              ))}
+                            </div>
+                            
+                            {/* Row 3: Low angle, Close up, Full body */}
+                            <div className="flex gap-2">
+                              {['Low angle', 'Close up', 'Full body'].map(view => (
+                                <button
+                                  key={view}
+                                  onClick={() => setCameraView(view)}
+                                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                    cameraView === view 
+                                      ? 'bg-primary text-white' 
+                                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                                  } ${view === 'Full body' ? 'flex-1' : 'flex-1'}`}
+                                >
+                                  {view}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Angle Section */}
+                        <div>
+                          <h3 className="text-sm font-medium text-neutral-300 mb-3">Angle</h3>
+                          <div className="space-y-2">
+                            {[
+                              { label: 'Wide angle - 10/24mm', value: 'wide' },
+                              { label: 'Standard - 50/90mm', value: 'standard' },
+                              { label: 'Long lens - 110/150mm', value: 'long' }
+                            ].map(angle => (
+                              <button
+                                key={angle.value}
+                                onClick={() => setLensAngle(angle.value)}
+                                className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left ${
+                                  lensAngle === angle.value 
+                                    ? 'bg-primary text-white' 
+                                    : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                                }`}
+                              >
+                                {angle.label}
+                              </button>
+                            ))}
                           </div>
                         </div>
                       </div>
