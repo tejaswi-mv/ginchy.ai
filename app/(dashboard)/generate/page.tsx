@@ -147,6 +147,36 @@ function AssetPreview({
 
   return (
     <div className="space-y-3">
+      {/* Selected Asset Display */}
+      {selectedAsset && (
+        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-md border border-primary/30 overflow-hidden flex-shrink-0">
+              <Image 
+                src={selectedAsset.url} 
+                alt={selectedAsset.name} 
+                width={48} 
+                height={48} 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-primary truncate">{selectedAsset.name}</p>
+              <p className="text-xs text-neutral-400">Currently selected</p>
+            </div>
+            <Button 
+              onClick={onOpenLibrary} 
+              variant="outline" 
+              size="sm"
+              className="text-xs border-primary/30 text-primary hover:bg-primary/10"
+            >
+              Change
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Asset Grid */}
       <div className="grid grid-cols-3 gap-2">
         {isAssetsLoading ? (
           // Show skeleton placeholder when loading
@@ -157,17 +187,32 @@ function AssetPreview({
           // Show real assets when loaded
           assets.map((asset) => (
             <button key={asset.name} type="button" onClick={() => onSelect(asset)}
-              className={`relative aspect-square w-full rounded-md object-cover border-2 transition-all ${selectedAsset?.url === asset.url ? 'border-primary' : 'border-transparent'} hover:border-primary/50`}>
+              className={`relative aspect-square w-full rounded-md object-cover border-2 transition-all group ${
+                selectedAsset?.url === asset.url 
+                  ? 'border-primary ring-2 ring-primary/20' 
+                  : 'border-transparent hover:border-primary/50'
+              }`}>
               <Image src={asset.url} alt={asset.name} fill className="rounded-md object-cover" />
+              {selectedAsset?.url === asset.url && (
+                <div className="absolute inset-0 bg-primary/20 rounded-md flex items-center justify-center">
+                  <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                    <X className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              )}
             </button>
           ))
         )}
       </div>
-       <div className="flex items-center gap-2">
+      
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2">
         <Button onClick={handleUploadClick} variant="outline" size="sm" className="flex-1" disabled={isUploading || isPending}>
           <Upload className="mr-2 h-4 w-4" /> {isUploading || isPending ? 'Uploading...' : 'Upload'}
         </Button>
-         <Button onClick={onOpenLibrary} variant="ghost" size="sm" className="flex-1">View Library</Button>
+        <Button onClick={onOpenLibrary} variant="ghost" size="sm" className="flex-1">
+          {selectedAsset ? 'Change Selection' : 'View Library'}
+        </Button>
       </div>
       <input type="file" id={`file-upload-${type}`} className="hidden" onChange={handleFileUpload} accept="image/*" />
       {uploadState?.error && <p className="text-red-500 text-xs mt-1">{uploadState.error}</p>}
@@ -176,16 +221,68 @@ function AssetPreview({
   );
 }
 
-function CollapsibleSection({ title, children, defaultOpen = false, icon: Icon }: { title: string; children: React.ReactNode; defaultOpen?: boolean; icon: React.ElementType }) {
+function CollapsibleSection({ 
+  title, 
+  children, 
+  defaultOpen = false, 
+  icon: Icon, 
+  selectedAsset, 
+  onClearSelection 
+}: { 
+  title: string; 
+  children: React.ReactNode; 
+  defaultOpen?: boolean; 
+  icon: React.ElementType;
+  selectedAsset?: Asset | null;
+  onClearSelection?: () => void;
+}) {
   const [open, setOpen] = useState(defaultOpen);
+  
   return (
     <div className="border-b border-neutral-800">
       <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-3 text-sm text-neutral-200 hover:bg-neutral-800/50">
-        <span className="font-medium flex items-center gap-3">
-          <Icon className="h-5 w-5 text-neutral-400" />
-          {title}
-        </span>
-        {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <Icon className="h-5 w-5 text-neutral-400 flex-shrink-0" />
+          <span className="font-medium truncate">{title}</span>
+          {selectedAsset && (
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="w-6 h-6 rounded border border-primary/30 overflow-hidden">
+                <Image 
+                  src={selectedAsset.url} 
+                  alt={selectedAsset.name} 
+                  width={24} 
+                  height={24} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="text-xs text-primary font-medium truncate max-w-20">
+                {selectedAsset.name}
+              </span>
+              {onClearSelection && (
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClearSelection();
+                  }}
+                  className="p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+                  title="Clear selection"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onClearSelection();
+                    }
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        {open ? <ChevronDown className="h-4 w-4 flex-shrink-0" /> : <ChevronRight className="h-4 w-4 flex-shrink-0" />}
       </button>
       {open && <div className="p-3 pt-0">{children}</div>}
     </div>
@@ -419,7 +516,6 @@ export default function GeneratePage() {
   const [processor, setProcessor] = useState<'Nano Banana' | 'Kling'>('Nano Banana');
   const [showModelMenu, setShowModelMenu] = useState<boolean>(false);
   const [imagesToGenerate, setImagesToGenerate] = useState<number>(4);
-  const [showBilling, setShowBilling] = useState<boolean>(false);
 
   const handleGenerate = (formData: FormData) => {
     formData.append('modelUrl', selectedModel?.url || '');
@@ -442,10 +538,38 @@ export default function GeneratePage() {
   }, [generateState, user, mutateUser]);
 
   const assetCategories = [
-    { type: 'characters' as AssetType, title: 'Character', selected: selectedModel, setter: setSelectedModel, icon: UserIcon },
-    { type: 'poses' as AssetType, title: 'Poses', selected: selectedPose, setter: setSelectedPose, icon: Accessibility },
-    { type: 'garments' as AssetType, title: 'Garment', selected: selectedGarment, setter: setSelectedGarment, icon: Shirt },
-    { type: 'environment' as AssetType, title: 'Environment', selected: selectedEnvironment, setter: setSelectedEnvironment, icon: Globe },
+    { 
+      type: 'characters' as AssetType, 
+      title: 'Character', 
+      selected: selectedModel, 
+      setter: setSelectedModel, 
+      icon: UserIcon,
+      onClear: () => setSelectedModel(null)
+    },
+    { 
+      type: 'poses' as AssetType, 
+      title: 'Poses', 
+      selected: selectedPose, 
+      setter: setSelectedPose, 
+      icon: Accessibility,
+      onClear: () => setSelectedPose(null)
+    },
+    { 
+      type: 'garments' as AssetType, 
+      title: 'Garment', 
+      selected: selectedGarment, 
+      setter: setSelectedGarment, 
+      icon: Shirt,
+      onClear: () => setSelectedGarment(null)
+    },
+    { 
+      type: 'environment' as AssetType, 
+      title: 'Environment', 
+      selected: selectedEnvironment, 
+      setter: setSelectedEnvironment, 
+      icon: Globe,
+      onClear: () => setSelectedEnvironment(null)
+    },
   ];
 
   const handleSelectAsset = (asset: Asset) => {
@@ -481,7 +605,7 @@ export default function GeneratePage() {
               <Link href="/" className="text-white font-extrabold tracking-wide text-xl md:text-2xl mr-4 hover:text-neutral-300 transition-colors">
                 GINCHY
               </Link>
-              {user && <ProfileDropdown user={user} onBillingClick={() => setShowBilling(true)} />}
+              {user && <ProfileDropdown user={user} />}
             </div>
             <div className="mt-0 mb-3 md:mb-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -519,9 +643,121 @@ export default function GeneratePage() {
                     <Upload className="mr-2 h-4 w-4" /> Upload Images
                   </Button>
                 </form>
+                
+                {/* Selected Assets Summary */}
+                {(selectedModel || selectedPose || selectedGarment || selectedEnvironment) && (
+                  <div className="mx-3 mb-4 p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg">
+                    <h3 className="text-sm font-medium text-neutral-200 mb-2">Selected Assets</h3>
+                    <div className="space-y-2">
+                      {selectedModel && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <UserIcon className="h-3 w-3 text-neutral-400" />
+                          <span className="text-neutral-300">Character:</span>
+                          <span className="text-primary truncate">{selectedModel.name}</span>
+                          <div 
+                            onClick={() => setSelectedModel(null)}
+                            className="ml-auto p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedModel(null);
+                              }
+                            }}
+                          >
+                            <X className="h-3 w-3" />
+                          </div>
+                        </div>
+                      )}
+                      {selectedPose && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Accessibility className="h-3 w-3 text-neutral-400" />
+                          <span className="text-neutral-300">Pose:</span>
+                          <span className="text-primary truncate">{selectedPose.name}</span>
+                          <div 
+                            onClick={() => setSelectedPose(null)}
+                            className="ml-auto p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedPose(null);
+                              }
+                            }}
+                          >
+                            <X className="h-3 w-3" />
+                          </div>
+                        </div>
+                      )}
+                      {selectedGarment && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Shirt className="h-3 w-3 text-neutral-400" />
+                          <span className="text-neutral-300">Garment:</span>
+                          <span className="text-primary truncate">{selectedGarment.name}</span>
+                          <div 
+                            onClick={() => setSelectedGarment(null)}
+                            className="ml-auto p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedGarment(null);
+                              }
+                            }}
+                          >
+                            <X className="h-3 w-3" />
+                          </div>
+                        </div>
+                      )}
+                      {selectedEnvironment && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Globe className="h-3 w-3 text-neutral-400" />
+                          <span className="text-neutral-300">Environment:</span>
+                          <span className="text-primary truncate">{selectedEnvironment.name}</span>
+                          <div 
+                            onClick={() => setSelectedEnvironment(null)}
+                            className="ml-auto p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedEnvironment(null);
+                              }
+                            }}
+                          >
+                            <X className="h-3 w-3" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedModel(null);
+                        setSelectedPose(null);
+                        setSelectedGarment(null);
+                        setSelectedEnvironment(null);
+                      }}
+                      className="mt-2 text-xs text-neutral-400 hover:text-neutral-200 underline"
+                    >
+                      Clear all selections
+                    </button>
+                  </div>
+                )}
+
                 <div className="border border-neutral-800 rounded-lg">
                   {assetCategories.map((category, index) => (
-                    <CollapsibleSection key={category.type} title={category.title} defaultOpen={index < 2} icon={category.icon}>
+                    <CollapsibleSection 
+                      key={category.type} 
+                      title={category.title} 
+                      defaultOpen={index < 2} 
+                      icon={category.icon}
+                      selectedAsset={category.selected}
+                      onClearSelection={category.onClear}
+                    >
                       <AssetPreview 
                         type={category.type} 
                         onSelect={(asset) => category.setter(asset)} 
@@ -701,37 +937,28 @@ export default function GeneratePage() {
             </div>
           </aside>
 
-          <section className="col-span-12 lg:col-span-9">
-            {showBilling ? (
-              <BillingPage 
-                user={user!} 
-                onBack={() => setShowBilling(false)} 
-              />
-            ) : (
-              <div className="p-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="font-semibold text-neutral-200">Generated Images</h3>
-                        <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
-                    </div>
-                    {/* Add Tabs here if needed */}
+          <section className="col-span-12 lg:col-span-9 p-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="font-semibold text-neutral-200">Generated Images</h3>
+                    <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
                 </div>
-                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
-                  {gallery.map((src, index) => (
-                    <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
-                  ))}
-                  {gallery.length === 0 && !isGenerating && [
-                      "/images/image (1).png", 
-                      "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
-                      "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
-                      "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
-                  ].map(src => (
-                     <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
-                  ))}
-                </div>
-              </div>
-            )}
+                {/* Add Tabs here if needed */}
+            </div>
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+              {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
+              {gallery.map((src, index) => (
+                <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
+              ))}
+              {gallery.length === 0 && !isGenerating && [
+                  "/images/image (1).png", 
+                  "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
+                  "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
+                  "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
+              ].map(src => (
+                 <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
+              ))}
+            </div>
           </section>
         </div>
       </main>
