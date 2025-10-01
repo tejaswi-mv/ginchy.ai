@@ -94,8 +94,9 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
   await logActivity(foundTeam?.id, foundUser.id, ActivityType.SIGN_IN);
 
-  const priceId = formData.get('priceId') as string;
-  if (priceId) {
+  const redirectTo = formData.get('redirect') as string | null;
+  if (redirectTo === 'checkout') {
+    const priceId = formData.get('priceId') as string;
     return createCheckoutSession({ team: foundTeam, priceId });
   }
 
@@ -213,8 +214,9 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     logActivity(teamId, createdUser.id, ActivityType.SIGN_UP)
   ]);
 
-  const priceId = formData.get('priceId') as string;
-  if (priceId) {
+  const redirectTo = formData.get('redirect') as string | null;
+  if (redirectTo === 'checkout') {
+    const priceId = formData.get('priceId') as string;
     return createCheckoutSession({ team: createdTeam, priceId });
   }
 

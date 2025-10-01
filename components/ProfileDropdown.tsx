@@ -115,7 +115,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
               </Link>
               
               <Link 
-                href="/billing" 
+                href="/pricing" 
                 className="flex items-center gap-3 px-3 py-2 text-white hover:bg-neutral-800 transition-colors text-sm"
                 onClick={() => setIsOpen(false)}
               >

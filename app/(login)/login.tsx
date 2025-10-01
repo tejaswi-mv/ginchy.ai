@@ -14,6 +14,7 @@ import GoogleOAuthButton from '@/components/GoogleOAuthButton';
 
 export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
   const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const priceId = searchParams.get('priceId');
   const inviteId = searchParams.get('inviteId');
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -38,6 +39,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <form className="space-y-6" action={formAction}>
+          <input type="hidden" name="redirect" value={redirect || ''} />
           <input type="hidden" name="priceId" value={priceId || ''} />
           <input type="hidden" name="inviteId" value={inviteId || ''} />
           <div>
@@ -145,8 +147,8 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           <div className="mt-6">
             <Link
               href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${
-                priceId ? `?priceId=${priceId}` : ''
-              }`}
+                redirect ? `?redirect=${redirect}` : ''
+              }${priceId ? `&priceId=${priceId}` : ''}`}
               className="w-full flex justify-center py-3 px-6 border border-neutral-700 rounded-lg shadow-sm text-sm font-medium bg-neutral-900 text-white hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009AFF] transition-all duration-200"
             >
               {mode === 'signin'
