@@ -55,7 +55,7 @@ async function hashPassword(password: string): Promise<string> {
 async function seed() {
   console.log('🌱 Starting database seed...');
   
-  const databaseUrl = process.env.POSTGRES_URL || 'PostgreSQL://postgres.lejnqimkweslrzsojtsp:Ginchy1231!!@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres';
+  const databaseUrl = process.env.POSTGRES_URL || 'postgres://postgres:postgres@localhost:54322/postgres';
   
   const client = postgres(databaseUrl, {
     max: 1,
