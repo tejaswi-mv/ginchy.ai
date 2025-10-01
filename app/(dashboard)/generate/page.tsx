@@ -183,12 +183,12 @@ function AssetPreview({
         </div>
       )}
 
-      {/* Professional Asset Grid - 6 items in horizontal row */}
-      <div className="grid grid-cols-6 gap-4">
+      {/* Asset Grid - 6 images in single horizontal row */}
+      <div className="grid grid-cols-6 gap-3">
         {isAssetsLoading ? (
-          // Show skeleton placeholder when loading - faster loading
+          // Show skeleton placeholder when loading
           Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-square w-full min-h-[80px] rounded-lg bg-gradient-to-br from-neutral-800 to-neutral-700 animate-pulse">
+            <div key={i} className="aspect-square w-full rounded-lg bg-neutral-800 animate-pulse">
               <div className="w-full h-full bg-neutral-600/30 rounded-lg"></div>
             </div>
           ))
@@ -199,7 +199,7 @@ function AssetPreview({
               key={asset.name} 
               type="button" 
               onClick={() => onSelect(asset)}
-              className={`relative aspect-square w-full min-h-[80px] rounded-lg overflow-hidden border-2 transition-all duration-200 group ${
+              className={`relative aspect-square w-full rounded-lg overflow-hidden border-2 transition-all duration-200 group ${
                 selectedAsset?.url === asset.url 
                   ? 'border-primary ring-2 ring-primary/30 shadow-lg' 
                   : 'border-neutral-700 hover:border-primary/50 hover:shadow-md'
@@ -211,7 +211,7 @@ function AssetPreview({
                 fill 
                 className="object-cover transition-transform duration-200 group-hover:scale-105" 
                 quality={75}
-                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 16vw, 12vw"
+                sizes="(max-width: 768px) 16vw, (max-width: 1200px) 12vw, 10vw"
                 priority={index < 3}
                 loading={index < 3 ? "eager" : "lazy"}
                 placeholder="blur"
@@ -542,6 +542,7 @@ export default function GeneratePage() {
   
   const [activeLibrary, setActiveLibrary] = useState<AssetType | null>(null);
   const [showCreateCharacter, setShowCreateCharacter] = useState(false);
+  const [showBilling, setShowBilling] = useState(false);
   const [gallery, setGallery] = useState<string[]>([]);
   const [generateState, generateAction, isGenerating] = useActionState<any, FormData>(generateImage, null);
   
@@ -642,7 +643,7 @@ export default function GeneratePage() {
               <Link href="/" className="text-white font-extrabold tracking-wide text-xl md:text-2xl mr-4 hover:text-neutral-300 transition-colors">
                 GINCHY
               </Link>
-              {user && <ProfileDropdown user={user} />}
+              {user && <ProfileDropdown user={user} onBillingClick={() => setShowBilling(true)} />}
             </div>
             <div className="mt-0 mb-3 md:mb-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -974,28 +975,37 @@ export default function GeneratePage() {
             </div>
           </aside>
 
-          <section className="col-span-12 lg:col-span-9 p-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="font-semibold text-neutral-200">Generated Images</h3>
-                    <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
+          <section className="col-span-12 lg:col-span-9">
+            {showBilling ? (
+              <BillingPage 
+                user={user!} 
+                onBack={() => setShowBilling(false)} 
+              />
+            ) : (
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="font-semibold text-neutral-200">Generated Images</h3>
+                        <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
+                    </div>
+                    {/* Add Tabs here if needed */}
                 </div>
-                {/* Add Tabs here if needed */}
-            </div>
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
-              {gallery.map((src, index) => (
-                <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
-              ))}
-              {gallery.length === 0 && !isGenerating && [
-                  "/images/image (1).png", 
-                  "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
-                  "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
-                  "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
-              ].map(src => (
-                 <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
-              ))}
-            </div>
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
+                  {gallery.map((src, index) => (
+                    <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
+                  ))}
+                  {gallery.length === 0 && !isGenerating && [
+                      "/images/image (1).png", 
+                      "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
+                      "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
+                      "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
+                  ].map(src => (
+                     <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
         </div>
       </main>
