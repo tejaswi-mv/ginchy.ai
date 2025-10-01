@@ -11,9 +11,8 @@ const GoogleOAuthButton = () => {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    const redirect = searchParams.get('redirect') || '/dashboard';
     const redirectTo = new URL('/auth/callback', window.location.origin);
-    redirectTo.searchParams.set('next', redirect);
+    redirectTo.searchParams.set('next', '/dashboard');
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

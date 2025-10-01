@@ -13,9 +13,7 @@ export async function middleware(request: NextRequest) {
 
   // If trying to access a protected route without a session, redirect to sign-in
   if (isProtectedRoute && !session) {
-    const redirectUrl = new URL('/sign-in', request.url);
-    redirectUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(redirectUrl);
+    return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
   // If user is logged in and tries to access sign-in/sign-up, redirect to dashboard

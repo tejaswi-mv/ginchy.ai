@@ -201,22 +201,22 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
       </div>
       {/* Integrated Navbar */}
       <header className={`sticky top-0 z-50 text-white ${tokens.gutter}`}>
-        <div className={`mx-auto ${tokens.maxW} h-16 flex items-center`}>
-          <div className="flex items-center gap-8">
-            <span className={`text-white font-extrabold tracking-wide ${largeOnHome ? 'text-2xl' : ''}`}>
+        <div className={`mx-auto ${tokens.maxW} h-16 flex items-center justify-between`}>
+          <div className="flex items-center gap-4 sm:gap-8">
+            <span className={`text-white font-extrabold tracking-wide ${largeOnHome ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'}`}>
               GINCHY
             </span>
             <NavigationLinks />
           </div>
-          <div className="flex items-center space-x-4 ml-auto mr-25">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {isLoading ? (
-              <div className="h-9 w-16 bg-neutral-800 rounded-full animate-pulse" />
+              <div className="h-8 w-12 sm:h-9 sm:w-16 bg-neutral-800 rounded-full animate-pulse" />
             ) : user ? (
               <UserMenu user={user} />
             ) : (
               <Button
                 asChild
-                className="rounded-full bg-[#1E90FF] px-5 py-2 text-base font-semibold text-white hover:bg-[#1E90FF]/90 transition"
+                className="rounded-full bg-[#1E90FF] px-3 py-1.5 sm:px-5 sm:py-2 text-sm sm:text-base font-semibold text-white hover:bg-[#1E90FF]/90 transition"
               >
                 <Link href="/sign-in">Sign in</Link>
               </Button>
@@ -231,32 +231,32 @@ export default function Hero({ largeOnHome = false }: { largeOnHome?: boolean })
         <div className={tokens.grid}>
           {/* Left: copy */}
           <div className="col-span-12 lg:col-span-6 flex flex-col justify-center">
-            <h1 className="font-['Aileron','Inter',system-ui,sans-serif] text-[32px] sm:text-[48px] md:text-[64px] lg:text-[88px] font-bold leading-[0.95] tracking-tight">
+            <h1 className="font-['Aileron','Inter',system-ui,sans-serif] text-[28px] sm:text-[48px] md:text-[64px] lg:text-[88px] font-bold leading-[0.9] sm:leading-[0.95] tracking-tight">
               <span className="text-[#1E90FF]">UNLOCK</span>
               <br />
-              <span className="italic font-['IBM_Plex_Serif','Georgia',serif] text-white ml-[0.3em] sm:ml-[0.6em]">GROWTH</span>
+              <span className="italic font-['IBM_Plex_Serif','Georgia',serif] text-white ml-[0.2em] sm:ml-[0.6em]">GROWTH</span>
             </h1>
-            <p className="mt-4 sm:mt-6 ml-[0.3em] sm:ml-[0.6em] text-[14px] sm:text-[18px] md:text-[20px] lg:text-[24px] text-white max-w-[90%] sm:max-w-[560px] leading-tight sm:leading-none font-bold">
+            <p className="mt-3 sm:mt-6 ml-[0.2em] sm:ml-[0.6em] text-[12px] sm:text-[18px] md:text-[20px] lg:text-[24px] text-white max-w-[95%] sm:max-w-[560px] leading-relaxed sm:leading-tight font-bold">
               Adopt the industry's leading AI platform<br className="hidden sm:block"/>
               <span className="sm:hidden"> </span>for in-house creation of PDP, Lookbook,<br className="hidden sm:block"/>
               <span className="sm:hidden"> </span>and Campaign visuals.
             </p>
-            <p className="mt-4 sm:mt-6 ml-[0.3em] sm:ml-[0.6em] text-[#1E90FF] italic font-['IBM_Plex_Serif','Georgia',serif] text-[24px] sm:text-[36px] md:text-[42px] lg:text-[48px] font-medium">[ with Ginchy ]</p>
-            <div className="mt-6">
-              <a 
-                href="#try" 
-                className="inline-flex lg:hidden items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-8 py-4 text-white text-lg font-bold hover:shadow-lg transition-all duration-300"
+            <p className="mt-3 sm:mt-6 ml-[0.2em] sm:ml-[0.6em] text-[#1E90FF] italic font-['IBM_Plex_Serif','Georgia',serif] text-[18px] sm:text-[36px] md:text-[42px] lg:text-[48px] font-medium">[ with Ginchy ]</p>
+            <div className="mt-4 sm:mt-6">
+              <Link 
+                href="/generate" 
+                className="inline-flex items-center justify-center gap-2 sm:gap-3 rounded-full bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-6 py-3 sm:px-8 sm:py-4 text-white text-base sm:text-lg font-bold hover:shadow-lg transition-all duration-300"
               >
                 <span>Try it now</span>
-                <ArrowRight className="w-5 h-5" />
-              </a>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              </Link>
             </div>
           </div>
 
                   {/* Right: Hero Image with Custom Dimensions */}
                   <div className="col-span-12 lg:col-span-6 mt-6 sm:mt-8 lg:mt-0 lg:ml-[-4rem] xl:ml-[-8rem] lg:mr-25">
                     <div 
-                      className="relative overflow-hidden border-2 border-white/20 shadow-2xl mx-auto"
+                      className="relative overflow-hidden border-2 border-white/20 shadow-2xl mx-auto max-w-[90vw] sm:max-w-none"
                       style={{
                         aspectRatio: '3764/2056', // Custom aspect ratio based on your dimensions
                         maxWidth: '100%',
