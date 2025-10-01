@@ -41,6 +41,7 @@ import { Input } from '@/components/ui/input';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import BillingPage from '@/components/BillingPage';
 
 type Asset = {
   name: string;
@@ -418,6 +419,7 @@ export default function GeneratePage() {
   const [processor, setProcessor] = useState<'Nano Banana' | 'Kling'>('Nano Banana');
   const [showModelMenu, setShowModelMenu] = useState<boolean>(false);
   const [imagesToGenerate, setImagesToGenerate] = useState<number>(4);
+  const [showBilling, setShowBilling] = useState<boolean>(false);
 
   const handleGenerate = (formData: FormData) => {
     formData.append('modelUrl', selectedModel?.url || '');
@@ -476,24 +478,10 @@ export default function GeneratePage() {
         <div className="border-b border-neutral-800 bg-neutral-950/60">
           <div className="w-full px-4 py-2">
             <div className="flex items-center justify-between mb-5">
-              <span className="text-white font-extrabold tracking-wide text-xl md:text-2xl mr-4">GINCHY</span>
-              <div className="flex items-center gap-3">
-                <span className="text-white text-sm font-medium">
-                  {user?.credits ?? 0} credits
-                </span>
-                {user ? (
-                  <ProfileDropdown user={user} />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Avatar className="size-8 rounded-full border border-neutral-800">
-                      <AvatarFallback className="text-xs bg-neutral-800 text-white rounded-full">
-                        U
-                      </AvatarFallback>
-                    </Avatar>
-                    <ChevronDown className="h-4 w-4 text-neutral-400" />
-                  </div>
-                )}
-              </div>
+              <Link href="/" className="text-white font-extrabold tracking-wide text-xl md:text-2xl mr-4 hover:text-neutral-300 transition-colors">
+                GINCHY
+              </Link>
+              {user && <ProfileDropdown user={user} onBillingClick={() => setShowBilling(true)} />}
             </div>
             <div className="mt-0 mb-3 md:mb-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -514,45 +502,22 @@ export default function GeneratePage() {
           </div>
         </div>
 
-        {/* Breadcrumb Navigation */}
-        <div className="px-4 py-2 bg-neutral-900/30 border-b border-neutral-800">
-          <div className="flex items-center text-sm text-neutral-400">
-            <span>My Creations</span>
-            <span className="mx-2">/</span>
-            <span className="text-neutral-300">Generate Images</span>
-          </div>
-        </div>
-
         <div className="grid grid-cols-12 h-full">
           <aside className="col-span-12 lg:col-span-3 border-r border-neutral-800 bg-neutral-900/50 p-4">
             <div className="flex flex-col h-full">
               <div className="flex-1 space-y-2 overflow-y-auto">
+                <div className="px-3 pt-1 pb-2 border-b border-neutral-800">
+                  <span className="text-xs text-neutral-400">My Creations</span>
+                  <span className="mx-2 text-neutral-600">/</span>
+                  <span className="text-xs text-neutral-300">Generate Images</span>
+                </div>
                 <h2 className="text-lg font-semibold text-neutral-100 mt-2 mb-2 px-3">Generate Images</h2>
                 <form id="generate-form" action={handleGenerate} className="space-y-3 px-3">
                   <textarea name="prompt" rows={4} placeholder="Describe your image style (e.g., 'red hoodie on tall male model')..."
                     className="w-full rounded-xl border border-neutral-700 bg-neutral-900 p-3 text-sm text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary" required />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full justify-start text-neutral-300 border-neutral-700 hover:bg-neutral-800 rounded-xl"
-                    onClick={() => document.getElementById('image-upload')?.click()}
-                  >
+                  <Button type="button" variant="outline" className="w-full justify-start text-neutral-300 border-neutral-700 hover:bg-neutral-800 rounded-xl">
                     <Upload className="mr-2 h-4 w-4" /> Upload Images
                   </Button>
-                  <input 
-                    type="file" 
-                    id="image-upload" 
-                    className="hidden" 
-                    multiple 
-                    accept="image/*"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      if (files.length > 0) {
-                        console.log('Selected files:', files);
-                        // You can add file preview or processing logic here
-                      }
-                    }}
-                  />
                 </form>
                 <div className="border border-neutral-800 rounded-lg">
                   {assetCategories.map((category, index) => (
@@ -567,11 +532,119 @@ export default function GeneratePage() {
                     </CollapsibleSection>
                   ))}
                    <CollapsibleSection title="Camera Settings" icon={Camera}>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <div>
-                          <h3 className="text-xs font-medium text-neutral-400 mb-2">Camera</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {['Front view', 'Side view', 'Back view', 'Close up', 'Full body'].map(view => (<Chip key={view} label={view} active={cameraView === view} onClick={() => setCameraView(view)} />))}
+                          <h3 className="text-xs font-medium text-neutral-400 mb-3">Camera</h3>
+                          <div className="space-y-2">
+                            {/* Row 1: Front view, Side view */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setCameraView('Front view')}
+                                className={`h-8 px-3 rounded-md text-sm border transition ${
+                                  cameraView === 'Front view' 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                Front view
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCameraView('Side view')}
+                                className={`h-8 px-3 rounded-md text-sm border transition ${
+                                  cameraView === 'Side view' 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                Side view
+                              </button>
+                            </div>
+                            {/* Row 2: Back view, Bottom view */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setCameraView('Back view')}
+                                className={`h-8 px-3 rounded-md text-sm border transition ${
+                                  cameraView === 'Back view' 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                Back view
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCameraView('Bottom view')}
+                                className={`h-8 px-3 rounded-md text-sm border transition ${
+                                  cameraView === 'Bottom view' 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                Bottom view
+                              </button>
+                            </div>
+                            {/* Row 3: Low angle, Close up, Full body */}
+                            <div className="grid grid-cols-3 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setCameraView('Low angle')}
+                                className={`h-8 px-3 rounded-md text-sm border transition ${
+                                  cameraView === 'Low angle' 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                Low angle
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCameraView('Close up')}
+                                className={`h-8 px-3 rounded-md text-sm border transition ${
+                                  cameraView === 'Close up' 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                Close up
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCameraView('Full body')}
+                                className={`h-8 px-3 rounded-md text-sm border transition ${
+                                  cameraView === 'Full body' 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                Full body
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-xs font-medium text-neutral-400 mb-3">Angle</h3>
+                          <div className="space-y-2">
+                            {[
+                              'Wide angle - 10/24mm',
+                              'Standard - 50/90mm', 
+                              'Long lens - 110/150mm'
+                            ].map(angle => (
+                              <button
+                                key={angle}
+                                type="button"
+                                onClick={() => setLensAngle(angle)}
+                                className={`w-full h-8 px-3 rounded-md text-sm border transition ${
+                                  lensAngle === angle 
+                                    ? 'bg-primary text-white border-primary' 
+                                    : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
+                                }`}
+                              >
+                                {angle}
+                              </button>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -628,28 +701,37 @@ export default function GeneratePage() {
             </div>
           </aside>
 
-          <section className="col-span-12 lg:col-span-9 p-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="font-semibold text-neutral-200">Generated Images</h3>
-                    <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
+          <section className="col-span-12 lg:col-span-9">
+            {showBilling ? (
+              <BillingPage 
+                user={user!} 
+                onBack={() => setShowBilling(false)} 
+              />
+            ) : (
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="font-semibold text-neutral-200">Generated Images</h3>
+                        <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
+                    </div>
+                    {/* Add Tabs here if needed */}
                 </div>
-                {/* Add Tabs here if needed */}
-            </div>
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
-              {gallery.map((src, index) => (
-                <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
-              ))}
-              {gallery.length === 0 && !isGenerating && [
-                  "/images/image (1).png", 
-                  "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
-                  "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
-                  "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
-              ].map(src => (
-                 <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
-              ))}
-            </div>
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
+                  {gallery.map((src, index) => (
+                    <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
+                  ))}
+                  {gallery.length === 0 && !isGenerating && [
+                      "/images/image (1).png", 
+                      "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
+                      "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
+                      "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
+                  ].map(src => (
+                     <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
         </div>
       </main>
