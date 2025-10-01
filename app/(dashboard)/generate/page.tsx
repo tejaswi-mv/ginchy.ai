@@ -77,26 +77,33 @@ function AssetPreview({
   const [isPending, startTransition] = useTransition();
 
   const fetchPublicAssets = async () => {
-    // FAST path: Load public assets immediately
-    const publicResult = await getPublicImages(type, 5);
-    setAssets(publicResult.data || []);
-    setIsAssetsLoading(false); 
+    // FAST path: Load public assets immediately with caching
+    try {
+      const publicResult = await getPublicImages(type, 6);
+      setAssets(publicResult.data || []);
+      setIsAssetsLoading(false); 
+    } catch (error) {
+      console.error('Error loading public assets:', error);
+      setIsAssetsLoading(false);
+    }
   };
 
   const fetchUserAssetsOnly = async () => {
     if (!user) return; // Only run if user is logged in
-    setIsAssetsLoading(true);
+    
+    try {
+      // SLOW path: Fetch user assets with error handling
+      const formData = new FormData();
+      formData.append('type', type);
+      formData.append('limit', '6');
+      const userAssetsResult = await getUserAssets({}, formData);
+      const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
 
-    // SLOW path: Fetch user assets
-    const formData = new FormData();
-    formData.append('type', type);
-    formData.append('limit', '5');
-    const userAssetsResult = await getUserAssets({}, formData);
-    const userData = (userAssetsResult && 'data' in userAssetsResult && userAssetsResult.data) ? userAssetsResult.data : [];
-
-    // Merge user assets with public, prioritize user assets
-    setAssets(prevPublic => [...userData, ...prevPublic.filter(a => !userData.find(u => u.url === a.url))].slice(0, 5));
-    setIsAssetsLoading(false);
+      // Merge user assets with public, prioritize user assets
+      setAssets(prevPublic => [...userData, ...prevPublic.filter(a => !userData.find(u => u.url === a.url))].slice(0, 6));
+    } catch (error) {
+      console.error('Error loading user assets:', error);
+    }
   };
 
   // Effect 1: Loads fast public assets on mount/type change
@@ -146,7 +153,7 @@ function AssetPreview({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Selected Asset Display */}
       {selectedAsset && (
         <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
@@ -176,27 +183,44 @@ function AssetPreview({
         </div>
       )}
 
-      {/* Asset Grid */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Professional Asset Grid - 6 items in horizontal row */}
+      <div className="grid grid-cols-6 gap-4">
         {isAssetsLoading ? (
-          // Show skeleton placeholder when loading
-          Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="aspect-square w-full rounded-md bg-neutral-800 animate-pulse" />
+          // Show skeleton placeholder when loading - faster loading
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="aspect-square w-full min-h-[80px] rounded-lg bg-gradient-to-br from-neutral-800 to-neutral-700 animate-pulse">
+              <div className="w-full h-full bg-neutral-600/30 rounded-lg"></div>
+            </div>
           ))
         ) : (
           // Show real assets when loaded
-          assets.map((asset) => (
-            <button key={asset.name} type="button" onClick={() => onSelect(asset)}
-              className={`relative aspect-square w-full rounded-md object-cover border-2 transition-all group ${
+          assets.map((asset, index) => (
+            <button 
+              key={asset.name} 
+              type="button" 
+              onClick={() => onSelect(asset)}
+              className={`relative aspect-square w-full min-h-[80px] rounded-lg overflow-hidden border-2 transition-all duration-200 group ${
                 selectedAsset?.url === asset.url 
-                  ? 'border-primary ring-2 ring-primary/20' 
-                  : 'border-transparent hover:border-primary/50'
-              }`}>
-              <Image src={asset.url} alt={asset.name} fill className="rounded-md object-cover" />
+                  ? 'border-primary ring-2 ring-primary/30 shadow-lg' 
+                  : 'border-neutral-700 hover:border-primary/50 hover:shadow-md'
+              }`}
+            >
+              <Image 
+                src={asset.url} 
+                alt={asset.name} 
+                fill 
+                className="object-cover transition-transform duration-200 group-hover:scale-105" 
+                quality={75}
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 16vw, 12vw"
+                priority={index < 3}
+                loading={index < 3 ? "eager" : "lazy"}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+              />
               {selectedAsset?.url === asset.url && (
-                <div className="absolute inset-0 bg-primary/20 rounded-md flex items-center justify-center">
+                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                   <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                    <X className="w-4 h-4 text-white" />
+                    <Check className="w-4 h-4 text-white" />
                   </div>
                 </div>
               )}
@@ -205,13 +229,26 @@ function AssetPreview({
         )}
       </div>
       
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2">
-        <Button onClick={handleUploadClick} variant="outline" size="sm" className="flex-1" disabled={isUploading || isPending}>
-          <Upload className="mr-2 h-4 w-4" /> {isUploading || isPending ? 'Uploading...' : 'Upload'}
+      {/* Professional Action Buttons */}
+      <div className="flex items-center gap-3">
+        <Button 
+          onClick={handleUploadClick} 
+          variant="outline" 
+          size="sm" 
+          className="flex-1 bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-700 transition-colors"
+          disabled={isUploading || isPending}
+        >
+          <Upload className="mr-2 h-4 w-4" /> 
+          {isUploading || isPending ? 'Uploading...' : 'Upload'}
         </Button>
-        <Button onClick={onOpenLibrary} variant="ghost" size="sm" className="flex-1">
-          {selectedAsset ? 'Change Selection' : 'View Library'}
+        <Button 
+          onClick={onOpenLibrary} 
+          variant="outline" 
+          size="sm" 
+          className="flex-1 bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-700 transition-colors"
+        >
+          <ImageIcon className="mr-2 h-4 w-4" />
+          View Library
         </Button>
       </div>
       <input type="file" id={`file-upload-${type}`} className="hidden" onChange={handleFileUpload} accept="image/*" />
