@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Define protected routes
-  const protectedRoutes = ['/dashboard', '/generate', '/my-creations'];
+  const protectedRoutes = ['/dashboard', '/my-creations'];
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
   // If trying to access a protected route without a session, redirect to sign-in
