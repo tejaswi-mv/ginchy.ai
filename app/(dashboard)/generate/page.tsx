@@ -31,7 +31,7 @@ import {
   Check,
   
 } from 'lucide-react';
-import { getPublicImages, getUserAssets, uploadAsset, generateImage, deleteAsset, createCharacter } from '@/app/(login)/actions';
+import { getPublicImages, getUserAssets, uploadAsset, generateImage, deleteAsset, createCharacter, upscaleImage } from '@/app/(login)/actions';
 import { useActionState } from 'react';
 import useSWR from 'swr';
 import { User } from '@/lib/db/schema';
@@ -555,6 +555,14 @@ export default function GeneratePage() {
   const [processor, setProcessor] = useState<'Nano Banana' | 'Kling' | 'Gemini' | 'OpenAI DALL-E'>('Nano Banana');
   const [showModelMenu, setShowModelMenu] = useState<boolean>(false);
   const [imagesToGenerate, setImagesToGenerate] = useState<number>(4);
+  const [upscaleState, upscaleAction, isUpscaling] = useActionState<any, FormData>(upscaleImage, null);
+
+  const handleUpscale = (imageUrl: string) => {
+    const formData = new FormData();
+    formData.append('imageUrl', imageUrl);
+    formData.append('scale', '2');
+    upscaleAction(formData);
+  };
 
   const handleGenerate = (formData: FormData) => {
     formData.append('modelUrl', selectedModel?.url || '');
@@ -575,6 +583,15 @@ export default function GeneratePage() {
     }
     if (generateState?.error) alert(`Generation failed: ${generateState.error}`);
   }, [generateState, user, mutateUser]);
+
+  useEffect(() => {
+    if (upscaleState?.success && upscaleState.upscaledUrl) {
+      setGallery(prev => [upscaleState.upscaledUrl, ...prev]);
+      if(user) mutateUser({ ...user, credits: upscaleState.remainingCredits }, false);
+      alert(`Image upscaled successfully! Used ${upscaleState.creditsUsed} credits.`);
+    }
+    if (upscaleState?.error) alert(`Upscaling failed: ${upscaleState.error}`);
+  }, [upscaleState, user, mutateUser]);
 
   const assetCategories = [
     { 
@@ -996,7 +1013,20 @@ export default function GeneratePage() {
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                   {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
                   {gallery.map((src, index) => (
-                    <div key={index} className="relative group aspect-[3/4]"><Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" /></div>
+                    <div key={index} className="relative group aspect-[3/4]">
+                      <Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                        <Button 
+                          size="sm" 
+                          variant="secondary"
+                          onClick={() => handleUpscale(src)}
+                          className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                        >
+                          <Layers className="h-4 w-4 mr-2" />
+                          Upscale
+                        </Button>
+                      </div>
+                    </div>
                   ))}
                   {gallery.length === 0 && !isGenerating && [
                       "/images/image (1).png", 

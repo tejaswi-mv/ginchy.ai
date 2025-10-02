@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   integer,
+  boolean,
   index,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
@@ -34,6 +35,14 @@ export const teams = pgTable('teams', {
   stripeProductId: text('stripe_product_id'),
   planName: varchar('plan_name', { length: 50 }),
   subscriptionStatus: varchar('subscription_status', { length: 20 }),
+  packageTier: varchar('package_tier', { length: 20 }).notNull().default('standard'),
+  monthlyCredits: integer('monthly_credits').notNull().default(50),
+  maxModels: integer('max_models').notNull().default(5),
+  maxVideos: integer('max_videos').notNull().default(10),
+  hasUpscaling: boolean('has_upscaling').notNull().default(false),
+  hasBatchProcessing: boolean('has_batch_processing').notNull().default(false),
+  hasAPI: boolean('has_api').notNull().default(false),
+  hasPrioritySupport: boolean('has_priority_support').notNull().default(false),
 });
 
 export const teamMembers = pgTable('team_members', {
@@ -185,4 +194,10 @@ export enum ActivityType {
   REMOVE_TEAM_MEMBER = 'REMOVE_TEAM_MEMBER',
   INVITE_TEAM_MEMBER = 'INVITE_TEAM_MEMBER',
   ACCEPT_INVITATION = 'ACCEPT_INVITATION',
+  IMAGE_GENERATED = 'IMAGE_GENERATED',
+  IMAGE_UPSCALED = 'IMAGE_UPSCALED',
+  CHARACTER_TRAINED = 'CHARACTER_TRAINED',
+  VIDEO_GENERATED = 'VIDEO_GENERATED',
+  CLOTHING_DETECTED = 'CLOTHING_DETECTED',
+  CLOTHING_APPLIED = 'CLOTHING_APPLIED',
 }
