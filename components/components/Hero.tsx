@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Wand2, Sparkles } from "lucide-react";
+import ImageGenerationPanel from "@/components/ImageGenerationPanel";
+import { User } from "@/lib/db/schema";
 
 const tokens = {
   maxW: "max-w-[1200px]",
@@ -10,7 +12,13 @@ const tokens = {
   grid: "grid grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-8",
 };
 
-export default function Hero() {
+interface HeroProps {
+  user?: User | null;
+}
+
+export default function Hero({ user }: HeroProps) {
+  const [showImageGenerator, setShowImageGenerator] = useState(false);
+
   return (
     <section className={`${tokens.gutter} pt-24 pb-20 bg-black text-white relative`}>
       
@@ -29,12 +37,19 @@ export default function Hero() {
               and Campaign visuals.
             </p>
             <p className="mt-6 ml-[0.6em] text-[#1E90FF] italic font-['IBM_Plex_Serif','Georgia',serif] text-[32px] sm:text-[36px] lg:text-[40px] font-medium">[ with Ginchy ]</p>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={() => setShowImageGenerator(true)}
+                className="inline-flex items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-8 py-4 text-white text-lg font-bold hover:shadow-lg transition-all duration-300"
+              >
+                <Wand2 className="w-5 h-5" />
+                <span>Generate Images</span>
+              </button>
               <a 
                 href="#try" 
-                className="inline-flex lg:hidden items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-8 py-4 text-white text-lg font-bold hover:shadow-lg transition-all duration-300"
+                className="inline-flex items-center justify-center gap-3 rounded-full border-2 border-white/20 px-8 py-4 text-white text-lg font-bold hover:bg-white/10 transition-all duration-300"
               >
-                <span>Try it now</span>
+                <span>Learn More</span>
                 <ArrowRight className="w-5 h-5" />
               </a>
             </div>
@@ -73,17 +88,34 @@ export default function Hero() {
             </div>
             {/* CTA under hero showcase on desktop */}
             <div className="hidden lg:block mt-4" style={{marginLeft: 'calc(-8rem + 8rem)', width: '95%'}}>
-              <a 
-                href="#try" 
-                className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-8 py-2 text-white text-lg font-bold hover:shadow-lg transition-all duration-300 rounded-lg"
-              >
-                <span>Try it now</span>
-                <ArrowRight className="w-5 h-5" />
-              </a>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowImageGenerator(true)}
+                  className="flex-1 inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#1E90FF] to-[#0EA5E9] px-8 py-3 text-white text-lg font-bold hover:shadow-lg transition-all duration-300 rounded-lg"
+                >
+                  <Wand2 className="w-5 h-5" />
+                  <span>Generate Images</span>
+                </button>
+                <a 
+                  href="#try" 
+                  className="flex-1 inline-flex items-center justify-center gap-3 border-2 border-white/20 px-8 py-3 text-white text-lg font-bold hover:bg-white/10 transition-all duration-300 rounded-lg"
+                >
+                  <span>Learn More</span>
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Image Generation Panel */}
+      {showImageGenerator && (
+        <ImageGenerationPanel 
+          user={user || null} 
+          onClose={() => setShowImageGenerator(false)} 
+        />
+      )}
     </section>
   );
 }

@@ -333,11 +333,11 @@ function ChooseModelSection() {
                           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                               <div className="col-span-1 lg:col-span-8">
                               <h2 className="text-center text-[24px] sm:text-[28px] lg:text-[32px] font-bold text-black mb-2">
-                              CHOOSE YOUR MODEL
-                          </h2>
+                            CHOOSE YOUR MODEL
+                        </h2>
                           <p className="text-center text-[12px] sm:text-[14px] text-neutral-600 mb-6 sm:mb-8">
-                              Browse our diverse library or generate a custom one.
-                          </p>
+                            Browse our diverse library or generate a custom one.
+                        </p>
                                  <div className="relative flex overflow-hidden mb-6">
                                      {/* Vertical text outside the box - hidden on mobile */}
                                      <div className="hidden sm:flex items-center justify-center" style={{ width: '30px' }}>
@@ -354,15 +354,15 @@ function ChooseModelSection() {
                                      </div>
                                      {/* Model grid container */}
                                      <div className="flex-1 p-2 sm:p-0 border border-neutral-200">
-                                      {isLoading ? (
+                                    {isLoading ? (
                                           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2">
-                                              {Array.from({ length: 18 }).map((_, i) => (
+                                            {Array.from({ length: 18 }).map((_, i) => (
                                                   <div key={i} className="aspect-square bg-neutral-200 animate-pulse"></div>
-                                              ))}
-                                          </div>
-                                      ) : (
+                                            ))}
+                                        </div>
+                                    ) : (
                                           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2">
-                                              {previewCharacters.map((char) => (
+                                            {previewCharacters.map((char) => (
                                               <div 
                                                   key={char.name} 
                                                   className={`relative aspect-square overflow-hidden cursor-pointer group transition-all duration-200 ${
@@ -372,33 +372,33 @@ function ChooseModelSection() {
                                                   }`} 
                                                   onClick={() => handleSelectCharacter(char)}
                                               >
-                                                  <Image 
-                                                      src={char.url} 
-                                                      alt={char.name} 
-                                                      fill 
+                                                <Image 
+                                                    src={char.url} 
+                                                    alt={char.name} 
+                                                    fill 
                                                       className="object-cover"
-                                                      onError={(e) => {
-                                                          console.error('Image failed to load:', char.url);
-                                                          e.currentTarget.style.display = 'none';
-                                                      }}
-                                                      onLoad={() => console.log('Image loaded successfully:', char.url)}
-                                                  />
-                                                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                                              </div>
-                                          ))}
-                                          </div>
-                                      )}
-                                  </div>
+                                                    onError={(e) => {
+                                                        console.error('Image failed to load:', char.url);
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                    onLoad={() => console.log('Image loaded successfully:', char.url)}
+                                                />
+                                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                                            </div>
+                                        ))}
+                                        </div>
+                                    )}
+                                </div>
                                  </div>
                                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                                        <button onClick={handleBrowseLibrary} className="flex-1 border border-black rounded-xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-black font-semibold hover:bg-neutral-100 transition">
-                                           BROWSE LIBRARY
-                                       </button>
+                                        BROWSE LIBRARY
+                                    </button>
                                        <button onClick={() => router.push('/generate')} className="flex-1 bg-neutral-900 text-white rounded-xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold hover:bg-neutral-700 transition">
-                                           GENERATE CUSTOM MODEL
-                                       </button>
-                                   </div>
-                               </div>
+                                        GENERATE CUSTOM MODEL
+                                    </button>
+                                </div>
+                            </div>
                                <div className="col-span-1 lg:col-span-4 mt-6 lg:mt-0">
                                  <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[600px] overflow-hidden bg-neutral-100 border border-neutral-200">
                                     {selectedCharacter ? (
@@ -489,29 +489,29 @@ export default function LandingPage() {
         <div className="relative w-full h-24">
           <div className="flex items-center justify-center h-full">
             <Image 
-              src="/images/logos.png" 
-              alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
+            src="/images/logos.png" 
+            alt="Company logos - ElevenLabs, Runway, Google, Magnific, KLING, Flux, ChatGPT" 
               width={1200}
               height={96}
               className="object-contain filter contrast-200 brightness-150 saturate-110 invert-0"
               unoptimized
-            />
+          />
           </div>
         </div>
       </section>
 
-       {/* ================== SECTION 2 — Create/All types ================== */}
+      {/* ================== SECTION 2 — Create/All types ================== */}
       <section className="pt-4 pb-12 sm:pb-16 lg:pb-20 bg-black text-white px-4 sm:px-6 lg:px-8" id="about">
         <div className="mx-auto max-w-[1200px] px-0">
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-12">
-             {/* Left column: title + media with benefits on the right */}
+            {/* Left column: title + media with benefits on the right */}
              <div className="col-span-1 lg:col-span-7 w-full">
                 <h2 className="font-[var(--font-display)] text-[24px] sm:text-[32px] md:text-[36px] lg:text-[40px] font-extrabold tracking-tight leading-none max-w-full lg:max-w-2xl text-center lg:text-left">
                   Create, amplify and scale<br className="hidden sm:block"/>
                   <span className="sm:hidden"> </span>professional product content.
-                </h2>
+              </h2>
                <div className="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-4 md:gap-6 items-start w-full">
-                 {/* media placeholder (video or image) */}
+                {/* media placeholder (video or image) */}
                  <div className="col-span-1 md:col-span-7 flex justify-center md:justify-start w-full">
                    <div className="relative inline-block mt-4 sm:mt-6 lg:mt-8 group w-full max-w-[350px] sm:max-w-[400px] md:max-w-none">
                      <Image 
@@ -543,7 +543,7 @@ export default function LandingPage() {
                          }}
                          unoptimized 
                        />
-                     </div>
+                  </div>
                      
                      {/* Center Play Button */}
                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -556,59 +556,59 @@ export default function LandingPage() {
                          </svg>
                        </button>
                      </div>
-                   </div>
-                 </div>
-                 {/* benefits text list */}
+                  </div>
+                </div>
+                {/* benefits text list */}
                  <div className="col-span-1 md:col-span-5 text-sm sm:text-[15px] leading-relaxed flex items-start md:items-end justify-center md:justify-start w-full">
                   <div className="space-y-6 sm:space-y-5 mt-6 sm:mt-8 md:mt-12 text-center md:text-left max-w-full sm:max-w-md md:max-w-none w-full px-4 sm:px-0">
                      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-3 md:p-0 md:bg-transparent">
                        <h3 className="font-bold text-white mb-2 text-base sm:text-lg md:text-base tracking-wide">Production efficiency</h3>
                        <p className="text-neutral-200 leading-relaxed text-sm sm:text-base md:text-sm font-light">Speed up the design-to-production process by eliminating the need for physical samples to respond quickly to market demands.</p>
-                     </div>
+                    </div>
                      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-3 md:p-0 md:bg-transparent">
                        <h3 className="font-bold text-white mb-2 text-base sm:text-lg md:text-base tracking-wide">Cost reduction</h3>
                        <p className="text-neutral-200 leading-relaxed text-sm sm:text-base md:text-sm font-light">Eliminates the need for traditional photoshoots, reducing costs and resource consumption while simplifying content creation.</p>
-                     </div>
+                    </div>
                      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-3 md:p-0 md:bg-transparent">
                        <h3 className="font-bold text-white mb-2 text-base sm:text-lg md:text-base tracking-wide">Sustainability</h3>
                        <p className="text-neutral-200 leading-relaxed text-sm sm:text-base md:text-sm font-light">Reduces the environmental impact by minimizing the need for physical photoshoots and associated logistics.</p>
-                     </div>
-                   </div>
-                 </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Right column: heading + three cards layout */}
             <div className="col-span-12 lg:col-span-5 mt-6 lg:mt-0 w-full">
                <h2 className="font-[var(--font-display)] text-[22px] sm:text-[28px] md:text-[36px] lg:text-[44px] xl:text-[50px] font-extrabold tracking-tight mb-3 uppercase leading-tight text-center lg:text-left">
-                 ALL TYPES OF
-                 <br />
+                ALL TYPES OF
+                <br />
                  <span className="italic text-[#1E90FF] font-['IBM_Plex_Serif','Georgia',serif] font-medium lowercase">[ fashion items ]</span>
-               </h2>
+              </h2>
               <div className="grid grid-cols-1 gap-3 sm:gap-4 w-full">
-                  {/* Top row: shoes with small label on the right */}
+                {/* Top row: shoes with small label on the right */}
                   <div className="relative flex justify-center lg:justify-start max-w-full overflow-hidden w-full">
                     <div className="relative w-[120px] sm:w-[140px] md:w-[160px] lg:w-[180px] h-[120px] sm:h-[140px] md:h-[160px] lg:h-[180px] flex-shrink-0 overflow-hidden border border-neutral-700 bg-neutral-100">
                       <Image src="/images/1.jpg" alt="Shoes" fill className="object-cover object-center" style={{objectPosition: 'center 20%'}} unoptimized />
-                    </div>
-                    <div className="absolute top-1/2 -translate-y-1/2 left-[130px] sm:left-[150px] md:left-[170px] lg:left-[190px] border border-neutral-600 bg-black/60 px-2 sm:px-3 lg:px-4 py-1 sm:py-2 text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] whitespace-nowrap">Shoes</div>
                   </div>
-               {/* second row: jewelry small square with label below */}
+                    <div className="absolute top-1/2 -translate-y-1/2 left-[130px] sm:left-[150px] md:left-[170px] lg:left-[190px] border border-neutral-600 bg-black/60 px-2 sm:px-3 lg:px-4 py-1 sm:py-2 text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] whitespace-nowrap">Shoes</div>
+                </div>
+                {/* second row: jewelry small square with label below */}
                <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start lg:justify-start gap-3 sm:gap-4 lg:gap-6 max-w-full overflow-hidden w-full">
                  <div className="relative flex justify-center sm:justify-start ml-0 sm:ml-0 lg:ml-6">
                    <div className="relative w-[100px] sm:w-[120px] md:w-[140px] lg:w-[160px] h-[90px] sm:h-[110px] md:h-[130px] lg:h-[150px] flex-shrink-0 overflow-hidden border border-neutral-700 bg-neutral-100">
                      <Image src="/images/2.jpg" alt="Accessories" fill className="object-cover" unoptimized />
-                   </div>
+                    </div>
                    <div className="absolute -bottom-5 sm:-bottom-6 lg:-bottom-8 left-[50px] sm:left-[60px] md:left-[70px] lg:left-[80px] -translate-x-1/2 w-[70px] sm:w-[80px] md:w-[90px] lg:w-[100px] text-center border border-neutral-600 bg-black/60 px-1 sm:px-2 lg:px-3 py-1 text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] whitespace-nowrap">Accessories</div>
-                 </div>
-                 {/* sunglasses big square with label on right */}
+                  </div>
+                  {/* sunglasses big square with label on right */}
                  <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 mt-6 sm:mt-0 max-w-full w-full">
                    <div className="relative w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] h-[140px] sm:h-[160px] md:h-[180px] lg:h-[200px] flex-shrink-0 overflow-hidden border border-neutral-700 bg-neutral-100">
                      <Image src="/images/3.jpg" alt="Sunglasses" fill className="object-cover" unoptimized />
-                   </div>
+                    </div>
                    <div className="border border-neutral-600 bg-black/60 px-1 sm:px-2 lg:px-3 py-1 text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] whitespace-nowrap">Sunglasses</div>
-                 </div>
-               </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -659,25 +659,25 @@ export default function LandingPage() {
 
             {/* four tall images row - professional images as specified */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-               {/* Sample placeholder - Desert scene */}
+              {/* Sample placeholder - Desert scene */}
                <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/1left-desert-lady.jpg" alt="Sample placeholder" unoptimized fill className="object-cover" />
-               </div>
+              </div>
               
-               {/* Customized 2 - New York scene */}
+              {/* Customized 2 - New York scene */}
                <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/city-2left.jpg" alt="Customized 2" unoptimized fill className="object-cover" />
-               </div>
+              </div>
               
-               {/* Customized 3 - White studio scene */}
+              {/* Customized 3 - White studio scene */}
                <div className="relative h-[500px] overflow-hidden bg-neutral-800">
-                 <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
-               </div>
+                <Image src="/images/freepik__we-see-her-in-ecommerce-page-white-studio-with-a-n__53453 (1).png" alt="Customized 3" unoptimized fill className="object-cover" />
+              </div>
               
-               {/* Customized 4 - Snow environment scene */}
+              {/* Customized 4 - Snow environment scene */}
                <div className="relative h-[500px] overflow-hidden bg-neutral-800">
                  <Image src="/images/snow-lady.jpg" alt="Customized 4" unoptimized fill className="object-cover" />
-               </div>
+              </div>
             </div>
 
             {/* Bottom text - professional styling */}
@@ -796,7 +796,7 @@ export default function LandingPage() {
             <div className="bg-black relative">
               {/* Social left gradient background */}
              
-               {/* Profile card */}
+              {/* Profile card */}
                <div className="relative flex items-center space-x-3 bg-white  p-3 w-fit pr-81 z-10">
                  <div className="w-10 h-10 rounded-full overflow-hidden">
                    <Image 
@@ -808,7 +808,7 @@ export default function LandingPage() {
                      unoptimized
                    />
                  </div>
-                 <div>
+                <div>
                    <p className="text-black font-semibold text-sm">Lil Miquela</p>
                     <p className="text-xs whitespace-nowrap flex items-center gap-1">
                       <svg className="w-3 h-3" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
@@ -825,9 +825,9 @@ export default function LandingPage() {
                       <span className="text-gray-400">• 2.7M followers</span>
                     </p>
                    
-                 </div>
+                </div>
                  
-               </div>
+              </div>
 
               {/* Main images - increased size to match right side */}
               <div className="relative grid grid-cols-2 gap-0 z-10">
@@ -918,7 +918,7 @@ export default function LandingPage() {
             <br />
             GENCHY AI
           </h2>
-
+          
           {/* Subtitle */}
           <p className="text-center text-white/80 text-[11px] mb-8">
             Real feedback from real people I've
@@ -944,29 +944,29 @@ export default function LandingPage() {
               {/* Actual Testimonial Card */}
               <div className="relative w-[280px] max-w-full rounded-xl text-white p-6  border border-white" > {/* Added bg-black to the card itself */}
                 
-                {/* Profile Picture */}
+              {/* Profile Picture */}
                 <div className="flex items-start rounded-xl space-x-4 mb-4">
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                       <Image src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Alina M." fill className="object-cover rounded-full" unoptimized />
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
                       o
-                    </div>
                   </div>
                 </div>
-
-                {/* Quote */}
+              </div>
+              
+              {/* Quote */}
                 <p className="text-white leading-relaxed mb-4">
-                  &ldquo;It&apos;s the small touches that made the big difference. The attention to detail made everything feel so well-crafted.&rdquo;
-                </p>
-
-                {/* Author */}
-                <div>
+                &ldquo;It&apos;s the small touches that made the big difference. The attention to detail made everything feel so well-crafted.&rdquo;
+              </p>
+              
+              {/* Author */}
+              <div>
                   <p className="font-bold text-white">Alina M.</p>
                   <p className="text-sm text-white/60">Co-founder of Noura Skincare</p>
-                </div>
               </div>
+            </div>
             </div>
             
             {/* Right Underline */}
@@ -1004,8 +1004,8 @@ export default function LandingPage() {
               
               <div className="text-center mb-8">
                 <a href="/pricing" className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-600 px-6 py-3 text-sm font-medium hover:bg-neutral-800 transition-all duration-200 hover:border-neutral-500">
-                  Sign up Free <Cog className="w-4 h-4" />
-                </a>
+                Sign up Free <Cog className="w-4 h-4" />
+              </a>
               </div>
               
               <div className="flex-grow">
@@ -1051,7 +1051,7 @@ export default function LandingPage() {
                     </div>
                     <span>Community support</span>
                   </li>
-                </ul>
+              </ul>
               </div>
             </div>
 
@@ -1116,7 +1116,7 @@ export default function LandingPage() {
                     </div>
                     <span>Priority email support</span>
                   </li>
-                </ul>
+              </ul>
               </div>
             </div>
 
@@ -1134,8 +1134,8 @@ export default function LandingPage() {
               
               <div className="text-center mb-8">
                 <a href="/pricing" className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-600 px-6 py-3 text-sm font-medium hover:bg-neutral-800 transition-all duration-200 hover:border-neutral-500">
-                  Contact Sales <Cog className="w-4 h-4" />
-                </a>
+                Contact Sales <Cog className="w-4 h-4" />
+              </a>
               </div>
               
               <div className="flex-grow">
@@ -1189,7 +1189,7 @@ export default function LandingPage() {
                     </div>
                     <span>24/7 VIP support</span>
                   </li>
-                </ul>
+              </ul>
               </div>
             </div>
           </div>

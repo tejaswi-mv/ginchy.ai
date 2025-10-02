@@ -28,6 +28,7 @@ import {
   Film,
   Package,
   Layers,
+  Check,
   
 } from 'lucide-react';
 import { getPublicImages, getUserAssets, uploadAsset, generateImage, deleteAsset, createCharacter } from '@/app/(login)/actions';
@@ -551,7 +552,7 @@ export default function GeneratePage() {
   const [cameraView, setCameraView] = useState<string | null>(null);
   const [lensAngle, setLensAngle] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
-  const [processor, setProcessor] = useState<'Nano Banana' | 'Kling'>('Nano Banana');
+  const [processor, setProcessor] = useState<'Nano Banana' | 'Kling' | 'Gemini'>('Nano Banana');
   const [showModelMenu, setShowModelMenu] = useState<boolean>(false);
   const [imagesToGenerate, setImagesToGenerate] = useState<number>(4);
 
@@ -955,7 +956,8 @@ export default function GeneratePage() {
                     {showModelMenu && (
                       <div className="absolute right-3 mt-2 w-40 rounded-md border border-neutral-700 bg-neutral-900 shadow-lg z-10">
                         <button type="button" onClick={() => { setProcessor('Nano Banana'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-t-md">Nano banana</button>
-                        <button type="button" onClick={() => { setProcessor('Kling'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-b-md">Kling</button>
+                        <button type="button" onClick={() => { setProcessor('Kling'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800">Kling</button>
+                        <button type="button" onClick={() => { setProcessor('Gemini'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-b-md">Gemini</button>
                       </div>
                     )}
                   </div>
@@ -978,7 +980,7 @@ export default function GeneratePage() {
           <section className="col-span-12 lg:col-span-9">
             {showBilling ? (
               <BillingPage 
-                user={user!} 
+                user={{ ...user!, name: user!.name || 'User' }} 
                 onBack={() => setShowBilling(false)} 
               />
             ) : (
