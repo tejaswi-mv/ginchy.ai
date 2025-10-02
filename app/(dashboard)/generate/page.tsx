@@ -552,7 +552,7 @@ export default function GeneratePage() {
   const [cameraView, setCameraView] = useState<string | null>(null);
   const [lensAngle, setLensAngle] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
-  const [processor, setProcessor] = useState<'Nano Banana' | 'Kling' | 'Gemini'>('Nano Banana');
+  const [processor, setProcessor] = useState<'Nano Banana' | 'Kling' | 'Gemini' | 'OpenAI DALL-E'>('Nano Banana');
   const [showModelMenu, setShowModelMenu] = useState<boolean>(false);
   const [imagesToGenerate, setImagesToGenerate] = useState<number>(4);
 
@@ -957,7 +957,8 @@ export default function GeneratePage() {
                       <div className="absolute right-3 mt-2 w-40 rounded-md border border-neutral-700 bg-neutral-900 shadow-lg z-10">
                         <button type="button" onClick={() => { setProcessor('Nano Banana'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-t-md">Nano banana</button>
                         <button type="button" onClick={() => { setProcessor('Kling'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800">Kling</button>
-                        <button type="button" onClick={() => { setProcessor('Gemini'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-b-md">Gemini</button>
+                        <button type="button" onClick={() => { setProcessor('Gemini'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800">Gemini</button>
+                <button type="button" onClick={() => { setProcessor('OpenAI DALL-E'); setShowModelMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 rounded-b-md">OpenAI DALL-E</button>
                       </div>
                     )}
                   </div>

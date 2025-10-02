@@ -750,6 +750,10 @@ async function generateWithAI(params: {
     else if (params.processor === 'Gemini') {
       result = await generateWithGemini(params);
     }
+    // OpenAI DALL-E Integration
+    else if (params.processor === 'OpenAI DALL-E') {
+      result = await generateWithOpenAI(params);
+    }
     // Stable Diffusion via Replicate (fallback)
     else {
       result = await generateWithReplicate(params);
@@ -962,6 +966,82 @@ Return only the enhanced prompt, no other text.`
     // Fallback to placeholder if Gemini fails
     return generatePlaceholderImage(params);
   }
+}
+
+async function generateWithOpenAI(params: {
+  prompt: string;
+  modelUrl?: string;
+  poseUrl?: string;
+  garmentUrl?: string;
+  environmentUrl?: string;
+  aspectRatio?: string;
+}): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OpenAI API key not configured');
+  }
+
+  const width = getWidthFromAspectRatio(params.aspectRatio);
+  const height = getHeightFromAspectRatio(params.aspectRatio);
+
+  // Build the enhanced prompt for DALL-E
+  let enhancedPrompt = params.prompt;
+  
+  // Add asset references to prompt
+  if (params.modelUrl) enhancedPrompt += `, character reference: ${params.modelUrl}`;
+  if (params.poseUrl) enhancedPrompt += `, pose reference: ${params.poseUrl}`;
+  if (params.garmentUrl) enhancedPrompt += `, garment reference: ${params.garmentUrl}`;
+  if (params.environmentUrl) enhancedPrompt += `, environment reference: ${params.environmentUrl}`;
+  
+  // Add professional photography terms
+  enhancedPrompt += ', professional photography, high quality, detailed, fashion photography';
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: enhancedPrompt,
+        n: 1,
+        size: getDALLE3Size(params.aspectRatio),
+        quality: 'hd',
+        style: 'natural',
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorData.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.data && data.data[0] && data.data[0].url) {
+      return data.data[0].url;
+    }
+    
+    throw new Error('No image URL returned from OpenAI');
+    
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    // Fallback to placeholder if OpenAI fails
+    return generatePlaceholderImage(params);
+  }
+}
+
+function getDALLE3Size(aspectRatio?: string): string {
+  const sizeMap: Record<string, string> = {
+    '1:1': '1024x1024',
+    '9:16': '1024x1792',
+    '16:9': '1792x1024',
+    '3:2': '1344x896',
+    '2:3': '896x1344'
+  };
+  return sizeMap[aspectRatio || '1:1'] || '1024x1024';
 }
 
 async function generateWithReplicate(params: {
