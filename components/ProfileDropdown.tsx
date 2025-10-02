@@ -105,7 +105,7 @@ export default function ProfileDropdown({ user, onBillingClick }: ProfileDropdow
               </Link>
               
               <Link 
-                href="/dashboard/settings" 
+                href="/dashboard/general" 
                 className="flex items-center gap-3 px-4 py-2 text-white hover:bg-neutral-800 transition-colors"
                 onClick={() => setIsOpen(false)}
               >

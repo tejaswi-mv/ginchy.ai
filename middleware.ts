@@ -18,9 +18,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // If user is logged in and tries to access sign-in/sign-up, redirect to dashboard
+  // If user is logged in and tries to access sign-in/sign-up, redirect to generate page
   if (session && (pathname === '/sign-in' || pathname === '/sign-up')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/generate', request.url));
   }
 
   return NextResponse.next();

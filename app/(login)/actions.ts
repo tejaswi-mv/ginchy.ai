@@ -100,7 +100,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
     return createCheckoutSession({ team: foundTeam, priceId });
   }
 
-  redirect('/');
+  redirect('/generate');
 });
 
 const signUpSchema = z.object({
@@ -960,7 +960,7 @@ export async function handleIdTokenLogin() {
   }
 
   if (dbUser) {
-    redirect('/dashboard');
+    redirect('/generate');
   } else {
     redirect('/sign-in?error=user_creation_failed');
   }
@@ -1013,7 +1013,7 @@ export async function handleOAuthCallback() {
   }
 
   if (dbUser) {
-    redirect('/dashboard');
+    redirect('/generate');
   } else {
     redirect('/sign-in?error=user_creation_failed');
   }

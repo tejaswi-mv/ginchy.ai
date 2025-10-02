@@ -184,7 +184,7 @@ function AssetPreview({
       )}
 
       {/* Asset Grid - 6 images in single horizontal row */}
-      <div className="grid grid-cols-6 gap-3">
+      <div className="grid grid-cols-6 gap-1">
         {isAssetsLoading ? (
           // Show skeleton placeholder when loading
           Array.from({ length: 6 }).map((_, i) => (
