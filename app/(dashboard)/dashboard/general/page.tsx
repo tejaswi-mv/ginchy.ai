@@ -34,7 +34,7 @@ function AccountForm({
   return (
     <>
       <div>
-        <Label htmlFor="name" className="mb-2 text-slate-300 font-medium">
+        <Label htmlFor="name" className="mb-2 text-neutral-300 font-medium">
           Name
         </Label>
         <Input
@@ -43,11 +43,11 @@ function AccountForm({
           placeholder="Enter your name"
           defaultValue={state.name || nameValue}
           required
-          className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
+          className="bg-neutral-800 border-neutral-700 text-white placeholder-neutral-400 focus:ring-2 focus:ring-neutral-500/50 focus:border-neutral-500"
         />
       </div>
       <div>
-        <Label htmlFor="email" className="mb-2 text-slate-300 font-medium">
+        <Label htmlFor="email" className="mb-2 text-neutral-300 font-medium">
           Email
         </Label>
         <Input
@@ -57,7 +57,7 @@ function AccountForm({
           placeholder="Enter your email"
           defaultValue={emailValue}
           required
-          className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
+          className="bg-neutral-800 border-neutral-700 text-white placeholder-neutral-400 focus:ring-2 focus:ring-neutral-500/50 focus:border-neutral-500"
         />
       </div>
     </>
@@ -82,18 +82,18 @@ export default function GeneralPage() {
   );
 
   return (
-    <section className="flex-1 p-4 lg:p-6">
-      <div className="mb-6 lg:mb-8">
-        <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2">General Settings</h1>
-        <p className="text-slate-300 text-sm lg:text-base">Manage your account information</p>
+    <section className="flex-1 p-4 bg-black">
+      <div className="mb-4">
+        <h1 className="text-xl font-bold text-white mb-1">General Settings</h1>
+        <p className="text-neutral-400 text-sm">Manage your account information</p>
       </div>
 
-      <Card className="bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold text-white">Account Information</CardTitle>
+      <Card className="bg-neutral-900 border border-neutral-800">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-white">Account Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="space-y-6" action={formAction}>
+          <form className="space-y-4" action={formAction}>
             <Suspense fallback={<AccountForm state={state} />}>
               <AccountFormWithData state={state} />
             </Suspense>
@@ -105,7 +105,7 @@ export default function GeneralPage() {
             )}
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-200"
+              className="w-full bg-neutral-700 hover:bg-neutral-600 text-white"
               disabled={isPending}
             >
               {isPending ? (

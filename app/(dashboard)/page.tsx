@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Cog, ArrowRight, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Cog, ArrowRight, X, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { askQuestion, getPublicCharacters } from './actions';
@@ -12,6 +12,7 @@ import { User } from '@/lib/db/schema';
 import { useRouter } from "next/navigation";
 import Hero from '@/components/Hero';
 import DraggableImage from '@/components/DraggableImage';
+import { Input } from '@/components/ui/input';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -70,6 +71,89 @@ const imageGallery: Record<string, string[]> = {
   "/images/Woman.png": ["/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg", "/images/romain.gn_a_casual_beautiful_Slavic_women_from_Albania_with_b_30e89a20-d0b8-4aba-9085-aca6cce1239f_0 (1).png", "/images/woman v2.png"],
   "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg": ["/images/romain.gn_A_hand_holding_a_phone_--ar_5877_--raw_--profile_h5_5161a1f7-02d7-43a3-afd2-b77925b50fab_0.png"],
 };
+
+// Garments Modal Component
+function GarmentsModal({ isOpen, onClose, onSelect }: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (garment: any) => void;
+}) {
+  const [activeTab, setActiveTab] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const filterTabs = ['All', 'My Garments', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Accessories'];
+  
+  // Sample garments data matching the design
+  const garments = [
+    { id: 1, name: 'freepik_white-b...', image: 'https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__white-background-blue-puffer-jacet__19944.png', type: 'shirt' },
+    { id: 2, name: 'freepik_white-b...', image: 'https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__white-background-blue-puffer-jacet__19944.png', type: 'shirt' },
+  ];
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="relative w-[min(1024px,92vw)] rounded-2xl border border-neutral-700 bg-neutral-800 p-6 shadow-2xl">
+        <button 
+          type="button" 
+          onClick={onClose} 
+          className="absolute top-4 right-4 p-1.5 rounded-md hover:bg-neutral-700" 
+          aria-label="Close"
+        >
+          <X className="h-5 w-5 text-white" />
+        </button>
+        
+        <h3 className="text-xl font-bold text-white">Garments</h3>
+        
+        <div className="flex items-center gap-6 mt-6 overflow-x-auto border-b border-neutral-700 pb-2">
+          {filterTabs.map(tab => (
+            <button 
+              key={tab} 
+              className={`py-2 text-sm whitespace-nowrap font-medium transition-colors ${
+                activeTab === tab ? 'text-white border-b-2 border-white' : 'text-neutral-400 hover:text-white'
+              }`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        
+        <div className="flex items-center gap-4 mt-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Input 
+              placeholder="Search garments" 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 pl-9 focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
+            />
+          </div>
+        </div>
+        
+        <div className="mt-6 grid grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+          {garments.map(garment => (
+            <div key={garment.id} className="relative group text-center">
+              <button 
+                type="button" 
+                onClick={() => onSelect(garment)} 
+                className="group relative w-full aspect-square overflow-hidden rounded-lg border border-neutral-300 hover:border-neutral-400 transition bg-white"
+              >
+                <Image 
+                  src={garment.image} 
+                  alt={garment.name} 
+                  fill 
+                  className="object-cover transition-transform group-hover:scale-105" 
+                />
+              </button>
+              <p className="text-xs text-neutral-300 mt-2 truncate">{garment.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
   isOpen: boolean;
@@ -160,6 +244,7 @@ const ImageModal = ({ isOpen, onClose, currentImage, relatedImages }: {
 // ================== PAGE SECTIONS ==================
 function ClothingSelectionSection() {
   const [selectedItem, setSelectedItem] = useState<number | null>(3); // Default to item 3 (strapless long dress)
+  const [isGarmentsModalOpen, setIsGarmentsModalOpen] = useState(false);
   
   const clothingItems = [
       { id: 1, name: "White Jacket", image: "https://lejnqimkweslrzsojtsp.supabase.co/storage/v1/object/public/public-assets/landing-vi/freepik__white-background-blue-puffer-jacet__19944.png", type: "top" },
@@ -172,6 +257,12 @@ function ClothingSelectionSection() {
 
   const handleItemSelect = (itemId: number) => {
       setSelectedItem(itemId);
+      setIsGarmentsModalOpen(true);
+  };
+
+  const handleGarmentSelect = (garment: any) => {
+      console.log('Selected garment:', garment);
+      setIsGarmentsModalOpen(false);
   };
 
   return (
@@ -187,7 +278,7 @@ function ClothingSelectionSection() {
                   {/* Panel 1: Woman in Car (Far Left) */}
                   <div className="w-full lg:w-[40%]">
                       <div className="relative aspect-[2/3]  overflow-hidden">
-                          <Image 
+                          <Image  
                               src="/images/Woman.png" 
                               alt="Woman in car" 
                               fill 
@@ -266,7 +357,7 @@ function ClothingSelectionSection() {
                   {/* Panel 5: Man on Couch (Far Right) */}
                   <div className="w-full lg:w-[40%]">
                       <div className="relative aspect-[2/3]  overflow-hidden">
-                          <Image 
+                          <Image  
                               src="/images/4.jpg" 
                               alt="Man on couch" 
                               fill 
@@ -276,6 +367,13 @@ function ClothingSelectionSection() {
                   </div>
               </div>
           </div>
+          
+          {/* Garments Modal */}
+          <GarmentsModal 
+            isOpen={isGarmentsModalOpen} 
+            onClose={() => setIsGarmentsModalOpen(false)} 
+            onSelect={handleGarmentSelect} 
+          />
       </section>
   );
 }

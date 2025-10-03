@@ -114,6 +114,18 @@ function NavigationLinks() {
         >
           My Creations
         </Link>
+        <Link
+          href="/my-characters"
+          className="text-neutral-300 hover:text-white transition"
+        >
+          My Characters
+        </Link>
+        <Link
+          href="/create-character"
+          className="text-neutral-300 hover:text-white transition"
+        >
+          Create Character
+        </Link>
       </nav>
     );
   }

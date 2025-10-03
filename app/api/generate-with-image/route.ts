@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🚀 Generation API called');
+    console.log('🚀 Image-based generation API called');
     
     const user = await getUser();
     console.log('User:', user ? 'authenticated' : 'not authenticated');
@@ -22,36 +22,39 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('Request body:', body);
     
-    const { prompt, modelUrl, processor = 'Nano Banana' } = body;
+    const { prompt, modelUrl, poseUrl, garmentUrl, environmentUrl, cameraView, lensAngle, aspectRatio } = body;
 
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    // Build enhanced prompt with all parameters
+    // Build enhanced prompt with image references
     let enhancedPrompt = prompt;
     
-    // Add reference images to prompt with specific instructions
-    if (body.modelUrl) {
-      enhancedPrompt += `, using this character as reference: ${body.modelUrl}`;
+    // Add specific instructions for image-based generation
+    if (modelUrl) {
+      enhancedPrompt += `, using this character as reference: ${modelUrl}`;
     }
-    if (body.poseUrl) {
-      enhancedPrompt += `, using this pose as reference: ${body.poseUrl}`;
+    if (poseUrl) {
+      enhancedPrompt += `, using this pose as reference: ${poseUrl}`;
     }
-    if (body.garmentUrl) {
-      enhancedPrompt += `, wearing this garment: ${body.garmentUrl}`;
+    if (garmentUrl) {
+      enhancedPrompt += `, wearing this garment: ${garmentUrl}`;
     }
-    if (body.environmentUrl) {
-      enhancedPrompt += `, in this environment: ${body.environmentUrl}`;
+    if (environmentUrl) {
+      enhancedPrompt += `, in this environment: ${environmentUrl}`;
     }
     
-    // Add camera settings to prompt
-    if (body.cameraView) {
-      enhancedPrompt += `, ${body.cameraView.toLowerCase()}`;
+    // Add camera and lens settings
+    if (cameraView) {
+      enhancedPrompt += `, ${cameraView.toLowerCase()}`;
+    }
+    if (lensAngle) {
+      enhancedPrompt += `, ${lensAngle.toLowerCase()}`;
     }
     
     // Add aspect ratio context
-    if (body.aspectRatio) {
+    if (aspectRatio) {
       const ratioMap: Record<string, string> = {
         '1:1': 'square format',
         '9:16': 'portrait format',
@@ -59,41 +62,33 @@ export async function POST(request: NextRequest) {
         '3:2': 'classic photography format',
         '2:3': 'vertical format'
       };
-      enhancedPrompt += `, ${ratioMap[body.aspectRatio] || body.aspectRatio}`;
-    }
-    
-    // Add lens angle context
-    if (body.lensAngle) {
-      enhancedPrompt += `, ${body.lensAngle.toLowerCase()}`;
+      enhancedPrompt += `, ${ratioMap[aspectRatio] || aspectRatio}`;
     }
     
     // Add professional photography terms
     enhancedPrompt += ', professional photography, high quality, detailed, fashion photography';
     
-    console.log('Enhanced prompt:', enhancedPrompt);
+    console.log('Enhanced prompt with image references:', enhancedPrompt);
     
-    // Try OpenAI DALL-E first, fallback to Pollinations
+    // Use Pollinations with image references
     let imageUrl: string;
     
     try {
-      // For now, use Pollinations which can handle image references better
-      console.log('Using Pollinations with image references');
-      
       // Build Pollinations URL with image references
       let pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=512&height=640&model=flux&seed=${Math.floor(Math.random() * 1000000)}`;
       
       // Add image references as parameters
-      if (body.modelUrl) {
-        pollinationsUrl += `&image=${encodeURIComponent(body.modelUrl)}`;
+      if (modelUrl) {
+        pollinationsUrl += `&image=${encodeURIComponent(modelUrl)}`;
       }
-      if (body.poseUrl) {
-        pollinationsUrl += `&pose=${encodeURIComponent(body.poseUrl)}`;
+      if (poseUrl) {
+        pollinationsUrl += `&pose=${encodeURIComponent(poseUrl)}`;
       }
-      if (body.garmentUrl) {
-        pollinationsUrl += `&garment=${encodeURIComponent(body.garmentUrl)}`;
+      if (garmentUrl) {
+        pollinationsUrl += `&garment=${encodeURIComponent(garmentUrl)}`;
       }
-      if (body.environmentUrl) {
-        pollinationsUrl += `&environment=${encodeURIComponent(body.environmentUrl)}`;
+      if (environmentUrl) {
+        pollinationsUrl += `&environment=${encodeURIComponent(environmentUrl)}`;
       }
       
       imageUrl = pollinationsUrl;
@@ -122,11 +117,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       imageUrl: imageUrl,
-      message: 'Image generated instantly!' 
+      message: 'Image generated with references!' 
     });
 
   } catch (error) {
-    console.error('Error generating image:', error);
-    return NextResponse.json({ error: 'Failed to generate image' }, { status: 500 });
+    console.error('Error generating image with references:', error);
+    return NextResponse.json({ error: 'Failed to generate image with references' }, { status: 500 });
   }
 }

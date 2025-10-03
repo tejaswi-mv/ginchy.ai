@@ -700,21 +700,36 @@ export const createCharacter = validatedActionWithUser(
 
       // Start actual character training with Nano Banana
       if (insertedAsset?.id) {
-        // Trigger training in background
-        trainCharacterWithNanoBanana(insertedAsset.id, uploadedUrls, data.name, data.gender)
-          .catch(error => {
-            console.error('Character training failed:', error);
-            // Update status to failed
-            db.update(assets)
-              .set({
-                metadata: JSON.stringify({
-                  ...JSON.parse(characterAsset.metadata || '{}'),
-                  status: 'failed',
-                  error: error.message,
-                }),
-              })
-              .where(eq(assets.id, insertedAsset.id));
-          });
+        // Check if Nano Banana API key is available
+        if (process.env.NANOBANANA_API_KEY) {
+          // Trigger training in background
+          trainCharacterWithNanoBanana(insertedAsset.id, uploadedUrls, data.name, data.gender)
+            .catch(error => {
+              console.error('Character training failed:', error);
+              // Update status to failed
+              db.update(assets)
+                .set({
+                  metadata: JSON.stringify({
+                    ...JSON.parse(characterAsset.metadata || '{}'),
+                    status: 'failed',
+                    error: error.message,
+                  }),
+                })
+                .where(eq(assets.id, insertedAsset.id));
+            });
+        } else {
+          // No API key available, mark as ready for manual training
+          console.log('Nano Banana API key not configured, marking character as ready for manual training');
+          db.update(assets)
+            .set({
+              metadata: JSON.stringify({
+                ...JSON.parse(characterAsset.metadata || '{}'),
+                status: 'ready',
+                note: 'Ready for manual training - API key not configured',
+              }),
+            })
+            .where(eq(assets.id, insertedAsset.id));
+        }
       }
 
       return { 
@@ -1016,7 +1031,7 @@ async function generateWithNanoBanana(params: {
     return data.image_url || data.output[0];
   } catch (error) {
     clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('Nano Banana API request timed out');
     }
     throw error;

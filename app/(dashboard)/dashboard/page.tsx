@@ -30,9 +30,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 function SubscriptionSkeleton() {
   return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
+    <Card className="mb-4 h-[120px] bg-neutral-900 border border-neutral-800">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-white text-base">Team Subscription</CardTitle>
       </CardHeader>
     </Card>
   );
@@ -42,18 +42,18 @@ function ManageSubscription() {
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
 
   return (
-    <Card className="mb-4 lg:mb-6 bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
-      <CardHeader className="pb-3 lg:pb-4">
-        <CardTitle className="text-base lg:text-lg font-semibold text-white">Team Subscription</CardTitle>
+    <Card className="mb-4 bg-neutral-900 border border-neutral-800">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold text-white">Team Subscription</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
             <div>
-              <p className="font-medium text-white text-sm lg:text-base">
+              <p className="font-medium text-white">
                 Current Plan: {teamData?.planName || 'Free'}
               </p>
-              <p className="text-xs lg:text-sm text-slate-300">
+              <p className="text-sm text-neutral-400">
                 {teamData?.subscriptionStatus === 'active'
                   ? 'Billed monthly'
                   : teamData?.subscriptionStatus === 'trialing'
@@ -62,7 +62,7 @@ function ManageSubscription() {
               </p>
             </div>
             <form action={customerPortalAction} className="w-full sm:w-auto">
-              <Button type="submit" variant="outline" className="w-full sm:w-auto border-blue-500 text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 shadow-lg shadow-blue-500/20 text-sm">
+              <Button type="submit" variant="outline" className="w-full sm:w-auto border-neutral-600 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-500">
                 Manage Subscription
               </Button>
             </form>
@@ -75,17 +75,17 @@ function ManageSubscription() {
 
 function TeamMembersSkeleton() {
   return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Members</CardTitle>
+    <Card className="mb-4 h-[120px] bg-neutral-900 border border-neutral-800">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-white text-base">Team Members</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="animate-pulse space-y-4 mt-1">
-          <div className="flex items-center space-x-4">
-            <div className="size-8 rounded-full bg-gray-200"></div>
-            <div className="space-y-2">
-              <div className="h-4 w-32 bg-gray-200 rounded"></div>
-              <div className="h-3 w-14 bg-gray-200 rounded"></div>
+        <div className="animate-pulse space-y-3 mt-1">
+          <div className="flex items-center space-x-3">
+            <div className="size-6 rounded-full bg-neutral-700"></div>
+            <div className="space-y-1">
+              <div className="h-3 w-24 bg-neutral-700 rounded"></div>
+              <div className="h-2 w-12 bg-neutral-700 rounded"></div>
             </div>
           </div>
         </div>
@@ -107,21 +107,21 @@ function TeamMembers() {
 
   if (!teamData?.teamMembers?.length) {
     return (
-      <Card className="mb-6 bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold text-white">Team Members</CardTitle>
+      <Card className="mb-4 bg-neutral-900 border border-neutral-800">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-white">Team Members</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-slate-300">No team members yet.</p>
+          <p className="text-neutral-400">No team members yet.</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="mb-6 bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-white">Team Members</CardTitle>
+    <Card className="mb-4 bg-neutral-900 border border-neutral-800">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold text-white">Team Members</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-4">
@@ -148,7 +148,7 @@ function TeamMembers() {
                   <p className="font-medium text-white">
                     {getUserDisplayName(member.user)}
                   </p>
-                  <p className="text-sm text-slate-300 capitalize">
+                  <p className="text-sm text-neutral-400 capitalize">
                     {member.role}
                   </p>
                 </div>
@@ -180,9 +180,9 @@ function TeamMembers() {
 
 function InviteTeamMemberSkeleton() {
   return (
-    <Card className="h-[260px]">
-      <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
+    <Card className="h-[200px] bg-neutral-900 border border-neutral-800">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-white text-base">Invite Team Member</CardTitle>
       </CardHeader>
     </Card>
   );
@@ -197,14 +197,14 @@ function InviteTeamMember() {
   >(inviteTeamMember, {});
 
   return (
-    <Card className="bg-slate-800 border border-slate-700 shadow-lg shadow-blue-500/10">
-      <CardHeader className="pb-3 lg:pb-4">
-        <CardTitle className="text-base lg:text-lg font-semibold text-white">Invite Team Member</CardTitle>
+    <Card className="bg-neutral-900 border border-neutral-800">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold text-white">Invite Team Member</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={inviteAction} className="space-y-4">
           <div>
-            <Label htmlFor="email" className="mb-2 text-slate-300 font-medium text-sm lg:text-base">
+            <Label htmlFor="email" className="mb-2 text-neutral-300 font-medium">
               Email
             </Label>
             <Input
@@ -214,11 +214,11 @@ function InviteTeamMember() {
               placeholder="Enter email"
               required
               disabled={!isOwner}
-              className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm lg:text-base"
+              className="bg-neutral-800 border-neutral-700 text-white placeholder-neutral-400 focus:ring-2 focus:ring-neutral-500/50 focus:border-neutral-500"
             />
           </div>
           <div>
-            <Label className="text-slate-300 font-medium text-sm lg:text-base">Role</Label>
+            <Label className="text-neutral-300 font-medium">Role</Label>
             <RadioGroup
               defaultValue="member"
               name="role"
@@ -227,11 +227,11 @@ function InviteTeamMember() {
             >
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member" className="text-slate-300 text-sm lg:text-base">Member</Label>
+                <Label htmlFor="member" className="text-neutral-300">Member</Label>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner" className="text-slate-300 text-sm lg:text-base">Owner</Label>
+                <Label htmlFor="owner" className="text-neutral-300">Owner</Label>
               </div>
             </RadioGroup>
           </div>
@@ -243,7 +243,7 @@ function InviteTeamMember() {
           )}
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-200 text-sm lg:text-base"
+            className="w-full bg-neutral-700 hover:bg-neutral-600 text-white"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -262,7 +262,7 @@ function InviteTeamMember() {
       </CardContent>
       {!isOwner && (
         <CardFooter>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-neutral-400">
             You must be a team owner to invite new members.
           </p>
         </CardFooter>
@@ -273,10 +273,10 @@ function InviteTeamMember() {
 
 export default function SettingsPage() {
   return (
-    <section className="flex-1 p-4 lg:p-6 min-h-screen">
-      <div className="mb-6 lg:mb-8">
-        <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2">Team Settings</h1>
-        <p className="text-slate-300 text-sm lg:text-base">Manage your team members and subscription</p>
+    <section className="flex-1 p-4 bg-black">
+      <div className="mb-4">
+        <h1 className="text-xl font-bold text-white mb-1">Team Settings</h1>
+        <p className="text-neutral-400 text-sm">Manage your team members and subscription</p>
       </div>
       <Suspense fallback={<SubscriptionSkeleton />}>
         <ManageSubscription />

@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         generationJobs.set(jobId, {
           id: jobId,
           status: 'failed',
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
           createdAt: new Date()
         });
       });
@@ -133,7 +133,7 @@ async function generateImageAsync(jobId: string, prompt: string, modelUrl: strin
     generationJobs.set(jobId, {
       id: jobId,
       status: 'failed',
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       createdAt: new Date()
     });
   }
