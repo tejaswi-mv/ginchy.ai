@@ -728,57 +728,7 @@ export const createCharacter = validatedActionWithUser(
   }
 );
 
-// Image Upscaling Action
-export const upscaleImage = validatedActionWithUser(
-  z.object({
-    imageUrl: z.string().url('Valid image URL is required'),
-    scale: z.number().min(1).max(4).default(2),
-  }),
-  async (data, _, user) => {
-    try {
-      const userWithTeam = await getUserWithTeam(user.id);
-      
-      // Get user's package
-      const userPackage = getPackageByTier((userWithTeam as any)?.packageTier || 'standard');
-      if (!userPackage) {
-        return { error: 'Invalid package tier. Please contact support.' };
-      }
-      
-      // Check if user has access to upscaling
-      if (!canUserAccessFeature(userPackage, 'hasUpscaling')) {
-        return { error: 'Image upscaling not available in your package. Please upgrade to Pro or Premium.' };
-      }
-      
-      // Check if user has enough credits (upscaling costs 2 credits)
-      if (user.credits < 2) {
-        return { error: 'Insufficient credits. Upscaling requires 2 credits.' };
-      }
-
-      // Upscale the image
-      const upscaledUrl = await upscaleWithMagnifique(data.imageUrl, data.scale);
-      
-      // Deduct credits
-      await db
-        .update(users)
-        .set({ credits: user.credits - 2 })
-        .where(eq(users.id, user.id));
-
-      // Log activity
-      await logActivity(userWithTeam?.teamId, user.id, ActivityType.IMAGE_UPSCALED);
-
-      return { 
-        success: 'Image upscaled successfully!',
-        upscaledUrl,
-        creditsUsed: 2,
-        remainingCredits: user.credits - 2
-      };
-      
-    } catch (error) {
-      console.error('Upscaling error:', error);
-      return { error: 'Failed to upscale image. Please try again.' };
-    }
-  }
-);
+// Upscale functionality removed - space for new feature
 
 // Clothing Detection Action
 export const detectClothingItems = validatedActionWithUser(
@@ -926,8 +876,16 @@ async function generateWithAI(params: {
     
   } catch (error) {
     console.error('AI generation error:', error);
-    // Fallback to placeholder image
-    return generatePlaceholderImage(params);
+    // Fallback to a simple, fast image generation service
+    try {
+      // Use Pollinations as a fast fallback
+      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(params.prompt)}?width=512&height=640&model=flux&seed=${Math.floor(Math.random() * 1000000)}`;
+      return pollinationsUrl;
+    } catch (fallbackError) {
+      console.error('Fallback generation failed:', fallbackError);
+      // Final fallback to placeholder
+      return generatePlaceholderImage({ aspectRatio: params.aspectRatio, prompt: params.prompt });
+    }
   }
 }
 
@@ -1026,28 +984,43 @@ async function generateWithNanoBanana(params: {
   // Add professional photography terms
   enhancedPrompt += ', professional photography, high quality, detailed, fashion photography';
 
-  const response = await fetch('https://api.nanobanana.ai/v1/generate', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt: enhancedPrompt,
-      width,
-      height,
-      num_inference_steps: 20,
-      guidance_scale: 7.5,
-      model: 'stable-diffusion-xl',
-    }),
-  });
+  // Create AbortController for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
-  if (!response.ok) {
-    throw new Error(`Nano Banana API error: ${response.statusText}`);
+  try {
+    const response = await fetch('https://api.nanobanana.ai/v1/generate', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: enhancedPrompt,
+        width,
+        height,
+        num_inference_steps: 20,
+        guidance_scale: 7.5,
+        model: 'stable-diffusion-xl',
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Nano Banana API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.image_url || data.output[0];
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Nano Banana API request timed out');
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  return data.image_url || data.output[0];
 }
 
 async function generateWithKling(params: {
@@ -1310,39 +1283,7 @@ function getDALLE3Size(aspectRatio?: string): string {
   return sizeMap[aspectRatio || '1:1'] || '1024x1024';
 }
 
-async function upscaleWithMagnifique(imageUrl: string, scale: number = 2): Promise<string> {
-  const apiKey = process.env.MAGNIFIQUE_API_KEY;
-  if (!apiKey) {
-    throw new Error('Magnifique API key not configured');
-  }
-
-  try {
-    const response = await fetch('https://api.magnifique.ai/v1/upscale', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        image_url: imageUrl,
-        scale: scale,
-        quality: 'high',
-        format: 'png',
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Magnifique API error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.upscaled_url || data.output[0];
-    
-  } catch (error) {
-    console.error('Magnifique API error:', error);
-    throw error;
-  }
-}
+// Upscale function removed - space for new feature
 
 // Clothing Detection and Analysis
 async function detectClothing(imageUrl: string): Promise<{
@@ -1524,6 +1465,7 @@ async function generateWithReplicate(params: {
 
 async function generatePlaceholderImage(params: {
   aspectRatio?: string;
+  prompt?: string;
 }): Promise<string> {
     const aspectRatioMap: Record<string, string> = {
       '1:1': '800x800',
@@ -1536,13 +1478,14 @@ async function generatePlaceholderImage(params: {
     const dimensions = aspectRatioMap[params.aspectRatio || '1:1'] || '800x800';
     const [width, height] = dimensions.split('x').map(Number);
     
-    // Generate a placeholder image URL with the correct dimensions
-    const placeholderUrl = `https://picsum.photos/${width}/${height}?random=${Date.now()}`;
+    // Use Pollinations AI for free image generation instead of random placeholder
+    const encodedPrompt = encodeURIComponent(params.prompt || 'fashion photography, professional model, high quality');
+    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=flux&seed=${Math.floor(Math.random() * 1000000)}`;
     
     // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    return placeholderUrl;
+    return pollinationsUrl;
 }
 
 function getWidthFromAspectRatio(aspectRatio?: string): number {
@@ -1622,6 +1565,7 @@ export const generateImage = validatedActionWithUser(
       // Wrap the entire generation process with timeout
       const result = await withTimeout(
         (async () => {
+          console.log('🚀 Starting image generation...');
           // Build enhanced prompt with all parameters
           let enhancedPrompt = data.prompt;
           
@@ -1677,7 +1621,7 @@ export const generateImage = validatedActionWithUser(
           
           return { success: 'Image generated!', imageUrl: generatedImageUrl };
         })(),
-        30000, // 30 seconds timeout
+        20000, // 20 seconds timeout
         'Image generation timed out'
       );
 

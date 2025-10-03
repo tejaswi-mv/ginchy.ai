@@ -72,7 +72,8 @@ function NavigationLinks() {
   const isDashboard =
     pathname?.startsWith('/dashboard') ||
     pathname?.startsWith('/generate') ||
-    pathname?.startsWith('/pricing');
+    pathname?.startsWith('/pricing') ||
+    pathname?.startsWith('/about');
 
   if (isDashboard) {
     return (
@@ -82,6 +83,12 @@ function NavigationLinks() {
           className="text-neutral-300 hover:text-white transition"
         >
           Home
+        </Link>
+        <Link
+          href="/about"
+          className="text-neutral-300 hover:text-white transition"
+        >
+          About
         </Link>
         <Link
           href="/pricing"
@@ -113,9 +120,12 @@ function NavigationLinks() {
 
   return (
     <nav className="hidden md:flex items-center gap-6 text-sm">
-      <a href="#about" className="text-neutral-300 hover:text-white transition">
+      <Link
+        href="/about"
+        className="text-neutral-300 hover:text-white transition"
+      >
         About
-      </a>
+      </Link>
       <a
         href="#features"
         className="text-neutral-300 hover:text-white transition"

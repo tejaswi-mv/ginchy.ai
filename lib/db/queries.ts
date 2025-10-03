@@ -36,6 +36,9 @@ const getUserImpl = async () => {
 // 2. Export the cached version. All subsequent calls in the same request will be instant.
 export const getUser = cache(getUserImpl);
 
+// 3. Export uncached version for when we need fresh data
+export const getUserUncached = getUserImpl;
+
 export async function getTeamByStripeCustomerId(customerId: string) {
   try {
     const result = await db

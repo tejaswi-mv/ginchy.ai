@@ -12,7 +12,8 @@ import {
   Grid3X3, 
   Settings, 
   DollarSign, 
-  LogOut 
+  LogOut,
+  RefreshCw
 } from 'lucide-react';
 
 interface ProfileDropdownProps {
@@ -30,6 +31,23 @@ export default function ProfileDropdown({ user, onBillingClick }: ProfileDropdow
     router.push('/');
   };
 
+  const handleRefreshCredits = async () => {
+    try {
+      // Call the fix-credits API
+      const response = await fetch('/api/fix-credits');
+      if (response.ok) {
+        // Refresh user data
+        mutate('/api/user');
+        alert('Credits updated to 400!');
+      } else {
+        alert('Failed to update credits');
+      }
+    } catch (error) {
+      console.error('Error refreshing credits:', error);
+      alert('Error updating credits');
+    }
+  };
+
   return (
     <div className="relative">
       {/* Profile Button */}
@@ -37,9 +55,21 @@ export default function ProfileDropdown({ user, onBillingClick }: ProfileDropdow
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-1.5 hover:bg-neutral-800 transition-colors"
       >
-        <span className="text-white text-sm font-medium">
-          {user.credits ?? 0} credits
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-white text-sm font-medium">
+            {user.credits ?? 0} credits
+          </span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRefreshCredits();
+            }}
+            className="p-1 hover:bg-neutral-700 rounded transition-colors"
+            title="Refresh credits"
+          >
+            <RefreshCw className="h-3 w-3 text-neutral-400 hover:text-white" />
+          </button>
+        </div>
         <Avatar className="size-8 border border-neutral-800">
           <AvatarImage alt={user.name || ''} />
           <AvatarFallback className="text-xs bg-neutral-800 text-white">

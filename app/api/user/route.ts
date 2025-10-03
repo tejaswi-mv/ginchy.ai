@@ -1,11 +1,11 @@
-import { getUser } from '@/lib/db/queries';
+import { getUserUncached } from '@/lib/db/queries';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const user = await getUser();
+    const user = await getUserUncached();
     return Response.json(user);
   } catch (error) {
     console.error('Error in /api/user:', error);

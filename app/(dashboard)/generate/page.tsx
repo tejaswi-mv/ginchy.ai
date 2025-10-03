@@ -18,11 +18,13 @@ import {
   Accessibility,
   Shirt,
   Globe,
+  CheckCircle,
   Ratio,
   Trash2,
   Play,
   Square,
   Image as ImageIcon,
+  Download,
   Video,
   Aperture,
   Film,
@@ -31,7 +33,7 @@ import {
   Check,
   
 } from 'lucide-react';
-import { getPublicImages, getUserAssets, uploadAsset, generateImage, deleteAsset, createCharacter, upscaleImage } from '@/app/(login)/actions';
+import { getPublicImages, getUserAssets, uploadAsset, generateImage, deleteAsset, createCharacter } from '@/app/(login)/actions';
 import { useActionState } from 'react';
 import useSWR from 'swr';
 import { User } from '@/lib/db/schema';
@@ -86,6 +88,8 @@ function AssetPreview({
     } catch (error) {
       console.error('Error loading public assets:', error);
       setIsAssetsLoading(false);
+      // Set empty array on error to prevent crashes
+      setAssets([]);
     }
   };
 
@@ -110,6 +114,17 @@ function AssetPreview({
   // Effect 1: Loads fast public assets on mount/type change
   useEffect(() => {
     fetchPublicAssets();
+    
+    // Set a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (isAssetsLoading) {
+        console.warn('Asset loading timeout, setting empty state');
+        setIsAssetsLoading(false);
+        setAssets([]);
+      }
+    }, 10000); // 10 second timeout
+    
+    return () => clearTimeout(timeout);
   }, [type]);
 
   // Effect 2: Triggers the slow user fetch only when the SWR hook resolves
@@ -134,7 +149,7 @@ function AssetPreview({
     }
   };
   
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && user) {
       if (file.size > 10 * 1024 * 1024) {
@@ -146,10 +161,39 @@ function AssetPreview({
         return;
       }
       
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', type);
-      startTransition(() => uploadAction(formData));
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('type', type);
+          
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Add the uploaded asset to the assets list
+            const newAsset: Asset = {
+              name: file.name,
+              url: result.url,
+              isOwner: true,
+              type: type as AssetType
+            };
+            setAssets(prev => [newAsset, ...prev]);
+            alert('Image uploaded successfully!');
+          } else {
+            alert(`Upload failed: ${result.error || 'Unknown error'}`);
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          alert(`Upload failed: ${error.message || 'Please try again'}`);
+        }
     }
   };
 
@@ -343,10 +387,36 @@ function AddNewCharacterView({ onBack }: { onBack: () => void }) {
     
     const [createState, createAction, isCreating] = useActionState<any, FormData>(createCharacter, null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [dragActive, setDragActive] = useState(false);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
-        setSelectedFiles(files);
+        setSelectedFiles(prev => [...prev, ...files]);
+    };
+
+    const handleDrag = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") {
+            setDragActive(true);
+        } else if (e.type === "dragleave") {
+            setDragActive(false);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const files = Array.from(e.dataTransfer.files);
+            setSelectedFiles(prev => [...prev, ...files]);
+        }
+    };
+
+    const removeFile = (index: number) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = (formData: FormData) => {
@@ -358,59 +428,207 @@ function AddNewCharacterView({ onBack }: { onBack: () => void }) {
     };
 
     return (
-        <div>
-            <Button variant="ghost" onClick={onBack} className="absolute top-4 left-4"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
-                <div className="space-y-6">
-                    <div>
-                        <h4 className="font-semibold text-neutral-200">✅ Upload 5+ photos for best results</h4>
-                        <p className="text-sm text-neutral-400 mt-1">Upload high-quality images of one person. The more images you provide, the better the result - show different angles, clear facial expressions, and consistent identity.</p>
-                        <div className="grid grid-cols-5 gap-2 mt-3">
-                            {goodExamples.map(src => <Image key={src} src={src} alt="Good example" width={100} height={100} className="rounded-md object-cover aspect-square" />)}
-                        </div>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-neutral-200">❌ Avoid these types of photos</h4>
-                        <p className="text-sm text-neutral-400 mt-1">No duplicates, group shots, pets, nudes, filters, face-covering accessories, or masks.</p>
-                         <div className="grid grid-cols-5 gap-2 mt-3">
-                            {badExamples.map(src => <Image key={src} src={src} alt="Bad example" width={100} height={100} className="rounded-md object-cover aspect-square" />)}
-                        </div>
-                    </div>
+        <div className="min-h-screen bg-black text-white">
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                <Button variant="ghost" onClick={onBack} className="mb-6">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                </Button>
+                
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold mb-4">Create Your AI Character</h1>
+                    <p className="text-xl text-neutral-400 max-w-3xl mx-auto">
+                        Upload 5+ photos of a person to train a custom AI model. The more diverse photos you provide, the better your AI character will be.
+                    </p>
                 </div>
-                <div className="bg-neutral-900 p-6 rounded-lg">
-                    <h4 className="font-bold text-lg text-neutral-100">Create your character</h4>
-                    <form action={handleSubmit} className="space-y-4 mt-4">
-                        <Input name="name" placeholder="Name" className="bg-neutral-800 border-neutral-700" required/>
-                        <select name="gender" className="w-full rounded-lg border border-neutral-700 bg-neutral-800 p-3 text-sm text-neutral-200" required>
-                            <option value="">Select the gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="non-binary">Non-binary</option>
-                        </select>
-                        <Input name="available_models" placeholder="Available models" className="bg-neutral-800 border-neutral-700"/>
-                        <div className="border-2 border-dashed border-neutral-700 rounded-lg p-6 text-center">
-                            <p className="text-neutral-300">Drag and drop images or <Button variant="link" asChild><label htmlFor="file-upload-modal" className="cursor-pointer">browse</label></Button></p>
-                            <p className="text-xs text-neutral-500 mt-1">(5 images minimum)</p>
-                            <input 
-                                id="file-upload-modal" 
-                                type="file" 
-                                multiple 
-                                className="sr-only" 
-                                onChange={handleFileChange}
-                                accept="image/*"
-                                required
-                            />
-                            {selectedFiles.length > 0 && (
-                                <p className="text-sm text-primary mt-2">{selectedFiles.length} files selected</p>
-                            )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    {/* Guidelines */}
+                    <div className="space-y-8">
+                        <div className="bg-green-900/20 border border-green-500/30 p-6 rounded-xl">
+                            <h3 className="text-xl font-semibold text-green-400 mb-4 flex items-center">
+                                <CheckCircle className="w-6 h-6 mr-2" />
+                                ✅ Good Examples
+                            </h3>
+                            <p className="text-sm text-neutral-300 mb-4">
+                                Upload high-quality images showing different angles, expressions, and lighting conditions.
+                            </p>
+                            <div className="grid grid-cols-3 gap-2">
+                                {goodExamples.map((src, index) => (
+                                    <div key={index} className="aspect-square rounded-lg overflow-hidden border border-green-500/30">
+                                        <Image 
+                                            src={src} 
+                                            alt="Good example" 
+                                            width={120} 
+                                            height={120} 
+                                            className="w-full h-full object-cover" 
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isCreating}>
-                            {isCreating ? 'Creating character...' : 'Create your character'}
-                        </Button>
-                        {createState?.error && <p className="text-red-500 text-xs">{createState.error}</p>}
-                        {createState?.success && <p className="text-green-500 text-xs">{createState.success}</p>}
-                        <p className="text-xs text-neutral-500 text-center">Your custom character and all your generations are private and will not be used to train any datasets. By submitting, you agree to our <a href="#" className="underline">Terms of Service</a>.</p>
-                    </form>
+
+                        <div className="bg-red-900/20 border border-red-500/30 p-6 rounded-xl">
+                            <h3 className="text-xl font-semibold text-red-400 mb-4 flex items-center">
+                                <X className="w-6 h-6 mr-2" />
+                                ❌ Avoid These
+                            </h3>
+                            <p className="text-sm text-neutral-300 mb-4">
+                                No group shots, masks, filters, or low-quality images.
+                            </p>
+                            <div className="grid grid-cols-3 gap-2">
+                                {badExamples.map((src, index) => (
+                                    <div key={index} className="aspect-square rounded-lg overflow-hidden border border-red-500/30">
+                                        <Image 
+                                            src={src} 
+                                            alt="Bad example" 
+                                            width={120} 
+                                            height={120} 
+                                            className="w-full h-full object-cover" 
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Upload Form */}
+                    <div className="bg-neutral-900 p-8 rounded-xl border border-neutral-700">
+                        <h3 className="text-2xl font-bold mb-6">Character Details</h3>
+                        
+                        <form action={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-300 mb-2">Character Name</label>
+                                <Input 
+                                    name="name" 
+                                    placeholder="Enter character name" 
+                                    className="bg-neutral-800 border-neutral-600 text-white" 
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-300 mb-2">Gender</label>
+                                <select 
+                                    name="gender" 
+                                    className="w-full rounded-lg border border-neutral-600 bg-neutral-800 p-3 text-white" 
+                                    required
+                                >
+                                    <option value="">Select gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="non-binary">Non-binary</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-300 mb-2">Available Models</label>
+                                <Input 
+                                    name="available_models" 
+                                    placeholder="e.g., Professional, Casual, Formal" 
+                                    className="bg-neutral-800 border-neutral-600 text-white"
+                                />
+                            </div>
+
+                            {/* File Upload Area */}
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-300 mb-2">Upload Photos (5+ required)</label>
+                                <div 
+                                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                                        dragActive 
+                                            ? 'border-blue-500 bg-blue-500/10' 
+                                            : 'border-neutral-600 hover:border-neutral-500'
+                                    }`}
+                                    onDragEnter={handleDrag}
+                                    onDragLeave={handleDrag}
+                                    onDragOver={handleDrag}
+                                    onDrop={handleDrop}
+                                >
+                                    <Upload className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+                                    <p className="text-neutral-300 mb-2">
+                                        Drag and drop images here or{' '}
+                                        <label htmlFor="file-upload-modal" className="text-blue-400 cursor-pointer hover:text-blue-300">
+                                            browse files
+                                        </label>
+                                    </p>
+                                    <p className="text-xs text-neutral-500">PNG, JPG, JPEG up to 10MB each</p>
+                                    <input 
+                                        id="file-upload-modal" 
+                                        type="file" 
+                                        multiple 
+                                        className="sr-only" 
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Selected Files Preview */}
+                                {selectedFiles.length > 0 && (
+                                    <div className="mt-4">
+                                        <p className="text-sm text-neutral-300 mb-3">
+                                            {selectedFiles.length} files selected
+                                        </p>
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {selectedFiles.map((file, index) => (
+                                                <div key={index} className="relative group">
+                                                    <div className="aspect-square rounded-lg overflow-hidden bg-neutral-800">
+                                                        <img 
+                                                            src={URL.createObjectURL(file)} 
+                                                            alt={`Preview ${index + 1}`}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeFile(index)}
+                                                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <X className="w-4 h-4 text-white" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <Button 
+                                type="submit" 
+                                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3" 
+                                disabled={isCreating || selectedFiles.length < 5}
+                            >
+                                {isCreating ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Training AI Character...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles className="w-4 h-4 mr-2" />
+                                        Create AI Character
+                                    </>
+                                )}
+                            </Button>
+
+                            {createState?.error && (
+                                <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg">
+                                    <p className="text-red-400 text-sm">{createState.error}</p>
+                                </div>
+                            )}
+                            
+                            {createState?.success && (
+                                <div className="bg-green-900/20 border border-green-500/30 p-4 rounded-lg">
+                                    <p className="text-green-400 text-sm">{createState.success}</p>
+                                </div>
+                            )}
+
+                            <p className="text-xs text-neutral-500 text-center">
+                                Your custom character and all generations are private and will not be used to train any datasets. 
+                                By submitting, you agree to our{' '}
+                                <a href="#" className="text-blue-400 hover:text-blue-300 underline">Terms of Service</a>.
+                            </p>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -545,9 +763,16 @@ export default function GeneratePage() {
   const [showCreateCharacter, setShowCreateCharacter] = useState(false);
   const [showBilling, setShowBilling] = useState(false);
   const [gallery, setGallery] = useState<string[]>([]);
-  const [generateState, generateAction, isGenerating] = useActionState<any, FormData>(generateImage, null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationJobId, setGenerationJobId] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState<string | null>(null);
   
-  const { data: user, mutate: mutateUser } = useSWR<User>('/api/user', fetcher);
+  const { data: user, mutate: mutateUser } = useSWR<User>('/api/user', fetcher, {
+    refreshInterval: 5000, // Refresh every 5 seconds
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true
+  });
+  const { data: userCreations, mutate: mutateCreations } = useSWR('/api/my-creations', fetcher);
 
   const [cameraView, setCameraView] = useState<string | null>(null);
   const [lensAngle, setLensAngle] = useState<string | null>(null);
@@ -555,43 +780,194 @@ export default function GeneratePage() {
   const [processor, setProcessor] = useState<'Nano Banana' | 'Kling' | 'Gemini' | 'OpenAI DALL-E'>('Nano Banana');
   const [showModelMenu, setShowModelMenu] = useState<boolean>(false);
   const [imagesToGenerate, setImagesToGenerate] = useState<number>(4);
-  const [upscaleState, upscaleAction, isUpscaling] = useActionState<any, FormData>(upscaleImage, null);
+  // Removed upscale functionality
 
-  const handleUpscale = (imageUrl: string) => {
-    const formData = new FormData();
-    formData.append('imageUrl', imageUrl);
-    formData.append('scale', '2');
-    upscaleAction(formData);
-  };
+  // Removed upscale functionality
 
-  const handleGenerate = (formData: FormData) => {
-    formData.append('modelUrl', selectedModel?.url || '');
-    formData.append('poseUrl', selectedPose?.url || '');
-    formData.append('garmentUrl', selectedGarment?.url || '');
-    formData.append('environmentUrl', selectedEnvironment?.url || '');
-    formData.append('cameraView', cameraView || '');
-    formData.append('lensAngle', lensAngle || '');
-    formData.append('aspectRatio', aspectRatio);
-    formData.append('processor', processor);
-    generateAction(formData);
-  };
-  
-  useEffect(() => {
-    if (generateState?.success && generateState.imageUrl) {
-      setGallery(prev => [generateState.imageUrl, ...prev]);
+  const handleGenerate = async (formData: FormData) => {
+    // Prevent multiple simultaneous generations
+    if (isGenerating) {
+      console.warn('Generation already in progress');
+      return;
+    }
+
+    const prompt = formData.get('prompt') as string;
+    if (!prompt?.trim()) {
+      alert('Please enter a prompt');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      // Use instant generation API
+      const response = await fetch('/api/generate-instant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          modelUrl: selectedModel?.url || '',
+          poseUrl: selectedPose?.url || '',
+          garmentUrl: selectedGarment?.url || '',
+          environmentUrl: selectedEnvironment?.url || '',
+          cameraView: cameraView || '',
+          lensAngle: lensAngle || '',
+          aspectRatio: aspectRatio,
+          processor: processor
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.error) {
+        alert(`Generation failed: ${data.error}`);
+        setIsGenerating(false);
+        return;
+      }
+
+      // Image generated instantly!
+      setIsGenerating(false);
+      setGenerationJobId(null);
+      
+      // Add image to gallery
+      setGallery(prev => [data.imageUrl, ...prev]);
+      
+      // Refresh user creations
+      mutateCreations();
+      
+      // Update user credits
       if(user) mutateUser({ ...user, credits: (user.credits || 0) - 1 }, false);
-    }
-    if (generateState?.error) alert(`Generation failed: ${generateState.error}`);
-  }, [generateState, user, mutateUser]);
+      
+      console.log('✅ Image generated instantly!');
 
-  useEffect(() => {
-    if (upscaleState?.success && upscaleState.upscaledUrl) {
-      setGallery(prev => [upscaleState.upscaledUrl, ...prev]);
-      if(user) mutateUser({ ...user, credits: upscaleState.remainingCredits }, false);
-      alert(`Image upscaled successfully! Used ${upscaleState.creditsUsed} credits.`);
+    } catch (error) {
+      console.error('Generation error:', error);
+      alert('Generation failed. Please try again.');
+      setIsGenerating(false);
     }
-    if (upscaleState?.error) alert(`Upscaling failed: ${upscaleState.error}`);
-  }, [upscaleState, user, mutateUser]);
+  };
+
+  // Handle main file upload for the generate form
+  const handleMainFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`File ${file.name} exceeds 10MB limit.`);
+          continue;
+        }
+        if (!file.type.startsWith('image/')) {
+          alert(`Please select a valid image file for ${file.name}.`);
+          continue;
+        }
+        
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('type', 'garment'); // Default type for main uploads
+          
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Add to garment selection by default
+            const newAsset: Asset = {
+              name: file.name,
+              url: result.url,
+              isOwner: true,
+              type: 'garment'
+            };
+            setSelectedGarment(newAsset);
+            alert(`Image ${file.name} uploaded successfully!`);
+          } else {
+            alert(`Upload failed for ${file.name}: ${result.error || 'Unknown error'}`);
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          alert(`Upload failed for ${file.name}: ${error.message || 'Please try again'}`);
+        }
+      }
+    }
+  };
+
+  // Image action handlers
+  const handleImageUpload = (imageUrl: string) => {
+    // Show dropdown for adding to folders
+    setShowDropdown(imageUrl);
+  };
+
+  const handleFolderSelect = (folderName: string, imageUrl: string) => {
+    console.log(`Adding image to folder: ${folderName}`);
+    // Here you would implement the logic to add the image to the selected folder
+    alert(`Image added to ${folderName} folder!`);
+    setShowDropdown(null);
+  };
+
+  const handleImageDownload = (imageUrl: string) => {
+    // Download the image
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `generated-image-${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleVideoGeneration = (imageUrl: string) => {
+    // Generate video from image
+    console.log('Generating video for:', imageUrl);
+    alert('Video generation functionality will be implemented');
+  };
+
+  const handleImageEdit = (imageUrl: string) => {
+    // Edit the image
+    console.log('Editing image:', imageUrl);
+    alert('Image editing functionality will be implemented');
+  };
+
+  // Removed polling function - now using instant generation
+  
+  // Load user's generated images into gallery
+  useEffect(() => {
+    if (userCreations?.images) {
+      const imageUrls = userCreations.images.map((img: any) => img.imageUrl);
+      setGallery(imageUrls);
+    }
+  }, [userCreations]);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (generationJobId) {
+        // Clear any pending polling
+        setGenerationJobId(null);
+      }
+    };
+  }, [generationJobId]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showDropdown && !(event.target as Element).closest('.dropdown-container')) {
+        setShowDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  // Removed upscale useEffect
 
   const assetCategories = [
     { 
@@ -695,9 +1071,22 @@ export default function GeneratePage() {
                 <form id="generate-form" action={handleGenerate} className="space-y-3 px-3">
                   <textarea name="prompt" rows={4} placeholder="Describe your image style (e.g., 'red hoodie on tall male model')..."
                     className="w-full rounded-xl border border-neutral-700 bg-neutral-900 p-3 text-sm text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary" required />
-                  <Button type="button" variant="outline" className="w-full justify-start text-neutral-300 border-neutral-700 hover:bg-neutral-800 rounded-xl">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full justify-start text-neutral-300 border-neutral-700 hover:bg-neutral-800 rounded-xl"
+                    onClick={() => document.getElementById('main-file-upload')?.click()}
+                  >
                     <Upload className="mr-2 h-4 w-4" /> Upload Images
                   </Button>
+                  <input 
+                    type="file" 
+                    id="main-file-upload" 
+                    className="hidden" 
+                    onChange={handleMainFileUpload} 
+                    accept="image/*" 
+                    multiple
+                  />
                 </form>
                 
                 {/* Selected Assets Summary */}
@@ -803,6 +1192,18 @@ export default function GeneratePage() {
                     </button>
                   </div>
                 )}
+
+                {/* Upload Instructions */}
+                <div className="mx-3 mb-4 p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
+                  <h3 className="text-sm font-medium text-blue-300 mb-2">💡 Upload Tips</h3>
+                  <ul className="text-xs text-blue-200 space-y-1">
+                    <li>• Upload images from your gallery using the "Upload Images" button</li>
+                    <li>• Use Character section for people/faces</li>
+                    <li>• Use Garment section for clothing items</li>
+                    <li>• Use Environment section for backgrounds</li>
+                    <li>• Uploaded images will be used as references in your prompt</li>
+                  </ul>
+                </div>
 
                 <div className="border border-neutral-800 rounded-lg">
                   {assetCategories.map((category, index) => (
@@ -984,8 +1385,17 @@ export default function GeneratePage() {
 
               <div className="mt-4 pt-4 border-t border-neutral-800">
                 <Button type="submit" form="generate-form" className="w-full bg-primary text-white hover:bg-primary/90" disabled={isGenerating}>
-                  {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                  Generate Image
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Generate Image
+                    </>
+                  )}
                 </Button>
                  <div className="mt-2 flex justify-between items-center text-xs text-neutral-400 px-1">
                     <p>1 credit</p>
@@ -1006,36 +1416,129 @@ export default function GeneratePage() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="font-semibold text-neutral-200">Generated Images</h3>
-                        <p className="mt-1 text-sm text-neutral-500">These are just examples. Describe a garment or style to try it yourself!</p>
+                        <p className="mt-1 text-sm text-neutral-500">
+                          {gallery.length > 0 
+                            ? `Showing your latest ${Math.min(gallery.length, 4)} generated images` 
+                            : "These are just examples. Describe a garment or style to try it yourself!"
+                          }
+                        </p>
                     </div>
                     {/* Add Tabs here if needed */}
                 </div>
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {isGenerating && <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse"></div>}
-                  {gallery.map((src, index) => (
-                    <div key={index} className="relative group aspect-[3/4]">
-                      <Image src={src} alt={`Generated image ${index + 1}`} fill className="rounded-lg object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                        <Button 
-                          size="sm" 
-                          variant="secondary"
-                          onClick={() => handleUpscale(src)}
-                          className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                  {isGenerating && (
+                    <div className="aspect-[3/4] rounded-lg bg-neutral-800 animate-pulse flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                        <p className="text-sm text-neutral-400">
+                          Generating instantly...
+                        </p>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          No timeouts, no freezing!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {/* Show user's actual generated images (limit to 4) */}
+                  {gallery.slice(0, 4).map((src, index) => (
+                    <div key={`${src}-${index}`} className="relative group aspect-[3/4]">
+                      <Image 
+                        src={src} 
+                        alt={`Generated image ${index + 1}`} 
+                        fill 
+                        className="rounded-lg object-cover" 
+                        loading="lazy"
+                        onError={(e) => {
+                          console.error('Image failed to load:', src);
+                          e.currentTarget.src = '/images/placeholder.png';
+                        }}
+                      />
+                      {/* EXACT DESIGNER LAYOUT - Top Right Icons */}
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
+                        <div className="relative dropdown-container">
+                          <button 
+                            onClick={() => handleImageUpload(src)}
+                            className="w-7 h-7 bg-white rounded-full flex items-center justify-center border border-gray-300 shadow-sm"
+                          >
+                            <Plus className="h-3 w-3 text-gray-600" />
+                          </button>
+                          
+                          {/* My Creations Dropdown */}
+                          {showDropdown === src && (
+                            <div className="absolute top-8 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-50 min-w-[150px]">
+                              <div className="py-1">
+                                <button 
+                                  onClick={() => handleFolderSelect('Projects', src)}
+                                  className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                >
+                                  <ImageIcon className="h-4 w-4 text-blue-500" />
+                                  Projects
+                                </button>
+                                <button 
+                                  onClick={() => handleFolderSelect('Costumes', src)}
+                                  className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                >
+                                  <ImageIcon className="h-4 w-4 text-blue-500" />
+                                  Costumes
+                                </button>
+                                <button 
+                                  onClick={() => handleFolderSelect('Peach', src)}
+                                  className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                >
+                                  <ImageIcon className="h-4 w-4 text-blue-500" />
+                                  Peach
+                                </button>
+                                <button 
+                                  onClick={() => handleFolderSelect('New folder', src)}
+                                  className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                >
+                                  <Plus className="h-4 w-4 text-blue-500" />
+                                  New folder
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <button 
+                          onClick={() => handleImageDownload(src)}
+                          className="w-7 h-7 bg-white rounded-full flex items-center justify-center border border-gray-300 shadow-sm"
                         >
-                          <Layers className="h-4 w-4 mr-2" />
-                          Upscale
-                        </Button>
+                          <Download className="h-3 w-3 text-gray-600" />
+                        </button>
+                      </div>
+                      
+                      {/* EXACT DESIGNER LAYOUT - Bottom Buttons */}
+                      <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                        <button 
+                          onClick={() => handleVideoGeneration(src)}
+                          className="flex-1 bg-white border border-gray-300 rounded text-gray-700 px-2 py-1 text-xs font-medium flex items-center justify-center gap-1"
+                        >
+                          <Play className="h-2 w-2" />
+                          Video
+                        </button>
+                        <button 
+                          onClick={() => handleImageEdit(src)}
+                          className="flex-1 bg-white border border-gray-300 rounded text-gray-700 px-2 py-1 text-xs font-medium flex items-center justify-center gap-1"
+                        >
+                          <Settings className="h-2 w-2" />
+                          Edit
+                        </button>
                       </div>
                     </div>
                   ))}
-                  {gallery.length === 0 && !isGenerating && [
-                      "/images/image (1).png", 
-                      "/images/Waffle_Grey_Front_8d3f337c-e628-4e8f-bed8-6c2aa863e204.jpg", 
-                      "/images/freepik__a-full-shot-of-a-slender-darkskinned-black-woman-a__34268.jpeg",
-                      "/images/freepik__a-full-shot-of-a-smiling-black-man-around-24-years__34269.jpeg"
-                  ].map(src => (
-                     <div key={src} className="relative group aspect-[3/4]"><Image src={src} alt="Example image" fill className="rounded-lg object-cover" /></div>
-                  ))}
+                  {/* Show empty state when no generated images exist */}
+                  {gallery.length === 0 && !isGenerating && (
+                    <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                      <div className="w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mb-4">
+                        <Sparkles className="w-8 h-8 text-neutral-400" />
+                      </div>
+                      <h3 className="text-lg font-medium text-neutral-200 mb-2">No images generated yet</h3>
+                      <p className="text-sm text-neutral-400 max-w-md">
+                        Create your first AI-generated image by entering a prompt and clicking "Generate Image"
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
