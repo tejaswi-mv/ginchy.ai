@@ -93,12 +93,13 @@ const aspectRatios = [
   { value: '2:3', label: 'Vertical', icon: ImageIcon },
 ];
 
-const processors = [
-  { value: 'Nano Banana', label: 'Nano Banana', description: 'Fast & efficient' },
-  { value: 'Kling', label: 'Kling', description: 'High quality' },
-  { value: 'Gemini', label: 'Gemini', description: 'Prompt enhancement' },
-  { value: 'Stable Diffusion', label: 'Stable Diffusion', description: 'Balanced' },
-];
+  const processors = [
+    { value: 'Nano Banana', label: 'Nano Banana', description: 'Fast & efficient' },
+    { value: 'Kling', label: 'Kling', description: 'High quality' },
+    { value: 'Gemini', label: 'Gemini', description: 'Prompt enhancement' },
+    { value: 'OpenAI DALL-E', label: 'OpenAI DALL-E', description: 'Premium quality' },
+    { value: 'Stable Diffusion', label: 'Stable Diffusion', description: 'Balanced' },
+  ];
 
 export default function ImageGenerationPanel({ user, onClose }: ImageGenerationPanelProps) {
   const [prompt, setPrompt] = useState('');

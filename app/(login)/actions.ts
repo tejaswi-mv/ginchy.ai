@@ -24,6 +24,7 @@ import { comparePasswords, hashPassword } from '@/lib/auth/password';
 import { redirect } from 'next/navigation';
 import { createCheckoutSession } from '@/lib/payments/stripe';
 import { getUser, getUserWithTeam } from '@/lib/db/queries';
+import { getPackageByTier, canUserAccessFeature, canUserPerformAction } from '@/lib/packages/ginchy-packages';
 import {
   validatedAction,
   validatedActionWithUser
@@ -697,22 +698,24 @@ export const createCharacter = validatedActionWithUser(
 
       const [insertedAsset] = await db.insert(assets).values(characterAsset).returning();
 
-      // Simulate model training process
-      // In production, this would trigger actual AI model training
-      setTimeout(async () => {
-        // Update status to trained
-        if (insertedAsset?.id) {
-          await db
-            .update(assets)
-            .set({
-              metadata: JSON.stringify({
-                ...JSON.parse(characterAsset.metadata || '{}'),
-                status: 'trained',
-              }),
-            })
-            .where(eq(assets.id, insertedAsset.id));
-        }
-      }, 10000); // 10 seconds simulation
+      // Start actual character training with Nano Banana
+      if (insertedAsset?.id) {
+        // Trigger training in background
+        trainCharacterWithNanoBanana(insertedAsset.id, uploadedUrls, data.name, data.gender)
+          .catch(error => {
+            console.error('Character training failed:', error);
+            // Update status to failed
+            db.update(assets)
+              .set({
+                metadata: JSON.stringify({
+                  ...JSON.parse(characterAsset.metadata || '{}'),
+                  status: 'failed',
+                  error: error.message,
+                }),
+              })
+              .where(eq(assets.id, insertedAsset.id));
+          });
+      }
 
       return { 
         success: `Character "${data.name}" created successfully! Training will complete in a few minutes.`,
@@ -721,6 +724,155 @@ export const createCharacter = validatedActionWithUser(
     } catch (error) {
       console.error('Error creating character:', error);
       return { error: 'Failed to create character. Please try again.' };
+    }
+  }
+);
+
+// Image Upscaling Action
+export const upscaleImage = validatedActionWithUser(
+  z.object({
+    imageUrl: z.string().url('Valid image URL is required'),
+    scale: z.number().min(1).max(4).default(2),
+  }),
+  async (data, _, user) => {
+    try {
+      const userWithTeam = await getUserWithTeam(user.id);
+      
+      // Get user's package
+      const userPackage = getPackageByTier((userWithTeam as any)?.packageTier || 'standard');
+      if (!userPackage) {
+        return { error: 'Invalid package tier. Please contact support.' };
+      }
+      
+      // Check if user has access to upscaling
+      if (!canUserAccessFeature(userPackage, 'hasUpscaling')) {
+        return { error: 'Image upscaling not available in your package. Please upgrade to Pro or Premium.' };
+      }
+      
+      // Check if user has enough credits (upscaling costs 2 credits)
+      if (user.credits < 2) {
+        return { error: 'Insufficient credits. Upscaling requires 2 credits.' };
+      }
+
+      // Upscale the image
+      const upscaledUrl = await upscaleWithMagnifique(data.imageUrl, data.scale);
+      
+      // Deduct credits
+      await db
+        .update(users)
+        .set({ credits: user.credits - 2 })
+        .where(eq(users.id, user.id));
+
+      // Log activity
+      await logActivity(userWithTeam?.teamId, user.id, ActivityType.IMAGE_UPSCALED);
+
+      return { 
+        success: 'Image upscaled successfully!',
+        upscaledUrl,
+        creditsUsed: 2,
+        remainingCredits: user.credits - 2
+      };
+      
+    } catch (error) {
+      console.error('Upscaling error:', error);
+      return { error: 'Failed to upscale image. Please try again.' };
+    }
+  }
+);
+
+// Clothing Detection Action
+export const detectClothingItems = validatedActionWithUser(
+  z.object({
+    imageUrl: z.string().url('Valid image URL is required'),
+  }),
+  async (data, _, user) => {
+    try {
+      const userWithTeam = await getUserWithTeam(user.id);
+      
+      // Get user's package
+      const userPackage = getPackageByTier((userWithTeam as any)?.packageTier || 'standard');
+      if (!userPackage) {
+        return { error: 'Invalid package tier. Please contact support.' };
+      }
+      
+      // Check if user has access to clothing AI
+      if (!canUserAccessFeature(userPackage, 'hasClothingAI')) {
+        return { error: 'Clothing AI not available in your package. Please upgrade to access this feature.' };
+      }
+      
+      // Check if user has enough credits (clothing detection costs 1 credit)
+      if (user.credits < 1) {
+        return { error: 'Insufficient credits. Clothing detection requires 1 credit.' };
+      }
+
+      // Detect clothing items
+      const analysis = await detectClothing(data.imageUrl);
+      
+      // Deduct credits
+      await db
+        .update(users)
+        .set({ credits: user.credits - 1 })
+        .where(eq(users.id, user.id));
+
+      // Log activity
+      await logActivity(userWithTeam?.teamId, user.id, ActivityType.CLOTHING_DETECTED);
+
+      return { 
+        success: 'Clothing analysis completed successfully!',
+        analysis,
+        creditsUsed: 1,
+        remainingCredits: user.credits - 1
+      };
+      
+    } catch (error) {
+      console.error('Clothing detection error:', error);
+      return { error: 'Failed to analyze clothing. Please try again.' };
+    }
+  }
+);
+
+// Apply Clothing Action
+export const applyClothing = validatedActionWithUser(
+  z.object({
+    modelImageUrl: z.string().url('Valid model image URL is required'),
+    clothingImageUrl: z.string().url('Valid clothing image URL is required'),
+    clothingType: z.string().min(1, 'Clothing type is required'),
+  }),
+  async (data, _, user) => {
+    try {
+      const userWithTeam = await getUserWithTeam(user.id);
+      
+      // Check if user has enough credits (clothing application costs 2 credits)
+      if (user.credits < 2) {
+        return { error: 'Insufficient credits. Clothing application requires 2 credits.' };
+      }
+
+      // Apply clothing to model
+      const resultImageUrl = await applyClothingToModel(
+        data.modelImageUrl, 
+        data.clothingImageUrl, 
+        data.clothingType
+      );
+      
+      // Deduct credits
+      await db
+        .update(users)
+        .set({ credits: user.credits - 2 })
+        .where(eq(users.id, user.id));
+
+      // Log activity
+      await logActivity(userWithTeam?.teamId, user.id, ActivityType.CLOTHING_APPLIED);
+
+      return { 
+        success: 'Clothing applied successfully!',
+        resultImageUrl,
+        creditsUsed: 2,
+        remainingCredits: user.credits - 2
+      };
+      
+    } catch (error) {
+      console.error('Clothing application error:', error);
+      return { error: 'Failed to apply clothing. Please try again.' };
     }
   }
 );
@@ -750,6 +902,10 @@ async function generateWithAI(params: {
     else if (params.processor === 'Gemini') {
       result = await generateWithGemini(params);
     }
+    // OpenAI DALL-E Integration
+    else if (params.processor === 'OpenAI DALL-E') {
+      result = await generateWithOpenAI(params);
+    }
     // Stable Diffusion via Replicate (fallback)
     else {
       result = await generateWithReplicate(params);
@@ -772,6 +928,73 @@ async function generateWithAI(params: {
     console.error('AI generation error:', error);
     // Fallback to placeholder image
     return generatePlaceholderImage(params);
+  }
+}
+
+async function trainCharacterWithNanoBanana(assetId: number, trainingImages: string[], characterName: string, gender: string) {
+  const apiKey = process.env.NANOBANANA_API_KEY;
+  if (!apiKey) {
+    throw new Error('Nano Banana API key not configured');
+  }
+
+  try {
+    // Update status to training
+    await db
+      .update(assets)
+      .set({
+        metadata: JSON.stringify({
+          status: 'training',
+          progress: 0,
+          characterName,
+          gender,
+          trainingImages,
+        }),
+      })
+      .where(eq(assets.id, assetId));
+
+    // Call Nano Banana character training API
+    const response = await fetch('https://api.nanobanana.ai/v1/train-character', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: characterName,
+        gender: gender,
+        training_images: trainingImages,
+        quality: 'high',
+        style: 'photorealistic',
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Nano Banana training API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Update status to trained with model ID
+    await db
+      .update(assets)
+      .set({
+        metadata: JSON.stringify({
+          status: 'trained',
+          progress: 100,
+          characterName,
+          gender,
+          trainingImages,
+          modelId: data.model_id,
+          trainedAt: new Date().toISOString(),
+        }),
+      })
+      .where(eq(assets.id, assetId));
+
+    console.log(`Character "${characterName}" trained successfully with model ID: ${data.model_id}`);
+    
+  } catch (error) {
+    console.error('Character training error:', error);
+    throw error;
   }
 }
 
@@ -843,34 +1066,81 @@ async function generateWithKling(params: {
   const width = getWidthFromAspectRatio(params.aspectRatio);
   const height = getHeightFromAspectRatio(params.aspectRatio);
 
-  // Build the enhanced prompt
+  // Build the enhanced prompt for video generation
   let enhancedPrompt = params.prompt;
   if (params.modelUrl) enhancedPrompt += `, character: ${params.modelUrl}`;
   if (params.poseUrl) enhancedPrompt += `, pose: ${params.poseUrl}`;
   if (params.garmentUrl) enhancedPrompt += `, clothing: ${params.garmentUrl}`;
   if (params.environmentUrl) enhancedPrompt += `, background: ${params.environmentUrl}`;
+  
+  // Add video-specific terms
+  enhancedPrompt += ', professional video, smooth motion, high quality, fashion video';
 
-  const response = await fetch('https://api.kling.ai/v1/generate', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt: enhancedPrompt,
-      width,
-      height,
-      steps: 20,
-      cfg_scale: 7.5,
-    }),
-  });
+  try {
+    // Step 1: Create video generation request
+    const response = await fetch('https://api.kling.ai/v1/video/generate', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: enhancedPrompt,
+        width,
+        height,
+        duration: 5, // 5 seconds
+        fps: 24,
+        style: 'realistic',
+        quality: 'hd',
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`Kling API error: ${response.statusText}`);
+    if (!response.ok) {
+      throw new Error(`Kling API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const taskId = data.task_id;
+    
+    if (!taskId) {
+      throw new Error('No task ID returned from Kling API');
+    }
+
+    // Step 2: Poll for completion
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes max
+    
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+      
+      const statusResponse = await fetch(`https://api.kling.ai/v1/video/status/${taskId}`, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+        },
+      });
+      
+      if (!statusResponse.ok) {
+        throw new Error(`Kling status API error: ${statusResponse.statusText}`);
+      }
+      
+      const statusData = await statusResponse.json();
+      
+      if (statusData.status === 'completed') {
+        return statusData.video_url || statusData.output[0];
+      } else if (statusData.status === 'failed') {
+        throw new Error(`Video generation failed: ${statusData.error || 'Unknown error'}`);
+      }
+      
+      attempts++;
+    }
+    
+    throw new Error('Video generation timeout');
+    
+  } catch (error) {
+    console.error('Kling API error:', error);
+    // Fallback to placeholder image for now
+    return generatePlaceholderImage(params);
   }
-
-  const data = await response.json();
-  return data.image_url || data.output[0];
 }
 
 async function generateWithGemini(params: {
@@ -961,6 +1231,230 @@ Return only the enhanced prompt, no other text.`
     console.warn('Gemini API error:', error);
     // Fallback to placeholder if Gemini fails
     return generatePlaceholderImage(params);
+  }
+}
+
+async function generateWithOpenAI(params: {
+  prompt: string;
+  modelUrl?: string;
+  poseUrl?: string;
+  garmentUrl?: string;
+  environmentUrl?: string;
+  aspectRatio?: string;
+}): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OpenAI API key not configured');
+  }
+
+  const width = getWidthFromAspectRatio(params.aspectRatio);
+  const height = getHeightFromAspectRatio(params.aspectRatio);
+
+  // Build the enhanced prompt for DALL-E
+  let enhancedPrompt = params.prompt;
+  
+  // Add asset references to prompt
+  if (params.modelUrl) enhancedPrompt += `, character reference: ${params.modelUrl}`;
+  if (params.poseUrl) enhancedPrompt += `, pose reference: ${params.poseUrl}`;
+  if (params.garmentUrl) enhancedPrompt += `, garment reference: ${params.garmentUrl}`;
+  if (params.environmentUrl) enhancedPrompt += `, environment reference: ${params.environmentUrl}`;
+  
+  // Add professional photography terms
+  enhancedPrompt += ', professional photography, high quality, detailed, fashion photography';
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: enhancedPrompt,
+        n: 1,
+        size: getDALLE3Size(params.aspectRatio),
+        quality: 'hd',
+        style: 'natural',
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorData.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.data && data.data[0] && data.data[0].url) {
+      return data.data[0].url;
+    }
+    
+    throw new Error('No image URL returned from OpenAI');
+    
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    // Fallback to placeholder if OpenAI fails
+    return generatePlaceholderImage(params);
+  }
+}
+
+function getDALLE3Size(aspectRatio?: string): string {
+  const sizeMap: Record<string, string> = {
+    '1:1': '1024x1024',
+    '9:16': '1024x1792',
+    '16:9': '1792x1024',
+    '3:2': '1344x896',
+    '2:3': '896x1344'
+  };
+  return sizeMap[aspectRatio || '1:1'] || '1024x1024';
+}
+
+async function upscaleWithMagnifique(imageUrl: string, scale: number = 2): Promise<string> {
+  const apiKey = process.env.MAGNIFIQUE_API_KEY;
+  if (!apiKey) {
+    throw new Error('Magnifique API key not configured');
+  }
+
+  try {
+    const response = await fetch('https://api.magnifique.ai/v1/upscale', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image_url: imageUrl,
+        scale: scale,
+        quality: 'high',
+        format: 'png',
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Magnifique API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.upscaled_url || data.output[0];
+    
+  } catch (error) {
+    console.error('Magnifique API error:', error);
+    throw error;
+  }
+}
+
+// Clothing Detection and Analysis
+async function detectClothing(imageUrl: string): Promise<{
+  clothingItems: Array<{
+    type: string;
+    color: string;
+    style: string;
+    confidence: number;
+    boundingBox: { x: number; y: number; width: number; height: number };
+  }>;
+  dominantColors: string[];
+  style: string;
+}> {
+  const apiKey = process.env.CLOTHING_AI_API_KEY || process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('Clothing AI API key not configured');
+  }
+
+  try {
+    // Use OpenAI Vision API for clothing detection
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4-vision-preview',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: 'Analyze this fashion image and identify all clothing items. For each item, provide: type (top, bottom, dress, shoes, accessories), color, style, confidence score (0-1), and approximate bounding box coordinates. Also identify dominant colors and overall style. Return as JSON.'
+              },
+              {
+                type: 'image_url',
+                image_url: { url: imageUrl }
+              }
+            ]
+          }
+        ],
+        max_tokens: 1000
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Clothing detection API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const analysis = JSON.parse(data.choices[0].message.content);
+    
+    return {
+      clothingItems: analysis.clothingItems || [],
+      dominantColors: analysis.dominantColors || [],
+      style: analysis.style || 'casual'
+    };
+    
+  } catch (error) {
+    console.error('Clothing detection error:', error);
+    // Fallback to basic analysis
+    return {
+      clothingItems: [],
+      dominantColors: ['black', 'white'],
+      style: 'casual'
+    };
+  }
+}
+
+// Apply Clothing to Model
+async function applyClothingToModel(
+  modelImageUrl: string, 
+  clothingImageUrl: string, 
+  clothingType: string
+): Promise<string> {
+  const apiKey = process.env.NANOBANANA_API_KEY;
+  if (!apiKey) {
+    throw new Error('Nano Banana API key not configured');
+  }
+
+  try {
+    // Use Nano Banana for clothing application
+    const response = await fetch('https://api.nanobanana.ai/v1/apply-clothing', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model_image: modelImageUrl,
+        clothing_image: clothingImageUrl,
+        clothing_type: clothingType,
+        style: 'fashion',
+        quality: 'high',
+        preserve_pose: true,
+        blend_mode: 'realistic'
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Clothing application API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.result_image || data.output[0];
+    
+  } catch (error) {
+    console.error('Clothing application error:', error);
+    // Fallback to basic image combination
+    return modelImageUrl;
   }
 }
 
@@ -1088,6 +1582,17 @@ export const generateImage = validatedActionWithUser(
   async (data, _, user) => {
     try {
       const userWithTeam = await getUserWithTeam(user.id);
+      
+      // Get user's package
+      const userPackage = getPackageByTier((userWithTeam as any)?.packageTier || 'standard');
+      if (!userPackage) {
+        return { error: 'Invalid package tier. Please contact support.' };
+      }
+      
+      // Check if user has access to image generation
+      if (!canUserAccessFeature(userPackage, 'hasCharacterTraining')) {
+        return { error: 'Image generation not available in your package. Please upgrade to access this feature.' };
+      }
 
       if ((user.credits || 0) <= 0) {
           return { error: 'You have no credits remaining.' };

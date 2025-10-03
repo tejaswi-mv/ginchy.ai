@@ -17,6 +17,10 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'picsum.photos',
+            },
+            {
+                protocol: 'https',
+                hostname: 'oaidalleapiprodscus.blob.core.windows.net',
             }
         ],
     },
