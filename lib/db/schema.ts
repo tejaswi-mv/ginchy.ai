@@ -119,6 +119,22 @@ export const generatedImages = pgTable('generated_images', {
   userIdCreatedAtIdx: index('generated_images_user_created_idx').on(table.userId, table.createdAt),
 }));
 
+export const userUploadedImages = pgTable('user_uploaded_images', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  fileName: varchar('file_name', { length: 255 }).notNull(),
+  originalName: varchar('original_name', { length: 255 }).notNull(),
+  imageUrl: text('image_url').notNull(),
+  fileSize: integer('file_size'),
+  mimeType: varchar('mime_type', { length: 100 }),
+  uploadedAt: timestamp('uploaded_at').notNull().defaultNow(),
+}, (table) => ({
+  // Add indexes for faster queries
+  userIdIdx: index('user_uploaded_images_user_id_idx').on(table.userId),
+  uploadedAtIdx: index('user_uploaded_images_uploaded_at_idx').on(table.uploadedAt),
+  userIdUploadedAtIdx: index('user_uploaded_images_user_uploaded_idx').on(table.userId, table.uploadedAt),
+}));
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
@@ -177,6 +193,8 @@ export type Asset = typeof assets.$inferSelect;
 export type NewAsset = typeof assets.$inferInsert;
 export type GeneratedImage = typeof generatedImages.$inferSelect;
 export type NewGeneratedImage = typeof generatedImages.$inferInsert;
+export type UserUploadedImage = typeof userUploadedImages.$inferSelect;
+export type NewUserUploadedImage = typeof userUploadedImages.$inferInsert;
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
     user: Pick<User, 'id' | 'name' | 'email'>;

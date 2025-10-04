@@ -484,10 +484,11 @@ export async function getPublicImages(folderPath: string, limit: number = 100, o
       });
 
     if (error) {
-      throw error;
+      console.warn(`Supabase storage error for ${folderPath}:`, error.message);
+      return { data: [] };
     }
     
-    if (!fileList) {
+    if (!fileList || fileList.length === 0) {
         return { data: [] };
     }
 
@@ -501,8 +502,8 @@ export async function getPublicImages(folderPath: string, limit: number = 100, o
     return { data: images };
 
   } catch (error) {
-    console.error('Error fetching public images:', error);
-    return { error: 'Failed to fetch public images.' };
+    console.warn(`Error fetching public images for ${folderPath}:`, error);
+    return { data: [] };
   }
 }
 

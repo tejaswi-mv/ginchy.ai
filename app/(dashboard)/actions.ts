@@ -26,25 +26,34 @@ export const askQuestion = validatedAction(askQuestionSchema, async (data) => {
  * Fetches public character models from the 'characters' folder in Supabase Storage.
  */
 export async function getPublicCharacters() {
-  // This action fetches images from the 'characters' directory in your public bucket.
-  // It reuses the getPublicImages function for efficiency.
-  const supabase = await createClient();
-  const { data: fileList } = await supabase.storage
-    .from('public-assets')
-    .list('characters');
+  try {
+    // This action fetches images from the 'characters' directory in your public bucket.
+    const supabase = await createClient();
+    const { data: fileList, error } = await supabase.storage
+      .from('public-assets')
+      .list('characters');
 
-  if (!fileList) {
+    if (error) {
+      console.warn('Supabase storage error for characters:', error.message);
+      return { data: [] };
+    }
+
+    if (!fileList || fileList.length === 0) {
+      return { data: [] };
+    }
+
+    const images = fileList
+      .filter((file) => file.id !== null) // Filter out folders/non-files
+      .map(file => {
+        const { data: { publicUrl } } = supabase.storage
+          .from('public-assets')
+          .getPublicUrl(`characters/${file.name}`);
+        return { name: file.name, url: publicUrl };
+      });
+
+    return { data: images };
+  } catch (error) {
+    console.warn('Error fetching public characters:', error);
     return { data: [] };
   }
-
-  const images = fileList
-    .filter((file) => file.id !== null) // Filter out folders/non-files
-    .map(file => {
-      const { data: { publicUrl } } = supabase.storage
-        .from('public-assets')
-        .getPublicUrl(`characters/${file.name}`);
-      return { name: file.name, url: publicUrl };
-    });
-
-  return { data: images };
 }

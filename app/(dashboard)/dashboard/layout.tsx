@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, Shield, Activity, Menu } from 'lucide-react';
+import { Users, Settings, Shield, Activity, Menu, Image } from 'lucide-react';
 
 export default function DashboardLayout({
   children
@@ -13,9 +13,33 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [imageCount, setImageCount] = useState<number | null>(null);
+
+  // Fetch image count
+  useEffect(() => {
+    const fetchImageCount = async () => {
+      try {
+        const response = await fetch('/api/my-images');
+        if (response.ok) {
+          const data = await response.json();
+          setImageCount(data.images?.length || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching image count:', error);
+      }
+    };
+
+    fetchImageCount();
+  }, []);
 
   const navItems = [
     { href: '/dashboard', icon: Users, label: 'Team' },
+    { 
+      href: '/dashboard/my-images', 
+      icon: Image, 
+      label: 'My Images',
+      badge: imageCount !== null ? imageCount : undefined
+    },
     { href: '/dashboard/general', icon: Settings, label: 'General' },
     { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
     { href: '/dashboard/security', icon: Shield, label: 'Security' }
@@ -67,7 +91,12 @@ export default function DashboardLayout({
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <item.icon className="h-4 w-4" />
-                  {item.label}
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {item.badge !== undefined && (
+                    <span className="ml-auto bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+                      {item.badge}
+                    </span>
+                  )}
                 </Button>
               </Link>
             ))}

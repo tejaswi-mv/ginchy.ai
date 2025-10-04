@@ -54,7 +54,16 @@ function ModelLibraryModal({ isOpen, onClose, characters, onSelect, selectedChar
                             }`} 
                             onClick={() => onSelect(char)}
                         >
-                            <Image src={char.url} alt={char.name} fill className="object-cover"/>
+                            <Image 
+                                src={char.url} 
+                                alt={char.name} 
+                                fill 
+                                className="object-cover"
+                                onError={(e) => {
+                                    console.warn(`Failed to load character image: ${char.url}`);
+                                    e.currentTarget.src = '/images/placeholder.png';
+                                }}
+                            />
                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
                     ))}
@@ -392,14 +401,29 @@ function ChooseModelSection() {
                 setIsLoading(true);
                 const result = await getPublicCharacters();
                 console.log('Fetched characters:', result);
-                if (result.data) {
+                if (result.data && result.data.length > 0) {
                     setCharacters(result.data);
-                    if (result.data.length > 0) {
-                        setSelectedCharacter(result.data[0]);
-                    }
+                    setSelectedCharacter(result.data[0]);
+                } else {
+                    // Fallback to local images if no characters from storage
+                    const fallbackCharacters = [
+                        { name: 'Default Character 1', url: '/images/1.jpg' },
+                        { name: 'Default Character 2', url: '/images/2.jpg' },
+                        { name: 'Default Character 3', url: '/images/3.jpg' }
+                    ];
+                    setCharacters(fallbackCharacters);
+                    setSelectedCharacter(fallbackCharacters[0]);
                 }
             } catch (error) {
                 console.error('Error fetching characters:', error);
+                // Use fallback images on error
+                const fallbackCharacters = [
+                    { name: 'Default Character 1', url: '/images/1.jpg' },
+                    { name: 'Default Character 2', url: '/images/2.jpg' },
+                    { name: 'Default Character 3', url: '/images/3.jpg' }
+                ];
+                setCharacters(fallbackCharacters);
+                setSelectedCharacter(fallbackCharacters[0]);
             } finally {
                 setIsLoading(false);
             }

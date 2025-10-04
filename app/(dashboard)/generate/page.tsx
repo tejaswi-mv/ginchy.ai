@@ -579,13 +579,18 @@ function AddNewCharacterView({ onBack }: { onBack: () => void }) {
                             {/* Upload description */}
                             <div className="text-center">
                                 <p className="text-neutral-300 text-xs">
-                                    Drag and drop images or <span className="text-blue-400">Browse</span> (5 Images minimum)
+                                    Drag and drop images or <span 
+                                        className="text-blue-400 cursor-pointer hover:text-blue-300 underline" 
+                                        onClick={() => document.getElementById('file-upload-modal')?.click()}
+                                    >
+                                        Browse
+                                    </span> (5 Images minimum)
                                 </p>
                             </div>
 
                             {/* File Upload Area */}
                             <div 
-                                className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+                                className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer ${
                                     dragActive 
                                         ? 'border-blue-500 bg-blue-500/10' 
                                         : 'border-neutral-600 hover:border-neutral-500'
@@ -594,6 +599,7 @@ function AddNewCharacterView({ onBack }: { onBack: () => void }) {
                                 onDragLeave={handleDrag}
                                 onDragOver={handleDrag}
                                 onDrop={handleDrop}
+                                onClick={() => document.getElementById('file-upload-modal')?.click()}
                             >
                                 <Upload className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
                                 <input 

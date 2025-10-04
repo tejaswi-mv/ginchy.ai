@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import { getUser } from '@/lib/db/queries';
+import { db } from '@/lib/db/drizzle';
+import { userUploadedImages } from '@/lib/db/schema';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,24 +36,77 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop();
     const fileName = `${type}_${user.id}_${timestamp}_${randomString}.${fileExtension}`;
 
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Try Supabase Storage first, fallback to local storage
+    let publicUrl: string;
+    let uploadSuccess = false;
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
     try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist, ignore error
+      const supabase = await createClient();
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('user-uploads')
+        .upload(`user-${user.id}/${fileName}`, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.warn('Supabase upload failed, falling back to local storage:', uploadError);
+        throw new Error('Supabase bucket not available');
+      }
+
+      // Get public URL from Supabase Storage
+      const { data: { publicUrl: supabaseUrl } } = supabase.storage
+        .from('user-uploads')
+        .getPublicUrl(`user-${user.id}/${fileName}`);
+      
+      publicUrl = supabaseUrl;
+      uploadSuccess = true;
+    } catch (supabaseError) {
+      console.log('Using local storage fallback');
+      
+      // Fallback to local storage
+      const { writeFile, mkdir } = await import('fs/promises');
+      const { join } = await import('path');
+      
+      // Create uploads directory if it doesn't exist
+      const uploadsDir = join(process.cwd(), 'public', 'uploads');
+      try {
+        await mkdir(uploadsDir, { recursive: true });
+      } catch (error) {
+        // Directory might already exist, ignore error
+      }
+
+      // Convert file to buffer
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Save file to public/uploads directory
+      const filePath = join(uploadsDir, fileName);
+      await writeFile(filePath, buffer);
+
+      // Generate public URL
+      publicUrl = `/uploads/${fileName}`;
+      uploadSuccess = true;
     }
 
-    // Save file to public/uploads directory
-    const filePath = join(uploadsDir, fileName);
-    await writeFile(filePath, buffer);
-
-    // Generate public URL
-    const publicUrl = `/uploads/${fileName}`;
+    // Save image information to database
+    try {
+      await db.insert(userUploadedImages).values({
+        userId: user.id,
+        fileName: fileName,
+        originalName: file.name,
+        imageUrl: publicUrl,
+        fileSize: file.size,
+        mimeType: file.type,
+      });
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      // If database save fails, try to delete the uploaded file
+      await supabase.storage
+        .from('user-uploads')
+        .remove([`user-${user.id}/${fileName}`]);
+      return NextResponse.json({ error: 'Failed to save image metadata' }, { status: 500 });
+    }
 
     // For model photos, we could trigger NanoBanana model training here
     if (type === 'model') {
